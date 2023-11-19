@@ -25,7 +25,7 @@ function App() {
       <header className="App-header">
         <img src={logo} className="App-logo" alt="logo" />
         <p>
-          Voila notre debut de transcendance !
+          Ceci est un test 1 parce qu'on a pas d'imagination
         </p>
 		{data && <p>Données reçues de Nest: {data.message}</p>}
         <a
