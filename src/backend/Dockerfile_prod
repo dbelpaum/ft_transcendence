@@ -1,0 +1,21 @@
+# Étape de construction
+FROM node:21 as build
+ENV DATABASE_URL=postgresql://samir:samir@postgres:5432
+WORKDIR /app
+COPY ./nest/package*.json ./
+RUN npm install
+COPY ./nest/prisma ./prisma
+RUN npx prisma generate
+COPY ./nest/ .
+RUN npm run build
+
+# Étape de production
+FROM node:21
+WORKDIR /app
+COPY --from=build /app/dist ./dist
+COPY --from=build /app/node_modules ./node_modules
+COPY --from=build /app/prisma .
+EXPOSE 4000
+COPY ./conf/prod.sh /tmp/prod.sh
+RUN chmod +x /tmp/prod.sh
+CMD ["/tmp/prod.sh"]
