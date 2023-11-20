@@ -1,0 +1,19 @@
+.title h1
+{
+	font-size: 64px; letter-spacing: -1px; color: #DFBF84; text-transform: uppercase; text-shadow: 1px 1px 0 #000;
+	margin: 10px 0 24px; text-align: center; line-height: 50px;
+	color: white;
+	text-decoration: none;
+	transition: 0.2s;
+}
+
+.title h1:hover
+{
+	transform: scale(1.05);
+}
+
+.title h2
+{
+	margin-top: 72px;
+	margin-bottom: 30px;
+}
