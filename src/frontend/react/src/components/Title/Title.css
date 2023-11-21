@@ -1,10 +1,12 @@
+
 .title h1
 {
 	font-size: 64px; letter-spacing: -1px; color: #DFBF84; text-transform: uppercase; text-shadow: 1px 1px 0 #000;
 	margin: 10px 0 24px; text-align: center; line-height: 50px;
-	color: white;
+	color: darkturquoise;
 	text-decoration: none;
 	transition: 0.2s;
+	font-family: 'Andale Mono', monospace;
 }
 
 .title h1:hover
@@ -14,6 +16,7 @@
 
 .title h2
 {
+	font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
 	margin-top: 72px;
 	margin-bottom: 30px;
 }
