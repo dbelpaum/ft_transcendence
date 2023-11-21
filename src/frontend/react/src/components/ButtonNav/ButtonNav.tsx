@@ -1,6 +1,11 @@
 import React from "react";
 
-function ButtonNav({ color, text }) {
+interface ButtonNavProps {
+    color: string;
+    text: string;
+}
+
+function ButtonNav({ color, text }: ButtonNavProps) {
     const buttonStyle = {
         display: 'flex',
         alignItems: 'center',
@@ -15,13 +20,10 @@ function ButtonNav({ color, text }) {
         letterSpacing: '0.05em',
         borderRadius: '20em',
         cursor: 'pointer',
-        userSelect: 'none',
-        WebkitUserSelect: 'none',
-        touchAction: 'manipulation'
-
+        userSelect: 'none' as const, // Specify the type as 'none'
+        WebkitUserSelect: 'none' as const, // Specify the type as 'none'
+        touchAction: 'manipulation',
     };
-
-    
 
     return (
         <button style={buttonStyle}>
