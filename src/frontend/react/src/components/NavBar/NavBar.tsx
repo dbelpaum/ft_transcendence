@@ -15,7 +15,7 @@ function NavBar() {
 		document.body.classList.toggle('active');
     };
 	return (
-		<nav class="nav">
+		<nav className="nav">
 			<div className="pie pie1" onClick={retirerActive}>
 			<Link to="/game">
 			<div className="pie-color pie-color1">
