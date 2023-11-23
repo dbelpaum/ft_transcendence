@@ -5,7 +5,8 @@ import NavBar from './components/NavBar/NavBar';
 import Home from './pages/Home/Home'; 
 import Chat from './pages/Chat/Chat'; 
 import Game from './pages/Game/Game'; 
-import Profil from './pages/Profil/Profil'; 
+import Profil from './pages/Profil/Profil';
+import OAuth from './pages/OAuth/OAuth';
 // import Chat from './pages/Chat/Chat'; 
 
 
@@ -19,6 +20,7 @@ function App() {
 				<Route path="/game" element={<Game />} />
 				<Route path="/chat" element={<Chat />} />
 				<Route path="/profil" element={<Profil />} />
+				<Route path="/OAuth" element={<OAuth/>} />
 			</Routes>
 		</div>
 	  </Router>

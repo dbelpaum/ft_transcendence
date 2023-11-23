@@ -1,11 +1,13 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
 
 interface ButtonNavProps {
     color: string;
     text: string;
+    path:string;
 }
 
-function ButtonNav({ color, text }: ButtonNavProps) {
+function ButtonNav({ color, text, path }: ButtonNavProps) {
     const buttonStyle = {
         display: 'flex',
         alignItems: 'center',
@@ -23,10 +25,20 @@ function ButtonNav({ color, text }: ButtonNavProps) {
         userSelect: 'none' as const, // Specify the type as 'none'
         WebkitUserSelect: 'none' as const, // Specify the type as 'none'
         touchAction: 'manipulation',
+        width: '200px',
+        height: '50px',
+        lineHeight: '50px',
+        textAlign: 'center' as 'center'
+    };
+
+    let navigate = useNavigate();
+
+    const handleClick = () => {
+        navigate(path);
     };
 
     return (
-        <button style={buttonStyle}>
+        <button style={buttonStyle} onClick={handleClick}>
             {text}
         </button>
     );
