@@ -29,37 +29,41 @@ const GameScene: React.FC<GameSceneProps> = ({ width, height, initialGameMode })
 	  camera3D.position.set(0, -300, 180);
 	  camera3D.lookAt(scene.position);
       const renderer = new THREE.WebGLRenderer({ canvas: canvasRef.current, antialias: true });
+	  renderer.setClearColor(0x9999ee, 1);
 
       const paddleWidth = 80;
       const paddleHeight = 10;
-	  const paddleDepth = 10;
+	  const paddleDepth = 15;
 	  const paddleVelocity = 2; // Vitesse de déplacement
       const ballRadius = 5;
 	  let gameTick: number = 0;
-	  let speedModifier: number = 1;
+	  let ballSpeedModifier: number = 1;
 	  let cameraInUse: { camera: THREE.PerspectiveCamera; id: number } = { camera: camera, id: 0 };
 	  let playerScore: number = 0;
 	  let opponentScore: number = 0;
 
-	  const groundGeometry = new THREE.BoxGeometry(width/1.3, height/1.3, 1);
+	  const mainLight = new THREE.HemisphereLight(0xFFFFFF, 0x003300);
+	  scene.add(mainLight);
+
+	  const groundGeometry = new THREE.BoxGeometry(width/1.21, height/1.21, 1);
 	  const groundMaterial =  new THREE.MeshBasicMaterial({ color: 0x006000 });
 	  const ground = new THREE.Mesh(groundGeometry, groundMaterial);
-	  ground.position.y = 0;
+	  ground.position.set(0, 0, -25);
 
       const playerPaddle = new THREE.BoxGeometry(paddleWidth, paddleHeight, paddleDepth);
-      const playerMaterial = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
+      const playerMaterial = new THREE.MeshLambertMaterial({ color: 0x0000CC });
       const player = new THREE.Mesh(playerPaddle, playerMaterial);
       player.position.y = -height / 2.7; // Place at the bottom
       player.position.x = 0;
 
       const aiPaddle = new THREE.BoxGeometry(paddleWidth, paddleHeight, paddleDepth);
-      const aiMaterial = new THREE.MeshBasicMaterial({ color: 0xff0000 });
+      const aiMaterial = new THREE.MeshLambertMaterial({ color: 0xCC0000 });
       const ai = new THREE.Mesh(aiPaddle, aiMaterial);
       ai.position.y = height / 2.7; // Place at the top
       ai.position.x = 0;
 
       const SphereGeometry = new THREE.SphereGeometry(ballRadius, 32, 32);
-      const ballMaterial = new THREE.MeshBasicMaterial({ color: 0xffffff });
+      const ballMaterial = new THREE.MeshBasicMaterial({ color: 0xffffff }); // THREE.MeshLambertMaterial({ color: 0xCC0000 });
       const ball = new THREE.Mesh(SphereGeometry, ballMaterial);
 	  ball.position.z = 0;
 	  let ballVelX: number;
@@ -98,6 +102,7 @@ const GameScene: React.FC<GameSceneProps> = ({ width, height, initialGameMode })
 		player.position.x = 0;
 		ai.position.x = 0;
 		gameTick = 0;
+		ballSpeedModifier = 1;
 
 		const randomAngle = Math.PI / 3 * (Math.random() * 2 - 1);
 		ballVelX = Math.sin(randomAngle);
@@ -121,17 +126,23 @@ const GameScene: React.FC<GameSceneProps> = ({ width, height, initialGameMode })
       // Function for rendering the scene
 	  const renderScene = () => {
 		if (gameTick % 10 == 0 && divInfo) {
-			divInfo.innerHTML = 'camera	____:' +
+			divInfo.innerHTML = 'camera	:' +
 									'Position: (' + camera.position.x.toFixed(2) + ', ' + camera.position.y.toFixed(2) + ', ' + camera.position.z.toFixed(2) + ') | ' +
 									'Rotation: (' + camera.rotation.x.toFixed(2) + ', ' + camera.rotation.y.toFixed(2) + ', ' + camera.rotation.z.toFixed(2) + ')' +
 									'<br>camera3D	:' +
 									'Position: (' + camera3D.position.x.toFixed(2) + ', ' + camera3D.position.y.toFixed(2) + ', ' + camera3D.position.z.toFixed(2) + ') | ' +
-									'Rotation: (' + camera3D.rotation.x.toFixed(2) + ', ' + camera3D.rotation.y.toFixed(2) + ', ' + camera3D.rotation.z.toFixed(2) + ')';
+									'Rotation: (' + camera3D.rotation.x.toFixed(2) + ', ' + camera3D.rotation.y.toFixed(2) + ', ' + camera3D.rotation.z.toFixed(2) + ') ' +
+									'<br>ball: ' + 
+									'Speed: ' + ballSpeedModifier.toFixed(2) + ' | ' +
+									'Position: (' + ball.position.x.toFixed(2) + ', ' + ball.position.y.toFixed(2) + ', ' + ball.position.z.toFixed(2) + ') ';
 		}
 		if (divGameScore) {
 			divGameScore.textContent = 'Player ' + playerScore + ' - ' + opponentScore + ' Opponent';
 		}
-        // Move the ball
+
+		
+
+
 		if (ball.position.x > 300 || ball.position.x < -300)	// Rebonds murs
 			ballVelX = -ballVelX;
 
@@ -145,9 +156,13 @@ const GameScene: React.FC<GameSceneProps> = ({ width, height, initialGameMode })
 			newRound();
 		}
 		
-		speedModifier = 1 + gameTick / 10000;
-		ball.position.x += ballVelX * speedModifier;	// La balle se déplace
-		ball.position.y += ballVelY * speedModifier;
+		
+		ball.position.x += ballVelX * ballSpeedModifier;	// La balle se déplace
+		ball.position.y += ballVelY * ballSpeedModifier;
+
+		// Trajectoire 3D de la balle, = 0 si en caméra 2D
+		ball.position.z = (185 + (-0.004 * (ball.position.y ** 2))) * cameraInUse.id;
+
 
 		if (checkCollisions(player))	// Check joueur touche balle
 		{
@@ -158,6 +173,7 @@ const GameScene: React.FC<GameSceneProps> = ({ width, height, initialGameMode })
 			// Adjust ball's velocity based on the reflection angle
 			ballVelX = Math.sin(reflectionAngle);
 			ballVelY = Math.cos(reflectionAngle);
+			ballSpeedModifier = Math.exp(gameTick / 5000);
 		}
 		else if (checkCollisions(ai))	//	Check AI touche balle
 		{
@@ -168,12 +184,16 @@ const GameScene: React.FC<GameSceneProps> = ({ width, height, initialGameMode })
 			// Adjust ball's velocity based on the reflection angle
 			ballVelX = Math.sin(reflectionAngle);
 			ballVelY = -Math.cos(reflectionAngle);
+			ballSpeedModifier = Math.exp(gameTick / 5000);
 		}
 
 		AImovement();
 
 		if (isValidMovement(player.position.x, paddleRightSpeed - paddleLeftSpeed))
 			player.position.x += paddleRightSpeed - paddleLeftSpeed;
+
+		// Camera 3D Qui suit le joueur
+		camera3D.position.set(player.position.x, -300, 180);
 
         renderer.render(scene, cameraInUse.camera);
 		gameTick++;

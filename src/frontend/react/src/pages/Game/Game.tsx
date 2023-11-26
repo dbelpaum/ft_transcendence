@@ -24,6 +24,11 @@ const Game: React.FC = () => {
 			initialGameMode={selectedGameMode}
 		  />
 		  <div id="info"></div>
+		  {!selectedGameMode &&<div style={{ fontSize: '20px' }}>
+			<p><span className="keycap">A</span>/<span className="keycap">Q</span>/<span className="keycap">←</span> to move left</p>
+			<p><span className="keycap">D</span>/<span className="keycap">→</span> to move right</p>
+			<p><span className="keycap">R</span> to switch camera</p>
+		  </div>}
 		</div>
 	  );
 	};
