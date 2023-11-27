@@ -18,7 +18,7 @@ export class SoloGameLogic {
 	private mainLight: THREE.HemisphereLight;
 	private ground: THREE.Mesh;
 	private player: THREE.Mesh;
-	private ai: THREE.Mesh;
+	private opponent: THREE.Mesh;
 	private ball: THREE.Mesh;
 	private width: number;
 	private height: number;
@@ -57,11 +57,11 @@ export class SoloGameLogic {
 		this.player.position.y = -height / 2.7; // Place at the bottom
 		this.player.position.x = 0;
 
-		const aiPaddle = new THREE.BoxGeometry(this.paddleWidth, this.paddleHeight, this.paddleDepth);
-		const aiMaterial = new THREE.MeshLambertMaterial({ color: 0xCC0000 });
-		this.ai = new THREE.Mesh(aiPaddle, aiMaterial);
-		this.ai.position.y = height / 2.7; // Place at the top
-		this.ai.position.x = 0;
+		const opponentPaddle = new THREE.BoxGeometry(this.paddleWidth, this.paddleHeight, this.paddleDepth);
+		const opponentMaterial = new THREE.MeshLambertMaterial({ color: 0xCC0000 });
+		this.opponent = new THREE.Mesh(opponentPaddle, opponentMaterial);
+		this.opponent.position.y = height / 2.7; // Place at the top
+		this.opponent.position.x = 0;
 
 		const sphereGeometry = new THREE.SphereGeometry(this.ballRadius, 32, 32);
 		const ballMaterial = new THREE.MeshLambertMaterial({ color: 0xc45c23 });
@@ -72,7 +72,7 @@ export class SoloGameLogic {
 		this.ballVelX = Math.sin(randomAngle);
 		this.ballVelY = -Math.cos(randomAngle);
 
-		this.scene.add(this.ground, this.player, this.ai, this.ball);
+		this.scene.add(this.ground, this.player, this.opponent, this.ball);
 	}
 
 	private handleKeyDown(event: KeyboardEvent) {
@@ -133,7 +133,7 @@ export class SoloGameLogic {
 		this.ball.position.x = 0;
 		this.ball.position.y = 0;
 		this.player.position.x = 0;
-		this.ai.position.x = 0;
+		this.opponent.position.x = 0;
 		this.gameTick = 0;
 		this.ballSpeedModifier = 1;
 
@@ -149,11 +149,11 @@ export class SoloGameLogic {
 		);
 	}
 
-	private AImovement() {
-		if (this.ai.position.x < this.ball.position.x - 10 && this.isValidMovement(this.ai.position.x, this.paddleVelocity))
-			this.ai.position.x += this.paddleVelocity;
-		else if (this.ai.position.x > this.ball.position.x + 10 && this.isValidMovement(this.ai.position.x, -this.paddleVelocity))
-			this.ai.position.x -= this.paddleVelocity;
+	protected opponentMovement() {
+		if (this.opponent.position.x < this.ball.position.x - 10 && this.isValidMovement(this.opponent.position.x, this.paddleVelocity))
+			this.opponent.position.x += this.paddleVelocity;
+		else if (this.opponent.position.x > this.ball.position.x + 10 && this.isValidMovement(this.opponent.position.x, -this.paddleVelocity))
+			this.opponent.position.x -= this.paddleVelocity;
 	}
 
 	public renderScene() {
@@ -202,8 +202,8 @@ export class SoloGameLogic {
 			this.ballVelX = Math.sin(reflectionAngle);
 			this.ballVelY = Math.cos(reflectionAngle);
 			this.ballSpeedModifier = Math.exp(this.gameTick / 5000);
-		} else if (this.checkCollisions(this.ai)) {
-			const hitIndex = (this.ball.position.x - this.ai.position.x) / (this.paddleWidth / 2);
+		} else if (this.checkCollisions(this.opponent)) {
+			const hitIndex = (this.ball.position.x - this.opponent.position.x) / (this.paddleWidth / 2);
 			const maxReflectionAngle = Math.PI / 3;
 			const reflectionAngle = hitIndex * maxReflectionAngle;
 			this.ballVelX = Math.sin(reflectionAngle);
@@ -211,7 +211,7 @@ export class SoloGameLogic {
 			this.ballSpeedModifier = Math.exp(this.gameTick / 5000);
 		}
 
-		this.AImovement();
+		this.opponentMovement();
 
 		if (this.isValidMovement(this.player.position.x, this.paddleRightSpeed - this.paddleLeftSpeed)) {
 			this.player.position.x += this.paddleRightSpeed - this.paddleLeftSpeed;

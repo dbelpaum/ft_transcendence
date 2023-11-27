@@ -1,20 +1,13 @@
 import * as THREE from 'three';
+import { SoloGameLogic } from './SoloGameLogic';
 
-export class OnlineGameLogic {
-  // Online game logic here
-  constructor(canvas: HTMLCanvasElement, width: number, height: number) {
-    // Initialize Three.js scene, camera, and WebSocket connection
+export class OnlineGameLogic extends SoloGameLogic {
+  // Override opponent movement to handle websockets
+  override opponentMovement() {
+    // Implement opponent movement based on websockets information
+    // For example, update opponent position based on data received
+    // through websockets
   }
 
-  public setup(): void {
-    // Set up online game-specific logic, including WebSocket handling
-  }
-
-  public animate(): void {
-    // Implement online game animation loop
-  }
-
-  public dispose(): void {
-    // Clean up online game resources on component unmount, including WebSocket disconnection
-  }
+  // Add any additional methods or properties specific to online gameplay
 }

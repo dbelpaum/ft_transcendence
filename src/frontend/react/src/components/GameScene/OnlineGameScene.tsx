@@ -1,31 +1,36 @@
-// src/components/GameScene/OnlineGameScene.tsx
 import React, { useRef, useEffect } from 'react';
-import { OnlineGameLogic } from './common/OnlineGameLogic';
+import { OnlineGameLogic } from './common/OnlineGameLogic'; // Update the import to point to the correct file
 
 interface OnlineGameSceneProps {
-  // Add necessary props for online mode
+  width: number;
+  height: number;
 }
 
-const OnlineGameScene: React.FC<OnlineGameSceneProps> = () => {
+const OnlineGameScene: React.FC<OnlineGameSceneProps> = ({ width, height }) => {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
+  const gameLogicRef = useRef<OnlineGameLogic | null>(null);
 
   useEffect(() => {
-    if (canvasRef.current) {
+    if (canvasRef.current && !gameLogicRef.current) {
       // Use OnlineGameLogic for online mode
-      const onlineGame = new OnlineGameLogic(canvasRef.current, 800, 600); // Adjust width and height as needed
-      onlineGame.setup();
-      onlineGame.animate();
+      const onlineGame = new OnlineGameLogic(canvasRef.current, width, height);
+      onlineGame.startGame();
+      gameLogicRef.current = onlineGame;
 
       // Cleanup on component unmount
-      return () => onlineGame.dispose();
+      return () => {
+        if (gameLogicRef.current) {
+          gameLogicRef.current.dispose();
+        }
+      };
     }
-  }, []);
+  }, [width, height]);
 
   return (
     <canvas
       ref={canvasRef}
-      width={800} // Adjust width as needed
-      height={600} // Adjust height as needed
+      width={width}
+      height={height}
       tabIndex={0}
     />
   );

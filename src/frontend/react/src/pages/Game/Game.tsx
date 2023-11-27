@@ -17,7 +17,7 @@ const Game: React.FC = () => {
       {!selectedGameMode && <GameModeButtons onSelectMode={handleSelectMode} />}
       <div id="gameScore"></div>
       {selectedGameMode === 'solo' && <SoloGameScene width={800} height={600} />}
-      {selectedGameMode === 'online' && <OnlineGameScene />}
+      {selectedGameMode === 'online' && <OnlineGameScene width={800} height={600}/>}
       <div id="info"></div>
       {!selectedGameMode && (
         <div style={{ fontSize: '20px' }}>
