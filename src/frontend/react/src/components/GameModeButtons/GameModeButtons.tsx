@@ -9,7 +9,7 @@ const GameModeButtons: React.FC<GameModeButtonsProps> = ({ onSelectMode }) => {
 	  <div style={{ textAlign: 'center', marginTop: '20px' }}>
 		<button
 		  style={buttonStyle}
-		  onClick={() => onSelectMode('ai')}
+		  onClick={() => onSelectMode('solo')}
 		>
 		  Play alone
 		</button>
