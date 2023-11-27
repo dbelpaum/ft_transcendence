@@ -1,0 +1,44 @@
+    /* Style pour la boîte de chat */
+    .chat-box {
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      padding: 10px;
+      max-width: 400px;
+      margin: 0 auto;
+      font-family: Arial, sans-serif;
+    }
+
+    /* Style pour les messages */
+    .chat-messages div {
+      margin-bottom: 5px;
+    }
+
+    /* Style pour le formulaire */
+    .chat-form input[type="text"] {
+      width: calc(100% - 70px);
+      padding: 8px;
+      border: 1px solid #ccc;
+      border-radius: 3px;
+    }
+
+    .chat-form button {
+      padding: 8px 15px;
+      border: none;
+      border-radius: 3px;
+      background-color: #007bff;
+      color: #fff;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    .chat-form button:hover {
+      background-color: #0056b3;
+    }
+  
+  .centered {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%; /* Utilisez la hauteur souhaitée ou % pour centrer verticalement */
+    text-align: center; /* Pour centrer horizontalement */
+  }
