@@ -6,24 +6,81 @@ import ChatContainer from './ChatContainer';
 
 function Chat() {
 	const [messages, setMessages] = useState([]);
-	// const [username, setUsername] = useState<string | null>(null);
+	
+	const [usernameInput, setUsernameInput] = useState<string>('');
+	const [username, setUsername] = useState<string | null>(null);
+    const [error, setError] = useState<string | null>(null);
 
-	// const handleUsernameSubmit = (enteredUsername: string) => {
-	// 	setUsername(enteredUsername.trim() !== '' ? enteredUsername : null);
-	//   };
+	const handleUsernameChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+		setUsernameInput(event.target.value);
+	};
+   
+	const handleUsernameSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+		event.preventDefault();
+		if (usernameInput.trim() !== '') {
+		 setUsername(usernameInput);
+		 setError(null);
+		} else {
+		 setError('Veuillez entrer un nom d\'utilisateur');
+		}
+		};
 
 	return (
-	<div className='container'>
-		<div className='channels'>
-			<h1> Channels</h1>
-			<h4>On verra apres</h4>
+		<div>
+		  {username ? (
+			  <div>
+				<h1>Bienvenue sur le chat {username} !</h1>
+			  { 
+				  <div className='container'>
+				  <div className='channels'>
+					  <h1> Channels</h1>
+					  <h4>On verra apres</h4>
+				  </div>
+				  <div className='chat'>
+					  <ChatContainer username={username} messages={messages} setMessages={setMessages} />
+				  </div>
+			  </div>
+			  }
+			</div>
+		  ) : (
+			  <div className='centered'>
+				<form onSubmit={handleUsernameSubmit}>
+				<img src="https://i.imgflip.com/7i61hx.jpg" alt='test'/>
+				<h1>Veuillez entrer votre nom</h1>
+				<input type="text" value={usernameInput} onChange={handleUsernameChange} />
+				{error && <p>{error}</p>}
+				<button type="submit">Envoyer</button>
+				</form>
+			</div>
+		  )}
 		</div>
-		<div className='chat'>
-			<h1>Little Chat</h1>
-			<ChatContainer messages={messages} setMessages={setMessages} />
-		</div>
-	</div>
-	);
+		);
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	// return (
+	// <div>
+		
+	// <div className='container'>
+	// 	<div className='channels'>
+	// 		<h1> Channels</h1>
+	// 		<h4>On verra apres</h4>
+	// 	</div>
+	// 	<div className='chat'>
+	// 		<h1>Little Chat</h1>
+	// 		<ChatContainer messages={messages} setMessages={setMessages} />
+	// 	</div>
+	// </div>
+
+
+	// </div>
+	// );
 }
 
 export default Chat;

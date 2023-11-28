@@ -2,10 +2,10 @@ import React from 'react';
 import MessageList from './MessageList';
 import MessageInput from './MessageInput';
 
-function ChatContainer({messages, setMessages}: any) {
+function ChatContainer({username, messages, setMessages}: any) {
     return (
         <div className='chat-box'>
-            <MessageList messages={messages} />
+            <MessageList username={username} messages={messages} />
             <MessageInput setMessages={setMessages} />
 
 
