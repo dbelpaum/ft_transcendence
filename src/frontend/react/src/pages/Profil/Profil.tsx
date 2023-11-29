@@ -12,7 +12,7 @@ function Profil() {
 
     useEffect(() => {
         // Effectuer la requête HTTP ici
-        fetch('http://localhost:4000/sam-test')
+        fetch('https://localhost:4000/sam-test')
             .then(response => response.json())
             .then(data => {
                 console.log("je rentre dans le then");
