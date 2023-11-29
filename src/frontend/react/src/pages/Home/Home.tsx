@@ -19,7 +19,7 @@ function Home(props: HomeProps) {
                 <img src={logo} alt="Logo" />
             </section>
             <div className="button_auth">
-                <ButtonNav text="Login with 42" color="DarkTurquoise" path='../OAuth'/>
+                <ButtonNav text="Login with 42" color="DarkTurquoise" path='https://localhost:4000/authentification/42'/>
                 {/* <br/>
                 <ButtonNav text="Login with Google" color="IndianRed" />
                 <br/>

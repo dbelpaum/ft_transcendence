@@ -19,7 +19,7 @@ const app = await NestFactory.create(AppModule, {
 	httpsOptions
 });
   app.enableCors({
-    origin: "http://localhost:3000",
+    origin: "https://localhost:3000",
 	credentials:true, // Autorise les requêtes de l'application React
   });
 	app.enableCors()
