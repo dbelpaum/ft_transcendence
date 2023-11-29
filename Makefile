@@ -5,7 +5,6 @@ RESET		= 	\033[0m
 DATA_PATH	= /home/snaggara/data
 
 all		:
-
 	@docker compose up --build
 	@echo "$(GREEN)Création des dockers terminés\nLe site est pret (enfin dans 10 secondes)!\n$(RESET)"
 down	:
@@ -15,6 +14,7 @@ down	:
 cert:
 	@echo "Exécution du script Bash..."
 	@sudo bash cert.sh
+	@sudo update-ca-certificates
 fclean	:
 	@sudo docker compose down -v
 	@echo "$(GREEN)\nLes volumes ont bien été supprimés !$(RESET)"
