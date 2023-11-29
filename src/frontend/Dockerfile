@@ -2,6 +2,10 @@
 FROM node:21 as build
 WORKDIR /app
 EXPOSE 3000
+COPY ./conf/react_cert.pem /var/react_cert.pem 
+COPY ./conf/react_key.pem /var/react_key.pem 
+RUN chmod 777 /var/*.pem
+
 CMD ["bash", "-c", "npm install && npm start"]
 
 #Étape de production
