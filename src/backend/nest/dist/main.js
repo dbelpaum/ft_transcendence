@@ -450,6 +450,10 @@ async function bootstrap() {
     const app = await core_1.NestFactory.create(app_module_1.AppModule, {
         httpsOptions
     });
+    app.enableCors({
+        origin: "https://localhost:3000",
+        credentials: true,
+    });
     app.enableCors();
     await app.listen(4000);
 }

@@ -34,17 +34,18 @@ function ButtonNav({ color, text, path }: ButtonNavProps) {
 
     const handleClick = () => {
         console.log("path: ", path);
-          fetch(path, {
-            method: 'GET',
-          })
-            .then(response => {
-              if (response.ok) {
-                // Effectuez la redirection ici après le succès de la requête
-                window.location.href = path;
-              } else {
-                console.error('Erreur lors de la requête');
-              }
-            })
+        fetch(path, {
+          method: 'GET',
+      })
+      .then(response => {
+          if (response.ok) {
+              window.location.href = path;
+          } else {
+              console.error('Error during the request:', response.statusText);
+          }
+      })
+      .catch(error => console.error('Fetch error:', error));
+            };
 
     return (
         <button style={buttonStyle} onClick={handleClick}>
@@ -52,6 +53,5 @@ function ButtonNav({ color, text, path }: ButtonNavProps) {
         </button>
     );
   }
-}
 
 export default ButtonNav;
