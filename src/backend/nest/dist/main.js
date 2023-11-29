@@ -387,6 +387,16 @@ module.exports = require("dotenv");
 
 module.exports = require("passport-42");
 
+/***/ }),
+
+/***/ "fs":
+/*!*********************!*\
+  !*** external "fs" ***!
+  \*********************/
+/***/ ((module) => {
+
+module.exports = require("fs");
+
 /***/ })
 
 /******/ 	});
@@ -426,11 +436,20 @@ var exports = __webpack_exports__;
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 const core_1 = __webpack_require__(/*! @nestjs/core */ "@nestjs/core");
+const fs = __webpack_require__(/*! fs */ "fs");
 const app_module_1 = __webpack_require__(/*! ./app.module */ "./src/app.module.ts");
 const dotenv = __webpack_require__(/*! dotenv */ "dotenv");
 async function bootstrap() {
     dotenv.config();
-    const app = await core_1.NestFactory.create(app_module_1.AppModule);
+    const cert = fs.readFileSync('/var/nest_cert.pem', 'utf8');
+    const key = fs.readFileSync('/var/nest_key.pem', 'utf8');
+    const httpsOptions = {
+        key: key,
+        cert: cert,
+    };
+    const app = await core_1.NestFactory.create(app_module_1.AppModule, {
+        httpsOptions
+    });
     app.enableCors();
     await app.listen(4000);
 }
