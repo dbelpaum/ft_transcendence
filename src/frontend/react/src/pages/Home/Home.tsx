@@ -5,7 +5,6 @@ import { BrowserRouter as Router, Route, Routes, Link} from 'react-router-dom';
 import accueil from './accueil.png';
 import logo from './logo_pong.png'
 import ButtonNav from '../../components/ButtonNav/ButtonNav';
-import OAuth from '../OAuth/OAuth'
 import test from '../Chat/Chat'
 
 

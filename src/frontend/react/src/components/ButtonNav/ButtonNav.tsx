@@ -31,17 +31,27 @@ function ButtonNav({ color, text, path }: ButtonNavProps) {
         textAlign: 'center' as 'center'
     };
 
-    let navigate = useNavigate();
 
     const handleClick = () => {
-        navigate(path);
-    };
+        console.log("path: ", path);
+          fetch(path, {
+            method: 'GET',
+          })
+            .then(response => {
+              if (response.ok) {
+                // Effectuez la redirection ici après le succès de la requête
+                window.location.href = path;
+              } else {
+                console.error('Erreur lors de la requête');
+              }
+            })
 
     return (
         <button style={buttonStyle} onClick={handleClick}>
             {text}
         </button>
     );
+  }
 }
 
 export default ButtonNav;
