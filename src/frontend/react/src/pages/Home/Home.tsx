@@ -19,7 +19,8 @@ function Home(props: HomeProps) {
                 <img src={logo} alt="Logo" />
             </section>
             <div className="button_auth">
-                <ButtonNav text="Login with 42" color="DarkTurquoise" path='https://localhost:4000/authentification/42'/>
+                <ButtonNav text="Login with 42" color="DarkTurquoise" path="https://localhost:4000/authentification/42" />
+            {/* <a href="https://localhost:4000/authentification/42" target="_blank" rel="noopener noreferrer">{"auth42"}</a> */}
                 {/* <br/>
                 <ButtonNav text="Login with Google" color="IndianRed" />
                 <br/>
