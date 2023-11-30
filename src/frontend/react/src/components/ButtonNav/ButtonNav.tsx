@@ -31,17 +31,25 @@ function ButtonNav({ color, text, path }: ButtonNavProps) {
         textAlign: 'center' as 'center'
     };
 
-    let navigate = useNavigate();
 
     const handleClick = () => {
-        navigate(path);
-    };
+        console.log("path: ", path);
+        fetch(path, {
+          method: 'GET',
+      })
+      .then(response => {
+          if (response.ok) {
+              window.location.href = path;
+          } else {
+              console.error('Error during the request:', response.statusText);
+          }
+      })
+      .catch(error => console.error('Fetch error:', error));
+            };
 
     return (
-        <button style={buttonStyle} onClick={handleClick}>
-            {text}
-        </button>
+        <a style={buttonStyle} href="https://localhost:4000/authentification/42" target="_blank" rel="noopener noreferrer">{text}</a>
     );
-}
+  }
 
 export default ButtonNav;

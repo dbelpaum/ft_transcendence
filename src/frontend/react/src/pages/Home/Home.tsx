@@ -5,7 +5,6 @@ import { BrowserRouter as Router, Route, Routes, Link} from 'react-router-dom';
 import accueil from './accueil.png';
 import logo from './logo_pong.png'
 import ButtonNav from '../../components/ButtonNav/ButtonNav';
-import OAuth from '../OAuth/OAuth'
 import test from '../Chat/Chat'
 
 
@@ -20,7 +19,8 @@ function Home(props: HomeProps) {
                 <img src={logo} alt="Logo" />
             </section>
             <div className="button_auth">
-                <ButtonNav text="Login with 42" color="DarkTurquoise" path='../OAuth'/>
+                <ButtonNav text="Login with 42" color="DarkTurquoise" path="https://localhost:4000/authentification/42" />
+            {/* <a href="https://localhost:4000/authentification/42" target="_blank" rel="noopener noreferrer">{"auth42"}</a> */}
                 {/* <br/>
                 <ButtonNav text="Login with Google" color="IndianRed" />
                 <br/>
