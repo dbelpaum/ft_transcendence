@@ -48,7 +48,7 @@ function ButtonNav({ color, text, path }: ButtonNavProps) {
             };
 
     return (
-        <a style={buttonStyle} href="https://localhost:4000/authentification/42" target="_blank" rel="noopener noreferrer">{text}</a>
+        <a style={buttonStyle} href={path} target="_blank" rel="noopener noreferrer">{text}</a>
     );
   }
 
