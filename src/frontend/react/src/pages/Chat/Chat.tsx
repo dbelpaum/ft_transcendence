@@ -56,31 +56,6 @@ function Chat() {
 		</div>
 		);
 	
-	
-	
-	
-	
-	
-	
-	
-	
-	// return (
-	// <div>
-		
-	// <div className='container'>
-	// 	<div className='channels'>
-	// 		<h1> Channels</h1>
-	// 		<h4>On verra apres</h4>
-	// 	</div>
-	// 	<div className='chat'>
-	// 		<h1>Little Chat</h1>
-	// 		<ChatContainer messages={messages} setMessages={setMessages} />
-	// 	</div>
-	// </div>
-
-
-	// </div>
-	// );
 }
 
 export default Chat;
