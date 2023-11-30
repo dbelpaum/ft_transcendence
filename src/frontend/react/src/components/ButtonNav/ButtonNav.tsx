@@ -48,9 +48,7 @@ function ButtonNav({ color, text, path }: ButtonNavProps) {
             };
 
     return (
-        <button style={buttonStyle} onClick={handleClick}>
-            {text}
-        </button>
+        <a style={buttonStyle} href={path} target="_blank" rel="noopener noreferrer">{text}</a>
     );
   }
 
