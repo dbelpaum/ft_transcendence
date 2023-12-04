@@ -3,6 +3,7 @@ import './Chat.css'; // Importation de styles spécifiques à la page d'accueil
 // import Title from '../../components/Title/Title';
 // import chat from './chat.png';
 import ChatContainer from './ChatContainer';
+import io from 'socket.io-client'
 
 function Chat() {
 	const [messages, setMessages] = useState([]);
