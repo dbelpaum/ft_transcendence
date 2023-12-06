@@ -1,5 +1,4 @@
 /******/ (() => { // webpackBootstrap
-/******/ 	"use strict";
 /******/ 	var __webpack_modules__ = ({
 
 /***/ "./src/app.controller.ts":
@@ -8,6 +7,7 @@
   \*******************************/
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
+"use strict";
 
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
@@ -52,6 +52,7 @@ exports.AppController = AppController = __decorate([
   \***************************/
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
+"use strict";
 
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
@@ -67,12 +68,13 @@ const app_service_1 = __webpack_require__(/*! ./app.service */ "./src/app.servic
 const sam_test_controller_1 = __webpack_require__(/*! ./sam-test/sam-test.controller */ "./src/sam-test/sam-test.controller.ts");
 const prisma_service_1 = __webpack_require__(/*! ./prisma.service */ "./src/prisma.service.ts");
 const authentification_module_1 = __webpack_require__(/*! ./authentification/authentification.module */ "./src/authentification/authentification.module.ts");
+const chat_module_1 = __webpack_require__(/*! ./chat/chat.module */ "./src/chat/chat.module.ts");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
 exports.AppModule = AppModule = __decorate([
     (0, common_1.Module)({
-        imports: [authentification_module_1.AuthentificationModule],
+        imports: [authentification_module_1.AuthentificationModule, chat_module_1.ChatModule],
         controllers: [app_controller_1.AppController, sam_test_controller_1.SamTestController],
         providers: [app_service_1.AppService, prisma_service_1.PrismaService],
     })
@@ -87,6 +89,7 @@ exports.AppModule = AppModule = __decorate([
   \****************************/
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
+"use strict";
 
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
@@ -116,6 +119,7 @@ exports.AppService = AppService = __decorate([
   \*************************************************************/
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
+"use strict";
 
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
@@ -170,6 +174,7 @@ exports.AuthentificationController = AuthentificationController = __decorate([
   \*********************************************************/
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
+"use strict";
 
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
@@ -201,6 +206,7 @@ exports.AuthentificationModule = AuthentificationModule = __decorate([
   \***********************************************************/
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
+"use strict";
 
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
@@ -241,12 +247,114 @@ exports.FortyTwoService = FortyTwoService = __decorate([
 
 /***/ }),
 
+/***/ "./src/chat/chat.gateway.ts":
+/*!**********************************!*\
+  !*** ./src/chat/chat.gateway.ts ***!
+  \**********************************/
+/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
+
+"use strict";
+
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+var __param = (this && this.__param) || function (paramIndex, decorator) {
+    return function (target, key) { decorator(target, key, paramIndex); }
+};
+var _a, _b, _c;
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.ChatGateway = void 0;
+const websockets_1 = __webpack_require__(/*! @nestjs/websockets */ "@nestjs/websockets");
+const common_1 = __webpack_require__(/*! @nestjs/common */ "@nestjs/common");
+const chat_interface_1 = __webpack_require__(/*! ./chat.interface */ "./src/chat/chat.interface.ts");
+const socket_io_1 = __webpack_require__(/*! socket.io */ "socket.io");
+let ChatGateway = class ChatGateway {
+    constructor() {
+        this.server = new socket_io_1.Server();
+        this.logger = new common_1.Logger('ChatGateway');
+    }
+    async handleEvent(payload) {
+        this.logger.log(payload);
+        this.server.emit('chat', payload);
+        return payload;
+    }
+};
+exports.ChatGateway = ChatGateway;
+__decorate([
+    (0, websockets_1.WebSocketServer)(),
+    __metadata("design:type", typeof (_a = typeof socket_io_1.Server !== "undefined" && socket_io_1.Server) === "function" ? _a : Object)
+], ChatGateway.prototype, "server", void 0);
+__decorate([
+    (0, websockets_1.SubscribeMessage)('chat'),
+    __param(0, (0, websockets_1.MessageBody)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [typeof (_b = typeof chat_interface_1.Message !== "undefined" && chat_interface_1.Message) === "function" ? _b : Object]),
+    __metadata("design:returntype", typeof (_c = typeof Promise !== "undefined" && Promise) === "function" ? _c : Object)
+], ChatGateway.prototype, "handleEvent", null);
+exports.ChatGateway = ChatGateway = __decorate([
+    (0, websockets_1.WebSocketGateway)({
+        cors: {
+            origin: '*',
+        },
+    })
+], ChatGateway);
+
+
+/***/ }),
+
+/***/ "./src/chat/chat.interface.ts":
+/*!************************************!*\
+  !*** ./src/chat/chat.interface.ts ***!
+  \************************************/
+/***/ (() => {
+
+
+
+/***/ }),
+
+/***/ "./src/chat/chat.module.ts":
+/*!*********************************!*\
+  !*** ./src/chat/chat.module.ts ***!
+  \*********************************/
+/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
+
+"use strict";
+
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.ChatModule = void 0;
+const common_1 = __webpack_require__(/*! @nestjs/common */ "@nestjs/common");
+const chat_gateway_1 = __webpack_require__(/*! ./chat.gateway */ "./src/chat/chat.gateway.ts");
+let ChatModule = class ChatModule {
+};
+exports.ChatModule = ChatModule;
+exports.ChatModule = ChatModule = __decorate([
+    (0, common_1.Module)({
+        providers: [chat_gateway_1.ChatGateway]
+    })
+], ChatModule);
+
+
+/***/ }),
+
 /***/ "./src/prisma.service.ts":
 /*!*******************************!*\
   !*** ./src/prisma.service.ts ***!
   \*******************************/
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
+"use strict";
 
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
@@ -281,6 +389,7 @@ exports.PrismaService = PrismaService = __decorate([
   \*********************************************/
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
+"use strict";
 
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
@@ -335,6 +444,7 @@ exports.SamTestController = SamTestController = __decorate([
   \*********************************/
 /***/ ((module) => {
 
+"use strict";
 module.exports = require("@nestjs/common");
 
 /***/ }),
@@ -345,6 +455,7 @@ module.exports = require("@nestjs/common");
   \*******************************/
 /***/ ((module) => {
 
+"use strict";
 module.exports = require("@nestjs/core");
 
 /***/ }),
@@ -355,7 +466,19 @@ module.exports = require("@nestjs/core");
   \***********************************/
 /***/ ((module) => {
 
+"use strict";
 module.exports = require("@nestjs/passport");
+
+/***/ }),
+
+/***/ "@nestjs/websockets":
+/*!*************************************!*\
+  !*** external "@nestjs/websockets" ***!
+  \*************************************/
+/***/ ((module) => {
+
+"use strict";
+module.exports = require("@nestjs/websockets");
 
 /***/ }),
 
@@ -365,6 +488,7 @@ module.exports = require("@nestjs/passport");
   \*********************************/
 /***/ ((module) => {
 
+"use strict";
 module.exports = require("@prisma/client");
 
 /***/ }),
@@ -375,6 +499,7 @@ module.exports = require("@prisma/client");
   \*************************/
 /***/ ((module) => {
 
+"use strict";
 module.exports = require("dotenv");
 
 /***/ }),
@@ -385,7 +510,19 @@ module.exports = require("dotenv");
   \******************************/
 /***/ ((module) => {
 
+"use strict";
 module.exports = require("passport-42");
+
+/***/ }),
+
+/***/ "socket.io":
+/*!****************************!*\
+  !*** external "socket.io" ***!
+  \****************************/
+/***/ ((module) => {
+
+"use strict";
+module.exports = require("socket.io");
 
 /***/ }),
 
@@ -395,6 +532,7 @@ module.exports = require("passport-42");
   \*********************/
 /***/ ((module) => {
 
+"use strict";
 module.exports = require("fs");
 
 /***/ })
@@ -427,8 +565,9 @@ module.exports = require("fs");
 /******/ 	
 /************************************************************************/
 var __webpack_exports__ = {};
-// This entry need to be wrapped in an IIFE because it need to be isolated against other modules in the chunk.
+// This entry need to be wrapped in an IIFE because it need to be in strict mode.
 (() => {
+"use strict";
 var exports = __webpack_exports__;
 /*!*********************!*\
   !*** ./src/main.ts ***!
