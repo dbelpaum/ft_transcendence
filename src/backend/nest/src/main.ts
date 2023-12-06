@@ -2,7 +2,6 @@ import { NestFactory } from '@nestjs/core';
 import * as fs from 'fs';
 import { AppModule } from './app.module';
 import * as dotenv from 'dotenv';
-import * as https from 'https';
 
 async function bootstrap() {
 	dotenv.config();
@@ -15,11 +14,9 @@ const httpsOptions = {
 	cert: cert,
   };
 
-const app = await NestFactory.create(AppModule, {
-	httpsOptions
-});
+const app = await NestFactory.create(AppModule);
   app.enableCors({
-    origin: "https://localhost:3000",
+    origin: "http://localhost:3000",
 	credentials:true, // Autorise les requêtes de l'application React
   });
 	app.enableCors()

@@ -1,4 +1,5 @@
 /******/ (() => { // webpackBootstrap
+/******/ 	"use strict";
 /******/ 	var __webpack_modules__ = ({
 
 /***/ "./src/app.controller.ts":
@@ -7,7 +8,6 @@
   \*******************************/
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
-"use strict";
 
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
@@ -52,7 +52,6 @@ exports.AppController = AppController = __decorate([
   \***************************/
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
-"use strict";
 
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
@@ -69,7 +68,18 @@ const sam_test_controller_1 = __webpack_require__(/*! ./sam-test/sam-test.contro
 const prisma_service_1 = __webpack_require__(/*! ./prisma.service */ "./src/prisma.service.ts");
 const authentification_module_1 = __webpack_require__(/*! ./authentification/authentification.module */ "./src/authentification/authentification.module.ts");
 const chat_module_1 = __webpack_require__(/*! ./chat/chat.module */ "./src/chat/chat.module.ts");
+const session = __webpack_require__(/*! express-session */ "express-session");
 let AppModule = class AppModule {
+    configure(consumer) {
+        consumer
+            .apply(session({
+            secret: 'g5fd6gfd564gdf54az65ecx',
+            resave: false,
+            saveUninitialized: false,
+            cookie: { secure: false }
+        }))
+            .forRoutes('*');
+    }
 };
 exports.AppModule = AppModule;
 exports.AppModule = AppModule = __decorate([
@@ -89,7 +99,6 @@ exports.AppModule = AppModule = __decorate([
   \****************************/
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
-"use strict";
 
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
@@ -119,7 +128,6 @@ exports.AppService = AppService = __decorate([
   \*************************************************************/
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
-"use strict";
 
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
@@ -133,6 +141,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 var __param = (this && this.__param) || function (paramIndex, decorator) {
     return function (target, key) { decorator(target, key, paramIndex); }
 };
+var _a, _b;
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.AuthentificationController = void 0;
 const common_1 = __webpack_require__(/*! @nestjs/common */ "@nestjs/common");
@@ -140,8 +149,26 @@ const passport_1 = __webpack_require__(/*! @nestjs/passport */ "@nestjs/passport
 let AuthentificationController = class AuthentificationController {
     async login42(req) {
     }
-    async callback42(req) {
+    async callback42(req, session) {
+        const apiResponse = await fetch('https://api.intra.42.fr/v2/me', {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${req.user.accessToken}`,
+                'Content-Type': 'application/json'
+            }
+        });
+        const userData = await apiResponse.json();
+        session.user = { id: userData.id, login: userData.login, email: userData.email };
         return req.user;
+    }
+    async profilSession42(req, session) {
+        if (session.user) {
+            return session.user;
+        }
+        else {
+            return 'Aucun utilisateur connecté';
+            return req.user;
+        }
     }
 };
 exports.AuthentificationController = AuthentificationController;
@@ -157,10 +184,19 @@ __decorate([
     (0, common_1.Get)('42/callback'),
     (0, common_1.UseGuards)((0, passport_1.AuthGuard)('42')),
     __param(0, (0, common_1.Req)()),
+    __param(1, (0, common_1.Session)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Object]),
+    __metadata("design:paramtypes", [Object, typeof (_a = typeof Record !== "undefined" && Record) === "function" ? _a : Object]),
     __metadata("design:returntype", Promise)
 ], AuthentificationController.prototype, "callback42", null);
+__decorate([
+    (0, common_1.Get)('42/profil'),
+    __param(0, (0, common_1.Req)()),
+    __param(1, (0, common_1.Session)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, typeof (_b = typeof Record !== "undefined" && Record) === "function" ? _b : Object]),
+    __metadata("design:returntype", Promise)
+], AuthentificationController.prototype, "profilSession42", null);
 exports.AuthentificationController = AuthentificationController = __decorate([
     (0, common_1.Controller)('authentification')
 ], AuthentificationController);
@@ -174,7 +210,6 @@ exports.AuthentificationController = AuthentificationController = __decorate([
   \*********************************************************/
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
-"use strict";
 
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
@@ -206,7 +241,6 @@ exports.AuthentificationModule = AuthentificationModule = __decorate([
   \***********************************************************/
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
-"use strict";
 
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
@@ -253,7 +287,6 @@ exports.FortyTwoService = FortyTwoService = __decorate([
   \**********************************/
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
-"use strict";
 
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
@@ -312,8 +345,10 @@ exports.ChatGateway = ChatGateway = __decorate([
 /*!************************************!*\
   !*** ./src/chat/chat.interface.ts ***!
   \************************************/
-/***/ (() => {
+/***/ ((__unused_webpack_module, exports) => {
 
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
 
 
 /***/ }),
@@ -324,7 +359,6 @@ exports.ChatGateway = ChatGateway = __decorate([
   \*********************************/
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
-"use strict";
 
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
@@ -354,7 +388,6 @@ exports.ChatModule = ChatModule = __decorate([
   \*******************************/
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
-"use strict";
 
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
@@ -389,7 +422,6 @@ exports.PrismaService = PrismaService = __decorate([
   \*********************************************/
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
-"use strict";
 
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
@@ -444,7 +476,6 @@ exports.SamTestController = SamTestController = __decorate([
   \*********************************/
 /***/ ((module) => {
 
-"use strict";
 module.exports = require("@nestjs/common");
 
 /***/ }),
@@ -455,7 +486,6 @@ module.exports = require("@nestjs/common");
   \*******************************/
 /***/ ((module) => {
 
-"use strict";
 module.exports = require("@nestjs/core");
 
 /***/ }),
@@ -466,7 +496,6 @@ module.exports = require("@nestjs/core");
   \***********************************/
 /***/ ((module) => {
 
-"use strict";
 module.exports = require("@nestjs/passport");
 
 /***/ }),
@@ -477,7 +506,6 @@ module.exports = require("@nestjs/passport");
   \*************************************/
 /***/ ((module) => {
 
-"use strict";
 module.exports = require("@nestjs/websockets");
 
 /***/ }),
@@ -488,7 +516,6 @@ module.exports = require("@nestjs/websockets");
   \*********************************/
 /***/ ((module) => {
 
-"use strict";
 module.exports = require("@prisma/client");
 
 /***/ }),
@@ -499,8 +526,17 @@ module.exports = require("@prisma/client");
   \*************************/
 /***/ ((module) => {
 
-"use strict";
 module.exports = require("dotenv");
+
+/***/ }),
+
+/***/ "express-session":
+/*!**********************************!*\
+  !*** external "express-session" ***!
+  \**********************************/
+/***/ ((module) => {
+
+module.exports = require("express-session");
 
 /***/ }),
 
@@ -510,7 +546,6 @@ module.exports = require("dotenv");
   \******************************/
 /***/ ((module) => {
 
-"use strict";
 module.exports = require("passport-42");
 
 /***/ }),
@@ -521,7 +556,6 @@ module.exports = require("passport-42");
   \****************************/
 /***/ ((module) => {
 
-"use strict";
 module.exports = require("socket.io");
 
 /***/ }),
@@ -532,7 +566,6 @@ module.exports = require("socket.io");
   \*********************/
 /***/ ((module) => {
 
-"use strict";
 module.exports = require("fs");
 
 /***/ })
@@ -565,9 +598,8 @@ module.exports = require("fs");
 /******/ 	
 /************************************************************************/
 var __webpack_exports__ = {};
-// This entry need to be wrapped in an IIFE because it need to be in strict mode.
+// This entry need to be wrapped in an IIFE because it need to be isolated against other modules in the chunk.
 (() => {
-"use strict";
 var exports = __webpack_exports__;
 /*!*********************!*\
   !*** ./src/main.ts ***!
@@ -586,11 +618,9 @@ async function bootstrap() {
         key: key,
         cert: cert,
     };
-    const app = await core_1.NestFactory.create(app_module_1.AppModule, {
-        httpsOptions
-    });
+    const app = await core_1.NestFactory.create(app_module_1.AppModule);
     app.enableCors({
-        origin: "https://localhost:3000",
+        origin: "http://localhost:3000",
         credentials: true,
     });
     app.enableCors();
