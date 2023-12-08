@@ -1,19 +1,19 @@
 // auth.controller.ts
-import { Controller, Get, Req, Session, UseGuards, Query } from '@nestjs/common';
+import { Controller, Get, Req, Res, Session, UseGuards, Query } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
-import { Request } from 'express';
+import { Request, Response } from 'express';
 
 @Controller('authentification')
 export class AuthentificationController {
   @Get('42')
   @UseGuards(AuthGuard('42'))
-  async login42(@Req() req) {
+  async login42(@Req() req, ) {
     // L'utilisateur est automatiquement authentifié ici
   }
 
   @Get('42/callback')
   @UseGuards(AuthGuard('42'))
-  async callback42(@Req() req, @Session() session: Record<string, any>) {
+  async callback42(@Req() req, @Res() res: Response, @Session() session: Record<string, any>) {
     // Gérer le callback après l'authentification
     // En fait on est la quand la personne a reussis a etre identifié
 
@@ -33,7 +33,8 @@ export class AuthentificationController {
       // Ici j'ai enregistrer dans la session les infos que j'ai reçu
       // Tu peux aussi enregistrer celles qui t'interessent dans la bdd avec prisma, en une ligne ou 2
       session.user = { id: userData.id, login: userData.login, email: userData.email};
-    return req.user;
+
+      res.redirect('http://localhost:3000');
   }
 
     // Un nouveau controlleur 42/profil
@@ -44,12 +45,14 @@ export class AuthentificationController {
   @Get('42/profil')
   async profilSession42(@Req() req, @Session() session: Record<string, any>) {
     // Gérer le callback après l'authentification
-    if (session.user) {
+    if (session.user)
+    {
       return session.user;
-    } else {
-      return 'Aucun utilisateur connecté';
-    return req.user;
-  }
+    }
+    else
+    {
+      return {}
+    }
 }
 }
 

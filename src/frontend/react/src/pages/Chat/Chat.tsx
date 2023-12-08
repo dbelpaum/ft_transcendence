@@ -1,61 +1,41 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { io, Socket } from 'socket.io-client';
 import './Chat.css'; // Importation de styles spécifiques à la page d'accueil
-// import Title from '../../components/Title/Title';
+import Title from '../../components/Title/Title';
 // import chat from './chat.png';
 import ChatContainer from './ChatContainer';
-import io from 'socket.io-client'
+import {
+	User,
+	Message,
+	ServerToClientEvents,
+	ClientToServerEvents,
+  } from './chat.interface';
+import { useAuth } from '../../context/AuthContexte'; 
+
+
 
 function Chat() {
-	const [messages, setMessages] = useState([]);
-	
-	const [usernameInput, setUsernameInput] = useState<string>('');
-	const [username, setUsername] = useState<string | null>(null);
-    const [error, setError] = useState<string | null>(null);
+	//const [isConnected, setIsConnected] = useState(Socket.connected);
+	const [messages, setMessages] = useState<Message[]>([]);
 
-	const handleUsernameChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-		setUsernameInput(event.target.value);
-	};
-   
-	const handleUsernameSubmit = (event: React.FormEvent<HTMLFormElement>) => {
-		event.preventDefault();
-		if (usernameInput.trim() !== '') {
-		 setUsername(usernameInput);
-		 setError(null);
-		} else {
-		 setError('Veuillez entrer un nom d\'utilisateur');
-		}
-		};
+	const { user, setUser } = useAuth(); 
+
+
 
 	return (
-		<div>
-		  {username ? (
-			  <div>
-				<h1>Bienvenue sur le chat {username} !</h1>
-			  { 
-				  <div className='container'>
-				  <div className='channels'>
-					  <h1> Channels</h1>
-					  <h4>On verra apres</h4>
-				  </div>
-				  <div className='chat'>
-					  <ChatContainer username={username} messages={messages} setMessages={setMessages} />
-				  </div>
-			  </div>
-			  }
+		<main>
+			<p className="test">nom :{user && user.login}</p>
+			<div className='container'>
+				<div className='channels'>
+					<h1>Channels</h1>
+
+				</div>
+				<div className='chat'>
+					<ChatContainer username={user && user.login} messages={messages} setMessages={setMessages} />
+				</div>
 			</div>
-		  ) : (
-			  <div className='centered'>
-				<form onSubmit={handleUsernameSubmit}>
-				<img src="https://i.imgflip.com/7i61hx.jpg" alt='test'/>
-				<h1>Veuillez entrer votre nom</h1>
-				<input type="text" value={usernameInput} onChange={handleUsernameChange} />
-				{error && <p>{error}</p>}
-				<button type="submit">Envoyer</button>
-				</form>
-			</div>
-		  )}
-		</div>
-		);
+		</main>
+	);
 	
 }
 

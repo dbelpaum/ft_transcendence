@@ -33,7 +33,6 @@ function ButtonNav({ color, text, path }: ButtonNavProps) {
 
 
     const handleClick = () => {
-        console.log("path: ", path);
         fetch(path, {
           method: 'GET',
       })
@@ -48,7 +47,7 @@ function ButtonNav({ color, text, path }: ButtonNavProps) {
             };
 
     return (
-        <a style={buttonStyle} href={path} target="_blank" rel="noopener noreferrer">{text}</a>
+        <a style={buttonStyle} href={path} rel="noopener noreferrer">{text}</a>
     );
   }
 

@@ -78,3 +78,8 @@ body {
     text-align: center; /* Pour centrer horizontalement */
   }
 
+.test{
+  color: white;
+  text-align: center;
+  font-size: 30px;
+}

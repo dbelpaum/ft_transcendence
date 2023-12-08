@@ -12,10 +12,9 @@ function Profil() {
 
     useEffect(() => {
         // Effectuer la requête HTTP ici
-        fetch('https://localhost:4000/sam-test')
+        fetch('http://localhost:4000/sam-test')
             .then(response => response.json())
             .then(data => {
-                console.log("je rentre dans le then");
                 setData(data); // Mettre à jour l'état avec les données reçues
             })
             .catch(error => {
@@ -29,7 +28,7 @@ function Profil() {
             <section className='image_test'>
                 <img src={profil} alt="Profile" />
             </section>
-            <p>{data && <p className='text-white text-center'>Données reçues de Nest: {data.message}</p>}</p>
+            {data && <p className='text-white text-center'>Données reçues de Nest: {data.message}</p>}
         </main>
     );
 }
