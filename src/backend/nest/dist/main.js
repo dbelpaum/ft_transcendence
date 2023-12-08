@@ -141,15 +141,16 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 var __param = (this && this.__param) || function (paramIndex, decorator) {
     return function (target, key) { decorator(target, key, paramIndex); }
 };
-var _a, _b;
+var _a, _b, _c;
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.AuthentificationController = void 0;
 const common_1 = __webpack_require__(/*! @nestjs/common */ "@nestjs/common");
 const passport_1 = __webpack_require__(/*! @nestjs/passport */ "@nestjs/passport");
+const express_1 = __webpack_require__(/*! express */ "express");
 let AuthentificationController = class AuthentificationController {
     async login42(req) {
     }
-    async callback42(req, session) {
+    async callback42(req, res, session) {
         const apiResponse = await fetch('https://api.intra.42.fr/v2/me', {
             method: 'GET',
             headers: {
@@ -159,15 +160,14 @@ let AuthentificationController = class AuthentificationController {
         });
         const userData = await apiResponse.json();
         session.user = { id: userData.id, login: userData.login, email: userData.email };
-        return req.user;
+        res.redirect('http://localhost:3000');
     }
     async profilSession42(req, session) {
         if (session.user) {
             return session.user;
         }
         else {
-            return 'Aucun utilisateur connecté';
-            return req.user;
+            return {};
         }
     }
 };
@@ -184,9 +184,10 @@ __decorate([
     (0, common_1.Get)('42/callback'),
     (0, common_1.UseGuards)((0, passport_1.AuthGuard)('42')),
     __param(0, (0, common_1.Req)()),
-    __param(1, (0, common_1.Session)()),
+    __param(1, (0, common_1.Res)()),
+    __param(2, (0, common_1.Session)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Object, typeof (_a = typeof Record !== "undefined" && Record) === "function" ? _a : Object]),
+    __metadata("design:paramtypes", [Object, typeof (_a = typeof express_1.Response !== "undefined" && express_1.Response) === "function" ? _a : Object, typeof (_b = typeof Record !== "undefined" && Record) === "function" ? _b : Object]),
     __metadata("design:returntype", Promise)
 ], AuthentificationController.prototype, "callback42", null);
 __decorate([
@@ -194,7 +195,7 @@ __decorate([
     __param(0, (0, common_1.Req)()),
     __param(1, (0, common_1.Session)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Object, typeof (_b = typeof Record !== "undefined" && Record) === "function" ? _b : Object]),
+    __metadata("design:paramtypes", [Object, typeof (_c = typeof Record !== "undefined" && Record) === "function" ? _c : Object]),
     __metadata("design:returntype", Promise)
 ], AuthentificationController.prototype, "profilSession42", null);
 exports.AuthentificationController = AuthentificationController = __decorate([
@@ -530,6 +531,16 @@ module.exports = require("dotenv");
 
 /***/ }),
 
+/***/ "express":
+/*!**************************!*\
+  !*** external "express" ***!
+  \**************************/
+/***/ ((module) => {
+
+module.exports = require("express");
+
+/***/ }),
+
 /***/ "express-session":
 /*!**********************************!*\
   !*** external "express-session" ***!
@@ -623,7 +634,6 @@ async function bootstrap() {
         origin: "http://localhost:3000",
         credentials: true,
     });
-    app.enableCors();
     await app.listen(4000);
 }
 bootstrap();

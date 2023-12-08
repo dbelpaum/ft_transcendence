@@ -7,8 +7,6 @@ function ChatContainer({username, messages, setMessages}: any) {
         <div className='chat-box'>
             <MessageList username={username} messages={messages} />
             <MessageInput setMessages={setMessages} />
-
-
         </div>
 
     );
