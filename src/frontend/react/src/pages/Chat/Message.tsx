@@ -1,16 +1,18 @@
 import React from 'react';
+import {
+	Message,
+  } from './chat.interface';
 
 interface MessageProps {
-  username: string;
-  text: string;
+	message: Message;
 }
 
-const Message: React.FC<MessageProps> = ({ username, text }) => {
+const MessageComponent: React.FC<MessageProps> = ({ message }) => {
   return (
     <div className='messages'>
-      <span>{username}: {text}</span>
+      <span>{message.user.login} : {message.message}</span>
     </div>
   );
 };
 
-export default Message;
+export default MessageComponent;

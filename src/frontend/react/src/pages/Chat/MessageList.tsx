@@ -1,16 +1,18 @@
 import React from 'react';
-import Message from './Message';
+import MessageComponent from './Message';
+import {
+	Message,
+  } from './chat.interface';
 
 interface MessageListProps {
-  username: string;
-  messages: { text: string }[]; // Définir le type de la prop messages
+  messages: Message[];
 }
 
-const MessageList: React.FC<MessageListProps> = ({ username, messages }) => {
+const MessageList: React.FC<MessageListProps> = ({ messages }) => {
   return (
     <div className='chat-box'>
       {messages.map((message, index) => (
-        <Message username={username} key={index} text={message.text} />
+        <MessageComponent message={message} key={index} />
       ))}
     </div>
   );

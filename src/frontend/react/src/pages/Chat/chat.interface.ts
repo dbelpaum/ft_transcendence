@@ -1,12 +1,13 @@
 export interface User {
     id: number;
     login: string;
-    email: string;
+    email?: string;
 }
   
 export interface Message {
+	id:string;
     user: User;
-    timeSent: string;
+    timeSent?: string;
     message: string;
 }
   
