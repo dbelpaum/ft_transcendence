@@ -1,29 +1,26 @@
-import React, { useEffect, useState } from 'react';
-import './Profil.css'; // Importation de styles spécifiques à la page d'accueil
+import React from 'react';
+import './Profil.css';
 import Title from '../../components/Title/Title';
-import profil from './profil.png';
 import { useAuth } from '../../context/AuthContexte';
 
-// interface Data {
-//     message: string;
-//     image:string;
-//     id: number;
-//     email:string; // Adjust the structure according to your API response
-// }
-
 function Profil() {
-    const {user, setUser} = useAuth();
+    const { user } = useAuth();
 
     return (
-        <main>
-            <br /><br /><br /><br />
-            <p>Nom d'utilisateur: {user?.login}</p>
-            <p>Adresse Email: {user?.email}</p>
-            <p>Identifiant: {user?.id}</p>
-            image: <img src={user?.imageUrl} alt="profil" />
+        <main className="profil-container">
+            <Title title="Votre Profil" />
+            <div className="profil-details">
+                <p>Nom d'utilisateur: {user?.login}</p>
+                <p>Adresse Email: {user?.email}</p>
+                <p>Nom: {user?.lastname}</p>
+                <p>Prénom: {user?.firstname}</p>
+                {/* Image de profil */}
+                <div className="profil-image-container">
+                    <img src={user?.imageUrl || 'default-profile.png'} alt="profil" />
+                </div>
+            </div>
         </main>
-    )
+    );
 }
 
 export default Profil;
-
