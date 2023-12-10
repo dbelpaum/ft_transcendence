@@ -315,6 +315,7 @@ let ChatGateway = class ChatGateway {
     }
     async handleEvent(payload) {
         this.logger.log(payload);
+        console.log(payload);
         this.server.emit('chat', payload);
         return payload;
     }

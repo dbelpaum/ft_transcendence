@@ -26,16 +26,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const { setErrorMessage } = useErrorMessage();
 
-  useEffect(() => {
-      if (user) {
-        setErrorMessage({
-        message: `Bravo, vous etes connecté ${user.login}`,
-        type: 'success'
-        });
-      }
-      }, [user, setErrorMessage]);
-
-
 
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
@@ -48,7 +38,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       });
         const userData = await response.json();
         if (Object.keys(userData).length != 0) {
-          setUser(userData); // Utilisateur connecté
+			setUser(userData); // Utilisateur connecté
         }
         else
           setUser(null)

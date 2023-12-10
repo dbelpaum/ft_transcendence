@@ -7,25 +7,29 @@ import {
 } from './chat.interface';
 import { Server } from 'socket.io';
 
-@WebSocketGateway(
-  {
-    cors: {
-      origin: '*',
-    },
-  }
-)
+
+@WebSocketGateway({
+  cors: {
+    origin: '*',
+  },
+})
 export class ChatGateway {
   @WebSocketServer() server: Server = new Server<
     ServerToClientEvents,
     ClientToServerEvents
   >();
-
   private logger = new Logger('ChatGateway');
 
   @SubscribeMessage('chat')
-  async handleEvent(@MessageBody() payload: Message): Promise<Message> {
+  async handleEvent(
+    @MessageBody()
+    payload: Message,
+  ): Promise<Message> {
     this.logger.log(payload);
+	console.log(payload)
     this.server.emit('chat', payload); // broadcast messages
     return payload;
   }
 }
+
+

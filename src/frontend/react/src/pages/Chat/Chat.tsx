@@ -12,172 +12,196 @@ import {
   } from './chat.interface';
 import { useAuth } from '../../context/AuthContexte'; 
 
+const socket: Socket<ServerToClientEvents, ClientToServerEvents> = io("http://localhost:4000");
+
+// function Chat() {
+// 	//const [isConnected, setIsConnected] = useState(Socket.connected);
+// 	const [messages, setMessages] = useState<Message[]>([]);
+// 	const [isConnected, setIsConnected] = useState(socket.connected);
+// 	const { user, setUser } = useAuth(); 
+
+// 	useEffect(() => {
+	
+// 		socket.on('connect', () => {
+// 		  setIsConnected(true);
+// 		});
+	
+// 		socket.on('disconnect', () => {
+// 		  setIsConnected(false);
+// 		});
+	
+// 		socket.on('chat', (e) => {
+// 		  setMessages((messages) => [e, ...messages]);
+// 		  console.log("quel chose a été recu")
+// 		  console.log(e)
+// 		});
+	
+// 		return () => {
+// 		  socket.off('connect');
+// 		  socket.off('disconnect');
+// 		  socket.off('chat');
+// 		};
+// 	  }, []);
+
+// 	  const sendMessage = (e: React.FormEvent<HTMLFormElement>) => {
+// 		console.log(e)
+// 		// 	const message = e.target[0].text as string
+// 		//   console.log("message envoye dans send message : " + message)
+// 		// if (user && message) {
+// 		//   const result = socket.emit('chat', {
+// 		// 	user: {
+// 		// 	  id: user.id,
+// 		// 	  login: user.login,
+// 		// 	},
+// 		// 	timeSent: new Date(Date.now()).toLocaleString('en-US'),
+// 		// 	message: e.target[0].value as string,
+// 		//   });
+// 		//   console.log(result)
+// 		// }
+// 	  };
+	
+
+// 	return (
+// 		<main>
+// 			<p className="test">nom :{user && user.login}</p>
+// 			<div className='container'>
+// 				<div className='channels'>
+// 					<h1>Channels</h1>
+
+// 				</div>
+// 				<div className='chat'>
+// 					<ChatContainer username={user && user.login} messages={messages} sendMessages={sendMessage} />
+// 				</div>
+// 			</div>
+// 		</main>
+// 	);
+// }
+
+// export default Chat;
 
 
-function Chat() {
-	//const [isConnected, setIsConnected] = useState(Socket.connected);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+function Chat(){
 	const [messages, setMessages] = useState<Message[]>([]);
-
+	const [inputValue, setInputValue] = useState<string>('');
 	const { user, setUser } = useAuth(); 
+	const [isConnected, setIsConnected] = useState(socket.connected);
 
 
+
+	
+	useEffect(() => {
+	
+		socket.on('connect', () => {
+		setIsConnected(true);
+		});
+	
+		socket.on('disconnect', () => {
+		setIsConnected(false);
+		});
+	
+		socket.on('chat', (e) => {
+			setMessages((messages) => [e, ...messages]);
+			console.log("quel chose a été recu")
+			console.log(e)
+		});
+	
+		return () => {
+			socket.off('connect');
+			socket.off('disconnect');
+			socket.off('chat');
+		};
+	}, []);
 
 	return (
-		<main>
-			<p className="test">nom :{user && user.login}</p>
+		<div>
+			<h1 className="chat-title">Bienvenue sur le chat {user?.login} !</h1>
 			<div className='container'>
 				<div className='channels'>
-					<h1>Channels</h1>
-
-				</div>
-				<div className='chat'>
-					<ChatContainer username={user && user.login} messages={messages} setMessages={setMessages} />
+					<h1> Channels</h1>
+					<h4>On verra apres</h4>
 				</div>
 			</div>
-		</main>
-	);
-	
-}
+			<div className='chat'>
+				<ChatContainer username={user?.login} messages={messages} setMessages={setMessages} socket={socket}/>
+			</div>
+	  </div>
+	  )}
+
+
+
 
 export default Chat;
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// interface Message {
-// 	username: string | null; // Champ username dans l'interface Message
-// 	id: number;
-// 	text: string;
-//   }
-  
-
-
-// function Chat(){
-// 	const [showChat, setShowChat] = useState<boolean>(false);
-// 	const [messages, setMessages] = useState<Message[]>([]);
-// 	const [inputValue, setInputValue] = useState<string>('');
-// 	const [showErrorMessage, setShowErrorMessage] = useState<boolean>(false);
-// 	const [username, setUsername] = useState<string | null>(null); // État pour stocker le nom d'utilisateur
-
-// 	const handleMessageSubmit = (e: React.FormEvent) => {
-// 		e.preventDefault();
-// 		if (inputValue.trim() !== '') {
-// 		  // Si l'input n'est pas vide, on affiche le chat et ajoute le message
-// 		  setShowChat(true);
-// 		  setShowErrorMessage(false); // Cache le message d'erreur s'il était affiché
-// 		  const newMessage: Message = {
-// 			id: messages.length + 1,
-// 			text: inputValue.trim(),
-// 			username: username, // Utilisation du nom d'utilisateur saisi
-// 		  };
-// 		  setMessages([...messages, newMessage]); // Ajoute le nouveau message à la liste
-// 		  setInputValue(''); // Efface l'input après l'envoi du message
-// 		} else {
-// 		  // Si l'input est vide, on affiche un message d'erreur
-// 		  setShowErrorMessage(true);
-// 		}
-// 	  };
-	
-// 	  const handleUsernameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-// 		setUsername(e.target.value); // Mettre à jour le nom d'utilisateur lorsque l'utilisateur tape
-// 	  };
-
-// 	return (
-// 		<main>
-// 		  <Title title="Chat" />
-// 		  <div className="centered">
-// 			{!showChat ? (
-// 			  <div>
-// 				{showErrorMessage && <p>Please enter a username</p>}
-// 				<input
-//             type="text"
-//             value={username || ''}
-//             onChange={handleUsernameChange}
-//             placeholder="Enter your username"/>
-// 				<button onClick={() => 
-// 				{
-// 					if (username == null)
-// 					{
-// 						alert('Put a name');
-// 					}
-// 					else
-// 					{
-// 						setShowChat(true);
-// 					}
-// 				}}>Enter the chat</button>
-// 			  </div>
-// 			) : (
-// 			  <div>
-// 				<div className="chat-container">
-// 				<div className="message-list">
-// 				{messages.map((message) => (
-// 					<div key={message.id} className="message">
-// 					{message.username + ": " + message.text}
-// 					</div>
-// 				))}
-// 				</div>
-// 				<form onSubmit={handleMessageSubmit}>
-// 				<input
-// 					type="text"
-// 					value={inputValue}
-// 					onChange={(e) => setInputValue(e.target.value)}
-// 					placeholder="Type a message..."
-// 				/>
-// 				<button type="submit">Send</button>
-// 				</form>
-// 			</div>
-// 			  </div>
-// 			)}
-// 		  </div>
-// 		</main>
-// 	  );
-
-// }
-
-
-
-// export default Chat;
+{/* <main>
+<Title title="Chat" />
+<div className='container'>
+  <div className="channels">
+	  <h1>Channels</h1>
+	  <h4>Channels</h4>
+	  <div className="message-list">
+		  {messages.map((message) => (
+			  <div key={message.id} className="message">
+			  {message.user.login + ": " + message.message}
+			  </div>
+		  ))}
+	  </div>
+	  <form onSubmit={handleMessageSubmit}>
+		  <input
+			  type="text"
+			  value={inputValue}
+			  onChange={(e) => setInputValue(e.target.value)}
+			  placeholder="Type a message..."
+		  />
+		  <button type="submit">Send</button>
+	  </form>
+  </div>
+</div>
+</main> */}

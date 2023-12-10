@@ -13,20 +13,24 @@ type ProtectedChatProps = {
 
 export const ProtectedChat: React.FC<ProtectedChatProps> = ({ children }) => {
 
-	const { user } = useAuth(); 
+	const { user, isLoading } = useAuth(); 
 	const { setErrorMessage } = useErrorMessage();
 
 	useEffect(() => {
-		if (!user) {
-		  setErrorMessage({
-			message: 'Vous devez être connecté pour accéder à cette page.',
-			type: 'error'
-		  });
+		if (!isLoading && !user) {
+			setErrorMessage({
+				message: 'Vous devez être connecté pour accéder à cette page.',
+				type: 'error'
+			});
 		}
-	  }, [user, setErrorMessage]);
+	}, [user, isLoading, setErrorMessage]);
+	
+	if (isLoading) {
+		return <div>Chargement...</div>;
+	}
 
 	if (!user) {
-	  return <Navigate to="/" />;
+		return <Navigate to="/" />;
 	}
 	return children
 };
