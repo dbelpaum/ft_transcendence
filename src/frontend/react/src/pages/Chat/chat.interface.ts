@@ -1,3 +1,5 @@
+import { io, Socket } from 'socket.io-client';
+
 export interface User {
     id: number;
     login: string;
@@ -20,3 +22,15 @@ export interface ServerToClientEvents {
 export interface ClientToServerEvents {
     chat: (e: Message) => void;
 }
+
+export interface Room {
+	name: string
+	host: User|null
+	users: User[]
+  }
+  
+export interface ChannelUtility {
+	me: User|null;
+	socket: Socket<ServerToClientEvents, ClientToServerEvents>;
+	rooms: Room[];
+  }
