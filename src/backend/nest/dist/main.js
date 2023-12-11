@@ -388,6 +388,30 @@ exports.ChatModule = ChatModule = __decorate([
 
 /***/ }),
 
+/***/ "./src/game/ServerExceptions.ts":
+/*!**************************************!*\
+  !*** ./src/game/ServerExceptions.ts ***!
+  \**************************************/
+/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
+
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.ServerException = void 0;
+const websockets_1 = __webpack_require__(/*! @nestjs/websockets */ "@nestjs/websockets");
+class ServerException extends websockets_1.WsException {
+    constructor(type, message) {
+        const serverExceptionResponse = {
+            exception: type,
+            message: message,
+        };
+        super(serverExceptionResponse);
+    }
+}
+exports.ServerException = ServerException;
+
+
+/***/ }),
+
 /***/ "./src/game/game.gateway.ts":
 /*!**********************************!*\
   !*** ./src/game/game.gateway.ts ***!
@@ -408,9 +432,11 @@ var _a, _b, _c;
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.GameGateway = void 0;
 const websockets_1 = __webpack_require__(/*! @nestjs/websockets */ "@nestjs/websockets");
+const common_1 = __webpack_require__(/*! @nestjs/common */ "@nestjs/common");
+const validation_pipe_1 = __webpack_require__(/*! src/game/validation-pipe */ "./src/game/validation-pipe.ts");
 const socket_io_1 = __webpack_require__(/*! socket.io */ "socket.io");
-const ServerEvents_1 = __webpack_require__(/*! src/game/shared/ServerEvents */ "./src/game/shared/ServerEvents.ts");
-const ClientEvents_1 = __webpack_require__(/*! src/game/shared/ClientEvents */ "./src/game/shared/ClientEvents.ts");
+const ServerEvents_1 = __webpack_require__(/*! src/game/shared/server/ServerEvents */ "./src/game/shared/server/ServerEvents.ts");
+const ClientEvents_1 = __webpack_require__(/*! src/game/shared/client/ClientEvents */ "./src/game/shared/client/ClientEvents.ts");
 let GameGateway = class GameGateway {
     async handleConnection(client, ...args) {
     }
@@ -443,16 +469,17 @@ __decorate([
     __metadata("design:returntype", typeof (_c = typeof websockets_1.WsResponse !== "undefined" && websockets_1.WsResponse) === "function" ? _c : Object)
 ], GameGateway.prototype, "onLobbyCreate", null);
 exports.GameGateway = GameGateway = __decorate([
+    (0, common_1.UsePipes)(new validation_pipe_1.WsValidationPipe()),
     (0, websockets_1.WebSocketGateway)({ namespace: 'game' })
 ], GameGateway);
 
 
 /***/ }),
 
-/***/ "./src/game/shared/ClientEvents.ts":
-/*!*****************************************!*\
-  !*** ./src/game/shared/ClientEvents.ts ***!
-  \*****************************************/
+/***/ "./src/game/shared/client/ClientEvents.ts":
+/*!************************************************!*\
+  !*** ./src/game/shared/client/ClientEvents.ts ***!
+  \************************************************/
 /***/ ((__unused_webpack_module, exports) => {
 
 
@@ -467,10 +494,10 @@ var ClientEvents;
 
 /***/ }),
 
-/***/ "./src/game/shared/ServerEvents.ts":
-/*!*****************************************!*\
-  !*** ./src/game/shared/ServerEvents.ts ***!
-  \*****************************************/
+/***/ "./src/game/shared/server/ServerEvents.ts":
+/*!************************************************!*\
+  !*** ./src/game/shared/server/ServerEvents.ts ***!
+  \************************************************/
 /***/ ((__unused_webpack_module, exports) => {
 
 
@@ -482,6 +509,63 @@ var ServerEvents;
     ServerEvents["LobbyState"] = "server.lobby.state";
     ServerEvents["GameMessage"] = "server.game.message";
 })(ServerEvents || (exports.ServerEvents = ServerEvents = {}));
+
+
+/***/ }),
+
+/***/ "./src/game/shared/server/SocketExceptions.ts":
+/*!****************************************************!*\
+  !*** ./src/game/shared/server/SocketExceptions.ts ***!
+  \****************************************************/
+/***/ ((__unused_webpack_module, exports) => {
+
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.SocketExceptions = void 0;
+var SocketExceptions;
+(function (SocketExceptions) {
+    SocketExceptions["UnexpectedError"] = "exception.unexpected_error";
+    SocketExceptions["UnexpectedPayload"] = "exception.unexpected_payload";
+    SocketExceptions["LobbyError"] = "exception.lobby.error";
+    SocketExceptions["GameError"] = "exception.game.error";
+})(SocketExceptions || (exports.SocketExceptions = SocketExceptions = {}));
+
+
+/***/ }),
+
+/***/ "./src/game/validation-pipe.ts":
+/*!*************************************!*\
+  !*** ./src/game/validation-pipe.ts ***!
+  \*************************************/
+/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
+
+
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.WsValidationPipe = void 0;
+const common_1 = __webpack_require__(/*! @nestjs/common */ "@nestjs/common");
+const ServerExceptions_1 = __webpack_require__(/*! src/game/ServerExceptions */ "./src/game/ServerExceptions.ts");
+const SocketExceptions_1 = __webpack_require__(/*! src/game/shared/server/SocketExceptions */ "./src/game/shared/server/SocketExceptions.ts");
+let WsValidationPipe = class WsValidationPipe extends common_1.ValidationPipe {
+    createExceptionFactory() {
+        return (validationErrors = []) => {
+            if (this.isDetailedOutputDisabled) {
+                return new ServerExceptions_1.ServerException(SocketExceptions_1.SocketExceptions.UnexpectedError, 'Bad request');
+            }
+            const errors = this.flattenValidationErrors(validationErrors);
+            return new ServerExceptions_1.ServerException(SocketExceptions_1.SocketExceptions.UnexpectedPayload, errors);
+        };
+    }
+};
+exports.WsValidationPipe = WsValidationPipe;
+exports.WsValidationPipe = WsValidationPipe = __decorate([
+    (0, common_1.Injectable)()
+], WsValidationPipe);
 
 
 /***/ }),

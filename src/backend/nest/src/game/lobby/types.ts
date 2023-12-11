@@ -1,5 +1,5 @@
 import { Socket } from 'socket.io';
-import { ServerEvents } from 'src/game/shared/ServerEvents';
+import { ServerEvents } from 'src/game/shared/server/ServerEvents';
 import { Lobby } from 'src/game/lobby/lobby';
 
 export type AuthenticatedSocket = Socket & {

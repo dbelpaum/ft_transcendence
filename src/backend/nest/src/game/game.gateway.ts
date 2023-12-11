@@ -1,9 +1,12 @@
 import { SubscribeMessage, WebSocketGateway, WsResponse, OnGatewayConnection } from '@nestjs/websockets';
+import { UsePipes } from '@nestjs/common';
+import { WsValidationPipe } from 'src/game/validation-pipe';
 import { Socket } from 'socket.io';
-import { ServerEvents } from 'src/game/shared/ServerEvents';
-import { ClientEvents } from 'src/game/shared/ClientEvents';
-import { ServerPayloads } from 'src/game/shared/ServerPayloads';
+import { ServerEvents } from 'src/game/shared/server/ServerEvents';
+import { ClientEvents } from 'src/game/shared/client/ClientEvents';
+import { ServerPayloads } from 'src/game/shared/server/ServerPayloads';
 
+@UsePipes(new WsValidationPipe())
 @WebSocketGateway({ namespace: 'game' })
 export class GameGateway implements OnGatewayConnection{
 

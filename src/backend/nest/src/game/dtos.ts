@@ -1,4 +1,4 @@
-// import { IsInt, IsNumber, IsString, Max, Min } from 'class-validator';
+import { IsInt, IsNumber, IsString, Max, Min } from 'class-validator';
 
 export class LobbyCreateDto
 {
@@ -7,6 +7,6 @@ export class LobbyCreateDto
 
 export class LobbyJoinDto
 {
-	// @IsString
+	@IsString()
 	lobbyId: string;
 }
