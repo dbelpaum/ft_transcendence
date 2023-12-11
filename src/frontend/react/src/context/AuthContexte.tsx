@@ -5,6 +5,9 @@ export interface User {
     id: number;
     login: string;
     email: string;
+    imageUrl: string;
+    firstname: string;
+    lastname: string;
 }
 
 
@@ -60,10 +63,16 @@ return (
   );
 };
 
+/**
+ * Custom hook that provides access to the authentication context.
+ * Throws an error if used outside of an AuthProvider.
+ * @returns The authentication context.
+ * @throws Error if used outside of an AuthProvider.
+ */
 export const useAuth = (): AuthContextType => {
     const context = useContext(AuthContext);
     if (!context) {
       throw new Error('useAuth doit être utilisé au sein d’un AuthProvider');
     }
     return context;
-  };
+};

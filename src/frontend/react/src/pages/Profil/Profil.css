@@ -1,0 +1,21 @@
+.profil-container {
+    max-width: 600px;
+    margin: 20px auto;
+    padding: 20px;
+    background-color: #d0a2a2;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.profil-details {
+    text-align: center;
+}
+
+.profil-image-container img {
+    width: 150px; /* Redimensionner l'image */
+    height: 150px;
+    border-radius: 50%; /* Rendre l'image ronde */
+    object-fit: cover;
+    border: 3px solid #007bff;
+    margin: 10px 0;
+}

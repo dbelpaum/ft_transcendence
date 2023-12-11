@@ -1,34 +1,24 @@
-import React, { useEffect, useState } from 'react';
-import './Profil.css'; // Importation de styles spécifiques à la page d'accueil
+import React from 'react';
+import './Profil.css';
 import Title from '../../components/Title/Title';
-import profil from './profil.png';
-
-interface Data {
-    message: string; // Adjust the structure according to your API response
-}
+import { useAuth } from '../../context/AuthContexte';
 
 function Profil() {
-    const [data, setData] = useState<Data | null>(null); // Specify the type here
-
-    useEffect(() => {
-        // Effectuer la requête HTTP ici
-        fetch('http://localhost:4000/sam-test')
-            .then(response => response.json())
-            .then(data => {
-                setData(data); // Mettre à jour l'état avec les données reçues
-            })
-            .catch(error => {
-                console.error('Erreur lors de la requête:', error);
-            });
-    }, []);
+    const { user } = useAuth();
 
     return (
-        <main>
-            <Title title="Profil" />
-            <section className='image_test'>
-                <img src={profil} alt="Profile" />
-            </section>
-            {data && <p className='text-white text-center'>Données reçues de Nest: {data.message}</p>}
+        <main className="profil-container">
+            <Title title="Votre Profil" />
+            <div className="profil-details">
+                <p>Nom d'utilisateur: {user?.login}</p>
+                <p>Adresse Email: {user?.email}</p>
+                <p>Nom: {user?.lastname}</p>
+                <p>Prénom: {user?.firstname}</p>
+                {/* Image de profil */}
+                <div className="profil-image-container">
+                    <img src={user?.imageUrl || 'default-profile.png'} alt="profil" />
+                </div>
+            </div>
         </main>
     );
 }
