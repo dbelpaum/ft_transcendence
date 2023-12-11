@@ -68,10 +68,9 @@ const sam_test_controller_1 = __webpack_require__(/*! ./sam-test/sam-test.contro
 const prisma_service_1 = __webpack_require__(/*! ./prisma.service */ "./src/prisma.service.ts");
 const authentification_module_1 = __webpack_require__(/*! ./authentification/authentification.module */ "./src/authentification/authentification.module.ts");
 const chat_module_1 = __webpack_require__(/*! ./chat/chat.module */ "./src/chat/chat.module.ts");
-const logout_controller_1 = __webpack_require__(/*! ./logout/logout.controller */ "./src/logout/logout.controller.ts");
 const channel_module_1 = __webpack_require__(/*! ./channel/channel.module */ "./src/channel/channel.module.ts");
-
 const session = __webpack_require__(/*! express-session */ "express-session");
+const logout_controller_1 = __webpack_require__(/*! ./logout/logout.controller */ "./src/logout/logout.controller.ts");
 let AppModule = class AppModule {
     configure(consumer) {
         consumer
@@ -87,7 +86,6 @@ let AppModule = class AppModule {
 exports.AppModule = AppModule;
 exports.AppModule = AppModule = __decorate([
     (0, common_1.Module)({
-
         imports: [authentification_module_1.AuthentificationModule, chat_module_1.ChatModule, channel_module_1.ChannelModule],
         controllers: [app_controller_1.AppController, sam_test_controller_1.SamTestController, logout_controller_1.LogoutController],
         providers: [app_service_1.AppService, prisma_service_1.PrismaService],
