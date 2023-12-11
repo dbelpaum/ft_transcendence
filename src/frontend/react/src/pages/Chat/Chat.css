@@ -5,6 +5,12 @@ body {
 	font-family: Arial, sans-serif;
   }
 
+  .leave_icon
+  {
+	width: 15px;
+  	height: auto;
+  }
+
 .chat-title
 {
 	text-align: center;;
@@ -19,6 +25,12 @@ body {
 	width: 25%;
 	background-color: #f0f0f0;
 	padding: 20px;
+  }
+
+  .channel_item{
+		display: flex;
+	justify-content: space-between;
+	align-items: center;
   }
   
   .channels ul {
@@ -82,3 +94,12 @@ body {
 	  height: 100%; /* Utilisez la hauteur souhaitée ou % pour centrer verticalement */
 	  text-align: center; /* Pour centrer horizontalement */
 	}
+
+.status_indicator {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%; /* Rend le div circulaire */
+  background-color: green; /* Couleur verte pour l'indicateur */
+  display: inline-block; /* Pour positionner correctement avec le texte */
+  margin-right: 5px; /* Espace entre l'indicateur et le nom du channel */
+}

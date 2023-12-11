@@ -1,5 +1,7 @@
 import React, { ReactNode, createContext, useContext, useState, useEffect } from 'react';
 import { useErrorMessage, ErrorMessageProvider } from './ErrorContexte';
+import { User } from '../pages/Chat/chat.interface';
+
 
 export interface User {
     id: number;

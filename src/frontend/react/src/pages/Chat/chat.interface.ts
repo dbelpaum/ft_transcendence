@@ -1,7 +1,10 @@
+import { io, Socket } from 'socket.io-client';
+import { Dispatch, SetStateAction } from 'react';
 export interface User {
     id: number;
     login: string;
     email?: string;
+	socketId?: string;
 }
   
 export interface Message {
@@ -19,4 +22,24 @@ export interface ServerToClientEvents {
 // Interface for when clients emit events to the server.
 export interface ClientToServerEvents {
     chat: (e: Message) => void;
+	join_channel: (e: ChannelCreate) => void
+
+}
+
+export interface Channel {
+	name: string
+	host: User[]
+	users: User[]
+}
+  
+export interface ChannelUtility {
+	me: User|null;
+	socket: Socket<ServerToClientEvents, ClientToServerEvents>;
+	channels: Channel[];
+	setChannels: Dispatch<SetStateAction<Channel[]>>;
+  }
+
+export interface ChannelCreate {
+	name: string
+	user: User
 }

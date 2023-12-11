@@ -68,6 +68,7 @@ const sam_test_controller_1 = __webpack_require__(/*! ./sam-test/sam-test.contro
 const prisma_service_1 = __webpack_require__(/*! ./prisma.service */ "./src/prisma.service.ts");
 const authentification_module_1 = __webpack_require__(/*! ./authentification/authentification.module */ "./src/authentification/authentification.module.ts");
 const chat_module_1 = __webpack_require__(/*! ./chat/chat.module */ "./src/chat/chat.module.ts");
+const channel_module_1 = __webpack_require__(/*! ./channel/channel.module */ "./src/channel/channel.module.ts");
 const session = __webpack_require__(/*! express-session */ "express-session");
 let AppModule = class AppModule {
     configure(consumer) {
@@ -84,7 +85,7 @@ let AppModule = class AppModule {
 exports.AppModule = AppModule;
 exports.AppModule = AppModule = __decorate([
     (0, common_1.Module)({
-        imports: [authentification_module_1.AuthentificationModule, chat_module_1.ChatModule],
+        imports: [authentification_module_1.AuthentificationModule, chat_module_1.ChatModule, channel_module_1.ChannelModule],
         controllers: [app_controller_1.AppController, sam_test_controller_1.SamTestController],
         providers: [app_service_1.AppService, prisma_service_1.PrismaService],
     })
@@ -285,6 +286,182 @@ exports.FortyTwoService = FortyTwoService = __decorate([
 
 /***/ }),
 
+/***/ "./src/channel/channel.controller.ts":
+/*!*******************************************!*\
+  !*** ./src/channel/channel.controller.ts ***!
+  \*******************************************/
+/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
+
+
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+var __param = (this && this.__param) || function (paramIndex, decorator) {
+    return function (target, key) { decorator(target, key, paramIndex); }
+};
+var _a, _b, _c;
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.ChannelController = void 0;
+const common_1 = __webpack_require__(/*! @nestjs/common */ "@nestjs/common");
+const channel_service_1 = __webpack_require__(/*! ./channel.service */ "./src/channel/channel.service.ts");
+let ChannelController = class ChannelController {
+    constructor(channelService) {
+        this.channelService = channelService;
+    }
+    async getAllChannels() {
+        return await this.channelService.getChannels();
+    }
+    async getChannel(params) {
+        const channels = await this.channelService.getChannels();
+        const channel = await this.channelService.getChannelByName(params.channel);
+        return channels[channel];
+    }
+};
+exports.ChannelController = ChannelController;
+__decorate([
+    (0, common_1.Get)('/all'),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", []),
+    __metadata("design:returntype", typeof (_b = typeof Promise !== "undefined" && Promise) === "function" ? _b : Object)
+], ChannelController.prototype, "getAllChannels", null);
+__decorate([
+    (0, common_1.Get)('/one/:channel'),
+    __param(0, (0, common_1.Param)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", typeof (_c = typeof Promise !== "undefined" && Promise) === "function" ? _c : Object)
+], ChannelController.prototype, "getChannel", null);
+exports.ChannelController = ChannelController = __decorate([
+    (0, common_1.Controller)('channel'),
+    __metadata("design:paramtypes", [typeof (_a = typeof channel_service_1.ChannelService !== "undefined" && channel_service_1.ChannelService) === "function" ? _a : Object])
+], ChannelController);
+
+
+/***/ }),
+
+/***/ "./src/channel/channel.module.ts":
+/*!***************************************!*\
+  !*** ./src/channel/channel.module.ts ***!
+  \***************************************/
+/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
+
+
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.ChannelModule = void 0;
+const common_1 = __webpack_require__(/*! @nestjs/common */ "@nestjs/common");
+const channel_service_1 = __webpack_require__(/*! ./channel.service */ "./src/channel/channel.service.ts");
+const channel_controller_1 = __webpack_require__(/*! ./channel.controller */ "./src/channel/channel.controller.ts");
+let ChannelModule = class ChannelModule {
+};
+exports.ChannelModule = ChannelModule;
+exports.ChannelModule = ChannelModule = __decorate([
+    (0, common_1.Module)({
+        providers: [channel_service_1.ChannelService],
+        exports: [channel_service_1.ChannelService],
+        controllers: [channel_controller_1.ChannelController]
+    })
+], ChannelModule);
+
+
+/***/ }),
+
+/***/ "./src/channel/channel.service.ts":
+/*!****************************************!*\
+  !*** ./src/channel/channel.service.ts ***!
+  \****************************************/
+/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
+
+
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.ChannelService = void 0;
+const common_1 = __webpack_require__(/*! @nestjs/common */ "@nestjs/common");
+let ChannelService = class ChannelService {
+    constructor() {
+        this.channels = [];
+    }
+    async addChannel(channelName, host) {
+        const channel = await this.getChannelByName(channelName);
+        if (channel === -1) {
+            await this.channels.push({ name: channelName, host: [host], users: [host] });
+        }
+    }
+    async removeChannel(channelName) {
+        const findChannel = await this.getChannelByName(channelName);
+        if (findChannel !== -1) {
+            this.channels = this.channels.filter((channel) => channel.name !== channelName);
+        }
+    }
+    async getChannelHost(hostName) {
+        const channelIndex = await this.getChannelByName(hostName);
+        return this.channels[channelIndex].host;
+    }
+    async getChannelByName(channelName) {
+        const channelIndex = this.channels.findIndex((channel) => channel?.name === channelName);
+        return channelIndex;
+    }
+    async addUserToChannel(channelName, user) {
+        const channelIndex = await this.getChannelByName(channelName);
+        if (channelIndex !== -1) {
+            this.channels[channelIndex].users.push(user);
+        }
+        else {
+            await this.addChannel(channelName, user);
+        }
+    }
+    async findChannelsByUserSocketId(socketId) {
+        const filteredChannels = this.channels.filter((channel) => {
+            const found = channel.users.find((user) => user.socketId === socketId);
+            if (found) {
+                return found;
+            }
+        });
+        return filteredChannels;
+    }
+    async removeUserFromAllChannels(socketId) {
+        const channels = await this.findChannelsByUserSocketId(socketId);
+        for (const channel of channels) {
+            await this.removeUserFromChannel(socketId, channel.name);
+        }
+    }
+    async removeUserFromChannel(socketId, channelName) {
+        const channel = await this.getChannelByName(channelName);
+        if (this.channels[channel]) {
+            this.channels[channel].users = this.channels[channel].users.filter((user) => user.socketId !== socketId);
+            if (this.channels[channel].users.length === 0) {
+                await this.removeChannel(channelName);
+            }
+        }
+    }
+    async getChannels() {
+        return this.channels;
+    }
+};
+exports.ChannelService = ChannelService;
+exports.ChannelService = ChannelService = __decorate([
+    (0, common_1.Injectable)()
+], ChannelService);
+
+
+/***/ }),
+
 /***/ "./src/chat/chat.gateway.ts":
 /*!**********************************!*\
   !*** ./src/chat/chat.gateway.ts ***!
@@ -304,43 +481,66 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 var __param = (this && this.__param) || function (paramIndex, decorator) {
     return function (target, key) { decorator(target, key, paramIndex); }
 };
-var _a, _b, _c;
+var _a, _b, _c, _d;
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.ChatGateway = void 0;
 const websockets_1 = __webpack_require__(/*! @nestjs/websockets */ "@nestjs/websockets");
 const common_1 = __webpack_require__(/*! @nestjs/common */ "@nestjs/common");
 const chat_interface_1 = __webpack_require__(/*! ./chat.interface */ "./src/chat/chat.interface.ts");
 const socket_io_1 = __webpack_require__(/*! socket.io */ "socket.io");
+const channel_service_1 = __webpack_require__(/*! src/channel/channel.service */ "./src/channel/channel.service.ts");
 let ChatGateway = class ChatGateway {
-    constructor() {
+    constructor(channelService) {
+        this.channelService = channelService;
         this.server = new socket_io_1.Server();
         this.logger = new common_1.Logger('ChatGateway');
     }
     async handleEvent(payload) {
         this.logger.log(payload);
         console.log(payload);
-        this.server.emit('chat', payload);
         return payload;
+    }
+    async handleSetClientDataEvent(payload) {
+        if (payload.user.socketId) {
+            this.logger.log(`${payload.user.socketId} is joining ${payload.name}`);
+            await this.server.in(payload.user.socketId).socketsJoin(payload.name);
+            await this.channelService.addUserToChannel(payload.name, payload.user);
+        }
+    }
+    async handleConnection(socket) {
+        this.logger.log(`Socket connected: ${socket.id}`);
+    }
+    async handleDisconnect(socket) {
+        await this.channelService.removeUserFromAllChannels(socket.id);
+        this.logger.log(`Socket disconnected: ${socket.id}`);
     }
 };
 exports.ChatGateway = ChatGateway;
 __decorate([
     (0, websockets_1.WebSocketServer)(),
-    __metadata("design:type", typeof (_a = typeof socket_io_1.Server !== "undefined" && socket_io_1.Server) === "function" ? _a : Object)
+    __metadata("design:type", typeof (_b = typeof socket_io_1.Server !== "undefined" && socket_io_1.Server) === "function" ? _b : Object)
 ], ChatGateway.prototype, "server", void 0);
 __decorate([
     (0, websockets_1.SubscribeMessage)('chat'),
     __param(0, (0, websockets_1.MessageBody)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [typeof (_b = typeof chat_interface_1.Message !== "undefined" && chat_interface_1.Message) === "function" ? _b : Object]),
-    __metadata("design:returntype", typeof (_c = typeof Promise !== "undefined" && Promise) === "function" ? _c : Object)
+    __metadata("design:paramtypes", [typeof (_c = typeof chat_interface_1.Message !== "undefined" && chat_interface_1.Message) === "function" ? _c : Object]),
+    __metadata("design:returntype", typeof (_d = typeof Promise !== "undefined" && Promise) === "function" ? _d : Object)
 ], ChatGateway.prototype, "handleEvent", null);
+__decorate([
+    (0, websockets_1.SubscribeMessage)('join_channel'),
+    __param(0, (0, websockets_1.MessageBody)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", Promise)
+], ChatGateway.prototype, "handleSetClientDataEvent", null);
 exports.ChatGateway = ChatGateway = __decorate([
     (0, websockets_1.WebSocketGateway)({
         cors: {
             origin: '*',
         },
-    })
+    }),
+    __metadata("design:paramtypes", [typeof (_a = typeof channel_service_1.ChannelService !== "undefined" && channel_service_1.ChannelService) === "function" ? _a : Object])
 ], ChatGateway);
 
 
@@ -375,12 +575,14 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.ChatModule = void 0;
 const common_1 = __webpack_require__(/*! @nestjs/common */ "@nestjs/common");
 const chat_gateway_1 = __webpack_require__(/*! ./chat.gateway */ "./src/chat/chat.gateway.ts");
+const channel_module_1 = __webpack_require__(/*! src/channel/channel.module */ "./src/channel/channel.module.ts");
 let ChatModule = class ChatModule {
 };
 exports.ChatModule = ChatModule;
 exports.ChatModule = ChatModule = __decorate([
     (0, common_1.Module)({
-        providers: [chat_gateway_1.ChatGateway]
+        imports: [channel_module_1.ChannelModule],
+        providers: [chat_gateway_1.ChatGateway],
     })
 ], ChatModule);
 

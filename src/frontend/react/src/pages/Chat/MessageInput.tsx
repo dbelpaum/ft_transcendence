@@ -36,8 +36,6 @@ const MessageInput: React.FC<MessageInputProps> = ({ setMessages, messages, sock
 	setInputValue(''); // Efface l'input après l'envoi du message
 	if (user && newMessage) {
 		const result = socket.emit('chat', newMessage);
-		console.log("message envoye : " + result)
-		console.log(newMessage)
 	}
 	else {
 	  // Si l'input est vide, on affiche un message d'erreur
