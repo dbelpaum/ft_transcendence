@@ -1,10 +1,10 @@
 import React, { useState, ChangeEvent, FormEvent, Dispatch, SetStateAction } from 'react';
 import {
-	User,
 	Message,
 	ServerToClientEvents,
 	ClientToServerEvents,
   } from './chat.interface';
+import { User } from '../../context/AuthInteface';
 import { useAuth } from '../../context/AuthContexte'; 
 import { v4 as uuidv4 } from 'uuid';
 import { Socket } from 'socket.io-client';

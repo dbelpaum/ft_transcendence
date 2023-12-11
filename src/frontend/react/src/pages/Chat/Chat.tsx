@@ -6,7 +6,6 @@ import Title from '../../components/Title/Title';
 import ChatContainer from './ChatContainer';
 import Channels from './Channels';
 import {
-	User,
 	Message,
 	ServerToClientEvents,
 	ClientToServerEvents,
@@ -14,6 +13,7 @@ import {
 	ChannelUtility,
 	ChannelCreate
   } from './chat.interface';
+  import { User } from '../../context/AuthInteface';
 import { useAuth } from '../../context/AuthContexte'; 
 
 const socket: Socket<ServerToClientEvents, ClientToServerEvents> = io("http://localhost:4000", { autoConnect: false });

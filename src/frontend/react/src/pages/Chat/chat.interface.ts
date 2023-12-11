@@ -1,11 +1,7 @@
 import { io, Socket } from 'socket.io-client';
 import { Dispatch, SetStateAction } from 'react';
-export interface User {
-    id: number;
-    login: string;
-    email?: string;
-	socketId?: string;
-}
+import { User } from '../../context/AuthInteface';
+
   
 export interface Message {
 	id:string;
