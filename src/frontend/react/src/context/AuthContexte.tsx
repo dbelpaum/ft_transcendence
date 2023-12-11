@@ -16,6 +16,7 @@ type AuthContextType = {
     user: User | null;
     setUser: React.Dispatch<React.SetStateAction<User | null>>;
     isLoading: boolean;
+    logout: () => void;
   };
 
 type AuthProviderProps = {
@@ -26,11 +27,15 @@ const AuthContext = createContext<AuthContextType | null>(null);
 
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 	const [user, setUser] = useState<User | null>(null);
-
   const { setErrorMessage } = useErrorMessage();
-
-
   const [isLoading, setIsLoading] = useState<boolean>(true);
+
+  const logout = () => {
+    localStorage.clear();
+    sessionStorage.clear();
+    // Par exemple, effacer le token de l'utilisateur du stockage local ou de la session
+    setUser(null);
+  };
 
   useEffect(() => {
     const verifyUser = async () => {
@@ -57,7 +62,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
 
 return (
-    <AuthContext.Provider value={{ user, setUser, isLoading }}>
+    <AuthContext.Provider value={{ user, setUser, isLoading , logout}}>
       {children}
     </AuthContext.Provider>
   );
