@@ -16,13 +16,16 @@ interface ChannelsProps {
 const Channels: React.FC<ChannelsProps> = ({ channelUtility }) => {
 
 	return (
-		<div className='channel_container'>
-		  <CreateChannel channelUtility={channelUtility}/>
-		  <ul className='channel_list'>
-			{channelUtility.channels.map((channel, index) => (
-				<ChannelItem channelUtility={channelUtility} channel={channel} key={channel.name}/>
-			))}
-		  </ul>
+		<div className='channels'>
+			<h2>Channels</h2>
+			<div className='channel_container'>
+			<CreateChannel channelUtility={channelUtility}/>
+			<ul className='channel_list'>
+				{channelUtility.channels.map((channel, index) => (
+					<ChannelItem channelUtility={channelUtility} channel={channel} key={channel.name}/>
+				))}
+			</ul>
+			</div>
 		</div>
 	  );
 };

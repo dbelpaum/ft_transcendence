@@ -15,6 +15,8 @@ import {
   } from './chat.interface';
   import { User } from '../../context/AuthInteface';
 import { useAuth } from '../../context/AuthContexte'; 
+import ChannelWrite from './ChannelWrite';
+
 
 const socket: Socket<ServerToClientEvents, ClientToServerEvents> = io("http://localhost:4000", { autoConnect: false });
 
@@ -69,6 +71,7 @@ function Chat(){
 		
 			socket.on('chat', (e) => {
 				setMessages((messages) => [e, ...messages]);
+				console.log(messages)
 				
 			});
 		
@@ -83,17 +86,16 @@ function Chat(){
 		me: user,
 		socket: socket,
 		channels: channels,
-		setChannels: setChannels
+		setChannels: setChannels,
+		message: messages,
 	  };
 
 	return (
 		<div>
 			<h1 className="chat-title">Bienvenue sur le chat {user?.login} !</h1>
 			<div className='container'>
-				<div className='channels'>
-					<h1> Channels</h1>
-					<Channels channelUtility={channelUtility}/>
-				</div>
+				<Channels channelUtility={channelUtility}/>
+				<ChannelWrite channelUtility={channelUtility}/>
 			</div>
 			<div className='chat'>
 				<ChatContainer username={user?.login} messages={messages} setMessages={setMessages} socket={socket}/>

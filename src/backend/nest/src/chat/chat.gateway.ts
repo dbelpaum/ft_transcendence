@@ -34,6 +34,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     this.logger.log(payload);
 	console.log(payload)
 	//this.server.to(payload.name).emit('chat', payload)
+	this.server.to(payload.channelName).emit('chat', payload) 
     return payload;
   }
 

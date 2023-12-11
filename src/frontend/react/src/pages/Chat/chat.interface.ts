@@ -3,12 +3,7 @@ import { Dispatch, SetStateAction } from 'react';
 import { User } from '../../context/AuthInteface';
 
   
-export interface Message {
-	id:string;
-    user: User;
-    timeSent?: string;
-    message: string;
-}
+
   
 // Interface for when server emits events to clients.
 export interface ServerToClientEvents {
@@ -27,12 +22,22 @@ export interface Channel {
 	host: User[]
 	users: User[]
 }
+
+export interface Message {
+	id:string;
+    user: User;
+    timeSent?: string;
+    message: string;
+	channelName: string;
+}
   
 export interface ChannelUtility {
 	me: User|null;
 	socket: Socket<ServerToClientEvents, ClientToServerEvents>;
 	channels: Channel[];
 	setChannels: Dispatch<SetStateAction<Channel[]>>;
+	message: Message[],
+
   }
 
 export interface ChannelCreate {

@@ -498,6 +498,7 @@ let ChatGateway = class ChatGateway {
     async handleEvent(payload) {
         this.logger.log(payload);
         console.log(payload);
+        this.server.to(payload.channelName).emit('chat', payload);
         return payload;
     }
     async handleSetClientDataEvent(payload) {
