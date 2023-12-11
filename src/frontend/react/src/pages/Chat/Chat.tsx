@@ -10,14 +10,24 @@ import {
 	Message,
 	ServerToClientEvents,
 	ClientToServerEvents,
-	Room,
-	ChannelUtility
+	Channel,
+	ChannelUtility,
+	ChannelCreate
   } from './chat.interface';
 import { useAuth } from '../../context/AuthContexte'; 
 
-const socket: Socket<ServerToClientEvents, ClientToServerEvents> = io("http://localhost:4000");
+const socket: Socket<ServerToClientEvents, ClientToServerEvents> = io("http://localhost:4000", { autoConnect: false });
 
 
+/*
+  Ce que je veux d'abord c'est que lorsque j'ajoute un channel
+  Le channel apparaisse
+  Du coup il faut un truc qui fetch l'api au point voulu
+  et qui set la liste de channels en consequenses
+  ce truc sera dans un useEffects
+  et ce serais cool qu'on s'arrange pour qu'il se mette a jour toues les 60 secondes
+  ou quand channels est mis a jour avec set channels justement !
+*/
 
 function Chat(){
 	const [messages, setMessages] = useState<Message[]>([]);
@@ -25,36 +35,55 @@ function Chat(){
 	const { user, setUser } = useAuth(); 
 	const [isConnected, setIsConnected] = useState(socket.connected);
 	
-	const [rooms, setRooms] = useState<Room[]>([]);
+	const [channels, setChannels] = useState<Channel[]>([]);
 
 	
 	useEffect(() => {
 	
-		socket.on('connect', () => {
-		setIsConnected(true);
-		});
-	
-		socket.on('disconnect', () => {
-		setIsConnected(false);
-		});
-	
-		socket.on('chat', (e) => {
-			setMessages((messages) => [e, ...messages]);
-			console.log("quel chose a été recu")
-			console.log(e)
-		});
-	
-		return () => {
-			socket.off('connect');
-			socket.off('disconnect');
-			socket.off('chat');
-		};
-	}, []);
+		if (user)
+		{
+			socket.connect();
+
+			socket.on('connect', () => {
+				setIsConnected(true);
+				const updatedUser = { ...user, socketId: socket.id };
+				setUser(updatedUser); 
+				const savedChannels: {name: string}[] = JSON.parse(sessionStorage.getItem('channels') || '[]');
+				if (savedChannels && updatedUser)
+				{
+					savedChannels.forEach((channel) => {
+						const channelJoin : ChannelCreate = {
+							name: channel.name,
+							user: updatedUser
+						}
+						socket.emit('join_channel', channelJoin);
+					});
+				}
+
+			});
+		
+		}
+			socket.on('disconnect', () => {
+				setIsConnected(false);
+			});
+		
+			socket.on('chat', (e) => {
+				setMessages((messages) => [e, ...messages]);
+				
+			});
+		
+			return () => {
+				socket.off('connect');
+				socket.off('disconnect');
+				socket.off('chat');
+			};
+	}, [user]);
 
 	const channelUtility: ChannelUtility = {
 		me: user,
 		socket: socket,
-		rooms: rooms,
+		channels: channels,
+		setChannels: setChannels
 	  };
 
 	return (

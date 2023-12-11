@@ -5,10 +5,11 @@ import { SamTestController } from './sam-test/sam-test.controller';
 import { PrismaService } from './prisma.service';
 import { AuthentificationModule } from './authentification/authentification.module';
 import { ChatModule } from './chat/chat.module';
+import { ChannelModule } from './channel/channel.module';
 import * as session from 'express-session';
 
 @Module({
-  imports: [AuthentificationModule, ChatModule],
+  imports: [AuthentificationModule, ChatModule, ChannelModule],
   controllers: [AppController, SamTestController],
   providers: [AppService, PrismaService],
 })
