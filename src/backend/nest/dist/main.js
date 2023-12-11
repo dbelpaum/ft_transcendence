@@ -68,6 +68,7 @@ const sam_test_controller_1 = __webpack_require__(/*! ./sam-test/sam-test.contro
 const prisma_service_1 = __webpack_require__(/*! ./prisma.service */ "./src/prisma.service.ts");
 const authentification_module_1 = __webpack_require__(/*! ./authentification/authentification.module */ "./src/authentification/authentification.module.ts");
 const chat_module_1 = __webpack_require__(/*! ./chat/chat.module */ "./src/chat/chat.module.ts");
+const game_gateway_1 = __webpack_require__(/*! ./game/game.gateway */ "./src/game/game.gateway.ts");
 const session = __webpack_require__(/*! express-session */ "express-session");
 let AppModule = class AppModule {
     configure(consumer) {
@@ -86,7 +87,7 @@ exports.AppModule = AppModule = __decorate([
     (0, common_1.Module)({
         imports: [authentification_module_1.AuthentificationModule, chat_module_1.ChatModule],
         controllers: [app_controller_1.AppController, sam_test_controller_1.SamTestController],
-        providers: [app_service_1.AppService, prisma_service_1.PrismaService],
+        providers: [app_service_1.AppService, prisma_service_1.PrismaService, game_gateway_1.GameGateway],
     })
 ], AppModule);
 
@@ -383,6 +384,104 @@ exports.ChatModule = ChatModule = __decorate([
         providers: [chat_gateway_1.ChatGateway]
     })
 ], ChatModule);
+
+
+/***/ }),
+
+/***/ "./src/game/game.gateway.ts":
+/*!**********************************!*\
+  !*** ./src/game/game.gateway.ts ***!
+  \**********************************/
+/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
+
+
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+var _a, _b, _c;
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.GameGateway = void 0;
+const websockets_1 = __webpack_require__(/*! @nestjs/websockets */ "@nestjs/websockets");
+const socket_io_1 = __webpack_require__(/*! socket.io */ "socket.io");
+const ServerEvents_1 = __webpack_require__(/*! src/game/shared/ServerEvents */ "./src/game/shared/ServerEvents.ts");
+const ClientEvents_1 = __webpack_require__(/*! src/game/shared/ClientEvents */ "./src/game/shared/ClientEvents.ts");
+let GameGateway = class GameGateway {
+    async handleConnection(client, ...args) {
+    }
+    onPing(client) {
+        client.emit(ServerEvents_1.ServerEvents.Pong, {
+            message: 'pong',
+        });
+    }
+    onLobbyCreate(client) {
+        return {
+            event: ServerEvents_1.ServerEvents.GameMessage,
+            data: {
+                color: 'green',
+                message: 'Lobby created',
+            },
+        };
+    }
+};
+exports.GameGateway = GameGateway;
+__decorate([
+    (0, websockets_1.SubscribeMessage)(ClientEvents_1.ClientEvents.Ping),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [typeof (_a = typeof socket_io_1.Socket !== "undefined" && socket_io_1.Socket) === "function" ? _a : Object]),
+    __metadata("design:returntype", void 0)
+], GameGateway.prototype, "onPing", null);
+__decorate([
+    (0, websockets_1.SubscribeMessage)(ClientEvents_1.ClientEvents.LobbyCreate),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [typeof (_b = typeof socket_io_1.Socket !== "undefined" && socket_io_1.Socket) === "function" ? _b : Object]),
+    __metadata("design:returntype", typeof (_c = typeof websockets_1.WsResponse !== "undefined" && websockets_1.WsResponse) === "function" ? _c : Object)
+], GameGateway.prototype, "onLobbyCreate", null);
+exports.GameGateway = GameGateway = __decorate([
+    (0, websockets_1.WebSocketGateway)({ namespace: 'game' })
+], GameGateway);
+
+
+/***/ }),
+
+/***/ "./src/game/shared/ClientEvents.ts":
+/*!*****************************************!*\
+  !*** ./src/game/shared/ClientEvents.ts ***!
+  \*****************************************/
+/***/ ((__unused_webpack_module, exports) => {
+
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.ClientEvents = void 0;
+var ClientEvents;
+(function (ClientEvents) {
+    ClientEvents["Ping"] = "client.ping";
+    ClientEvents["LobbyCreate"] = "lobby.create";
+})(ClientEvents || (exports.ClientEvents = ClientEvents = {}));
+
+
+/***/ }),
+
+/***/ "./src/game/shared/ServerEvents.ts":
+/*!*****************************************!*\
+  !*** ./src/game/shared/ServerEvents.ts ***!
+  \*****************************************/
+/***/ ((__unused_webpack_module, exports) => {
+
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.ServerEvents = void 0;
+var ServerEvents;
+(function (ServerEvents) {
+    ServerEvents["Pong"] = "server.pong";
+    ServerEvents["LobbyState"] = "server.lobby.state";
+    ServerEvents["GameMessage"] = "server.game.message";
+})(ServerEvents || (exports.ServerEvents = ServerEvents = {}));
 
 
 /***/ }),
