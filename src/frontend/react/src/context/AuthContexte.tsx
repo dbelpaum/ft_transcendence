@@ -1,4 +1,5 @@
 import React, { ReactNode, createContext, useContext, useState, useEffect } from 'react';
+// import { useNavigate } from 'react-router-dom';
 import { useErrorMessage, ErrorMessageProvider } from './ErrorContexte';
 
 export interface User {
@@ -30,12 +31,22 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const { setErrorMessage } = useErrorMessage();
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
+
   const logout = () => {
-    localStorage.clear();
-    sessionStorage.clear();
-    // Par exemple, effacer le token de l'utilisateur du stockage local ou de la session
-    setUser(null);
-  };
+    return new Promise<void>((resolve, reject) => {
+    fetch(process.env.REACT_APP_URL_SERVER + 'logout', { credentials: 'include' })
+    .then(response => {
+      if (response.ok) {
+          setUser(null); // Met à jour l'état de l'utilisateur
+          resolve();
+      } else {
+          reject(new Error('Échec de la déconnexion'));
+      }
+  })
+  .catch(error => reject(error));
+});
+};
+
 
   useEffect(() => {
     const verifyUser = async () => {

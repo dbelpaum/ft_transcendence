@@ -4,6 +4,8 @@ import { AuthProvider, useAuth } from "../../context/AuthContexte";
 
 function LogoutButton(){
     const {logout} = useAuth();
+
+
     return (
         <button className="deconnexion-btn" onClick={logout}>Déconnexion</button>
     )

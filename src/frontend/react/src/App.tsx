@@ -28,7 +28,7 @@ function App() {
 							<Route path="/" element={<Home />} />
 							<Route path="/game" element={<Game />} />
 							<Route path="/chat" element={<ProtectedChat><Chat /></ProtectedChat>} />
-							<Route path="/profil" element={<Profil />} />
+							<Route path="/profil" element={<ProtectedChat><Profil /></ProtectedChat>} />
 							<Route path="/OAuth" element={<OAuth/>} />
 						</Routes>
 					</div>
