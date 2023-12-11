@@ -1,15 +1,8 @@
 import React, { ReactNode, createContext, useContext, useState, useEffect } from 'react';
 // import { useNavigate } from 'react-router-dom';
 import { useErrorMessage, ErrorMessageProvider } from './ErrorContexte';
+import { User } from './AuthInteface';
 
-export interface User {
-    id: number;
-    login: string;
-    email: string;
-    imageUrl: string;
-    firstname: string;
-    lastname: string;
-}
 
 
 
