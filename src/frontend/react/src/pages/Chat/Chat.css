@@ -27,6 +27,12 @@ body {
 	padding: 20px;
   }
 
+  .write-chat {
+	width: 50%;
+	background-color: ghostwhite;
+	padding: 20px;
+  }
+
   .channel_item{
 		display: flex;
 	justify-content: space-between;
@@ -102,4 +108,9 @@ body {
   background-color: green; /* Couleur verte pour l'indicateur */
   display: inline-block; /* Pour positionner correctement avec le texte */
   margin-right: 5px; /* Espace entre l'indicateur et le nom du channel */
+}
+
+.write-chat h2
+{
+	text-align: center;
 }
