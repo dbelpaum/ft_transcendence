@@ -33,18 +33,19 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
 
   const logout = () => {
-    return new Promise<void>((resolve, reject) => {
     fetch(process.env.REACT_APP_URL_SERVER + 'logout', { credentials: 'include' })
-    .then(response => {
-      if (response.ok) {
-          setUser(null); // Met à jour l'état de l'utilisateur
-          resolve();
-      } else {
-          reject(new Error('Échec de la déconnexion'));
-      }
-  })
-  .catch(error => reject(error));
-});
+        .then(response => {
+            if (response.ok) {
+              sessionStorage.clear();
+              setUser(null);
+              
+            } else {
+                console.error('Erreur lors de la déconnexion');
+            }
+        })
+        .catch(error => {
+            console.error('Erreur de réseau lors de la tentative de déconnexion', error);
+        });
 };
 
 

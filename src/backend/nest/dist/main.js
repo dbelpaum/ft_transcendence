@@ -413,7 +413,13 @@ const common_1 = __webpack_require__(/*! @nestjs/common */ "@nestjs/common");
 const express_1 = __webpack_require__(/*! express */ "express");
 let LogoutController = class LogoutController {
     logout(req, res) {
-        req.session.destroy();
+        req.session.destroy((err) => {
+            if (err) {
+                console.error("Session destruction failed", err);
+                return res.status(500).send("Internal Server Error");
+            }
+            res.send({ message: "Logout successful" });
+        });
         console.log("Session détruite cote serveur");
     }
 };

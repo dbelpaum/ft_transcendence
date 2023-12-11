@@ -11,9 +11,12 @@ function Profil() {
     const { user } = useAuth();
         
     return (
+        
         <main className="profil-container">
+            <div className='decoBut'>
+            <LogoutButton />
+            </div>
             <Title title="Votre Profil" />
-            <LogoutButton/>
             
             <div className="profil-details">
                 <p>Nom d'utilisateur: {user?.login}</p>
