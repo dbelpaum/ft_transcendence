@@ -6,7 +6,12 @@ export type ServerPayloads = {
 	};
 
 	[ServerEvents.LobbyState]: {
-		message: string;
+		lobbyId: string;
+		hasStarted: boolean;
+		hasFinished: boolean;
+		isSuspended: boolean;
+		playersCount: number;
+		scores: Record<string, number>;
 	};
 
 	[ServerEvents.GameMessage]: {

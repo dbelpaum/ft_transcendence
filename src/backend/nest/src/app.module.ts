@@ -5,13 +5,15 @@ import { SamTestController } from './sam-test/sam-test.controller';
 import { PrismaService } from './prisma.service';
 import { AuthentificationModule } from './authentification/authentification.module';
 import { ChatModule } from './chat/chat.module';
-import { GameGateway } from './game/game.gateway';
+// import { GameGateway } from './game/game.gateway';
+import { ScheduleModule } from '@nestjs/schedule';
 import * as session from 'express-session';
+import { GameModule } from './game/game.module';
 
 @Module({
-  imports: [AuthentificationModule, ChatModule],
+  imports: [AuthentificationModule, ChatModule, ScheduleModule.forRoot(), GameModule],
   controllers: [AppController, SamTestController],
-  providers: [AppService, PrismaService, GameGateway],
+  providers: [AppService, PrismaService],
 })
 
 export class AppModule implements NestModule {

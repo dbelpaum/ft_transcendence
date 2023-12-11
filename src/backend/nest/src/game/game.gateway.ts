@@ -1,24 +1,43 @@
-import { SubscribeMessage, WebSocketGateway, WsResponse, OnGatewayConnection } from '@nestjs/websockets';
+import { SubscribeMessage, WebSocketGateway, WsResponse, OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit } from '@nestjs/websockets';
 import { UsePipes } from '@nestjs/common';
 import { WsValidationPipe } from 'src/game/validation-pipe';
-import { Socket } from 'socket.io';
+import { Server, Socket } from 'socket.io';
 import { ServerEvents } from 'src/game/shared/server/ServerEvents';
 import { ClientEvents } from 'src/game/shared/client/ClientEvents';
 import { ServerPayloads } from 'src/game/shared/server/ServerPayloads';
+import { LobbyManager } from './lobby/lobby.manager';
+import { AuthenticatedSocket } from './types';
+import { LobbyCreateDto, LobbyJoinDto } from './dtos';
 
 @UsePipes(new WsValidationPipe())
 @WebSocketGateway({ namespace: 'game' })
-export class GameGateway implements OnGatewayConnection{
+export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
 
-	async handleConnection(client: Socket, ...args: any[]): Promise<void>
-	{
-	  // from here you can verify if the user is authenticated correctly,
-	  // you can perform whatever operation (database call, token check, ...) 
-	  // you can disconnect client if it didn't match authentication criterias
-	  // you can also perform other operations, such as initializing socket attached data 
-	  // or whatever you would like upon connection
+	constructor(
+		private readonly lobbyManager: LobbyManager,
+	) {
 	}
-	
+
+	afterInit(server: Server): any {
+		// Pass server instance to managers
+		this.lobbyManager.server = server;
+		console.log('Game server initialized !');
+	}
+
+	async handleConnection(client: Socket, ...args: any[]): Promise<void> {
+		// from here you can verify if the user is authenticated correctly,
+		// you can perform whatever operation (database call, token check, ...) 
+		// you can disconnect client if it didn't match authentication criterias
+		// you can also perform other operations, such as initializing socket attached data 
+		// or whatever you would like upon connection
+		this.lobbyManager.initializeSocket(client as AuthenticatedSocket);
+	}
+
+	async handleDisconnect(client: AuthenticatedSocket): Promise<void> {
+		// Handle termination of socket
+		this.lobbyManager.terminateSocket(client);
+	}
+
 	@SubscribeMessage(ClientEvents.Ping)
 	onPing(client: Socket): void {
 		client.emit(ServerEvents.Pong, {
@@ -27,10 +46,11 @@ export class GameGateway implements OnGatewayConnection{
 	}
 
 	@SubscribeMessage(ClientEvents.LobbyCreate)
-	onLobbyCreate(client: Socket): WsResponse<ServerPayloads[ServerEvents.GameMessage]>
-	{
-		// const lobby = this.lobbyManager.createLobby(data.mode, data.delayBetweenRounds);
-		// lobby.addClient(client);
+	onLobbyCreate(client: AuthenticatedSocket, data: LobbyCreateDto): WsResponse<ServerPayloads[ServerEvents.GameMessage]> {
+		const lobby = this.lobbyManager.createLobby(data.mode);
+		console.log('Created %s Lobby with id %s', data.mode, lobby.id);
+		lobby.addClient(client);
+
 		return {
 			event: ServerEvents.GameMessage,
 			data: {
@@ -38,5 +58,16 @@ export class GameGateway implements OnGatewayConnection{
 				message: 'Lobby created',
 			},
 		};
+	}
+
+	@SubscribeMessage(ClientEvents.LobbyJoin)
+	onLobbyJoin(client: AuthenticatedSocket, data: LobbyJoinDto): void {
+		console.log('Client %s joined lobby %s', client.id, data.lobbyId);
+		this.lobbyManager.joinLobby(data.lobbyId, client);
+	}
+
+	@SubscribeMessage(ClientEvents.LobbyLeave)
+	onLobbyLeave(client: AuthenticatedSocket): void {
+		client.data.lobby?.removeClient(client);
 	}
 }
