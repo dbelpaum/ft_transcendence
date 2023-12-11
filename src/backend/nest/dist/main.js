@@ -160,15 +160,18 @@ let AuthentificationController = class AuthentificationController {
             }
         });
         const userData = await apiResponse.json();
-        session.user = { id: userData.id, login: userData.login, email: userData.email };
-        res.redirect('http://localhost:3000');
+        session.user = { id: userData.id, login: userData.login, email: userData.email, imageUrl: userData.image.link, firstname: userData.first_name, lastname: userData.last_name };
+        console.log(session.user);
+        res.redirect('http://localhost:3000/profil');
     }
     async profilSession42(req, session) {
         if (session.user) {
+            console.log("Il y a un utilisateur connecté");
             return session.user;
         }
         else {
-            return {};
+            console.log("Aucun utilisateur connecté");
+            return { undefined };
         }
     }
 };
