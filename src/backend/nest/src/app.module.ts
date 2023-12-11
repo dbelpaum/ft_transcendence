@@ -7,6 +7,7 @@ import { AuthentificationModule } from './authentification/authentification.modu
 import { ChatModule } from './chat/chat.module';
 import { ChannelModule } from './channel/channel.module';
 import * as session from 'express-session';
+import { LogoutController } from './logout/logout.controller';
 
 @Module({
   imports: [AuthentificationModule, ChatModule, ChannelModule],
