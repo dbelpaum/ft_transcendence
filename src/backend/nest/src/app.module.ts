@@ -10,7 +10,7 @@ import * as session from 'express-session';
 
 @Module({
   imports: [AuthentificationModule, ChatModule, ChannelModule],
-  controllers: [AppController, SamTestController],
+  controllers: [AppController, SamTestController, LogoutController],
   providers: [AppService, PrismaService],
 })
 

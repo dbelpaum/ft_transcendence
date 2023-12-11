@@ -68,7 +68,9 @@ const sam_test_controller_1 = __webpack_require__(/*! ./sam-test/sam-test.contro
 const prisma_service_1 = __webpack_require__(/*! ./prisma.service */ "./src/prisma.service.ts");
 const authentification_module_1 = __webpack_require__(/*! ./authentification/authentification.module */ "./src/authentification/authentification.module.ts");
 const chat_module_1 = __webpack_require__(/*! ./chat/chat.module */ "./src/chat/chat.module.ts");
+const logout_controller_1 = __webpack_require__(/*! ./logout/logout.controller */ "./src/logout/logout.controller.ts");
 const channel_module_1 = __webpack_require__(/*! ./channel/channel.module */ "./src/channel/channel.module.ts");
+
 const session = __webpack_require__(/*! express-session */ "express-session");
 let AppModule = class AppModule {
     configure(consumer) {
@@ -85,8 +87,9 @@ let AppModule = class AppModule {
 exports.AppModule = AppModule;
 exports.AppModule = AppModule = __decorate([
     (0, common_1.Module)({
+
         imports: [authentification_module_1.AuthentificationModule, chat_module_1.ChatModule, channel_module_1.ChannelModule],
-        controllers: [app_controller_1.AppController, sam_test_controller_1.SamTestController],
+        controllers: [app_controller_1.AppController, sam_test_controller_1.SamTestController, logout_controller_1.LogoutController],
         providers: [app_service_1.AppService, prisma_service_1.PrismaService],
     })
 ], AppModule);
@@ -161,7 +164,6 @@ let AuthentificationController = class AuthentificationController {
         });
         const userData = await apiResponse.json();
         session.user = { id: userData.id, login: userData.login, email: userData.email, imageUrl: userData.image.link, firstname: userData.first_name, lastname: userData.last_name };
-        console.log(session.user);
         res.redirect('http://localhost:3000/profil');
     }
     async profilSession42(req, session) {
@@ -586,6 +588,58 @@ exports.ChatModule = ChatModule = __decorate([
         providers: [chat_gateway_1.ChatGateway],
     })
 ], ChatModule);
+
+
+/***/ }),
+
+/***/ "./src/logout/logout.controller.ts":
+/*!*****************************************!*\
+  !*** ./src/logout/logout.controller.ts ***!
+  \*****************************************/
+/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
+
+
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+var __param = (this && this.__param) || function (paramIndex, decorator) {
+    return function (target, key) { decorator(target, key, paramIndex); }
+};
+var _a, _b;
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.LogoutController = void 0;
+const common_1 = __webpack_require__(/*! @nestjs/common */ "@nestjs/common");
+const express_1 = __webpack_require__(/*! express */ "express");
+let LogoutController = class LogoutController {
+    logout(req, res) {
+        req.session.destroy((err) => {
+            if (err) {
+                console.error("Session destruction failed", err);
+                return res.status(500).send("Internal Server Error");
+            }
+            res.send({ message: "Logout successful" });
+        });
+        console.log("Session détruite cote serveur");
+    }
+};
+exports.LogoutController = LogoutController;
+__decorate([
+    (0, common_1.Get)(),
+    __param(0, (0, common_1.Req)()),
+    __param(1, (0, common_1.Res)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [typeof (_a = typeof express_1.Request !== "undefined" && express_1.Request) === "function" ? _a : Object, typeof (_b = typeof express_1.Response !== "undefined" && express_1.Response) === "function" ? _b : Object]),
+    __metadata("design:returntype", void 0)
+], LogoutController.prototype, "logout", null);
+exports.LogoutController = LogoutController = __decorate([
+    (0, common_1.Controller)('logout')
+], LogoutController);
 
 
 /***/ }),

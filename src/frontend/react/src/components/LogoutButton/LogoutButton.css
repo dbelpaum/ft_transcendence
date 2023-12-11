@@ -1,0 +1,15 @@
+.deconnexion-btn {
+    padding: 10px 20px; /* Taille du padding pour donner de l'espace autour du texte */
+    background-color: #c0a821; /* Couleur de fond du bouton */
+    color: white; /* Couleur du texte */
+    border: none; /* Pas de bordure */
+    border-radius: 20px; /* Coins arrondis */
+    font-weight: bold; /* Texte en gras */
+    cursor: pointer; /* Change le curseur pour indiquer qu'il s'agit d'un bouton cliquable */
+    outline: none; /* Enlève le contour lors de la sélection */
+    transition: background-color 0.3s; /* Transition douce pour l'interaction */
+}
+
+.deconnexion-btn:hover {
+    background-color: #7dc764; /* Couleur de fond du bouton au survol */
+}

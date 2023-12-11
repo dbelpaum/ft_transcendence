@@ -33,7 +33,6 @@ export class AuthentificationController {
       // Ici j'ai enregistrer dans la session les infos que j'ai reçu
       // Tu peux aussi enregistrer celles qui t'interessent dans la bdd avec prisma, en une ligne ou 2
       session.user = { id: userData.id, login: userData.login, email: userData.email, imageUrl: userData.image.link, firstname: userData.first_name, lastname: userData.last_name};
-      console.log(session.user);
       res.redirect('http://localhost:3000/profil');
   }
 
