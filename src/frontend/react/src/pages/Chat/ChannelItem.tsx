@@ -30,7 +30,7 @@ const ChannelItem: React.FC<ChannelsItemsProps> = ({ channelUtility, channel }) 
 
 
 
-	const userInChannel = channel.users.some(u => u.id === channelUtility!.me!.id);
+	const userInChannel = channel.users.some(u => u.socketId === channelUtility!.me!.socketId);
 
 	const userIsAdmin = channel.host.some(u => u.id === channelUtility.me?.id);
 

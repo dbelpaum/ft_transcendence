@@ -65,6 +65,11 @@ body {
   .messages {
 	margin-bottom: 20px;
   }
+
+  .messages.right
+  {
+	text-align: right;
+  }
   
   .input-box {
 	position: fixed;
@@ -114,3 +119,23 @@ body {
 {
 	text-align: center;
 }
+
+.join-channel-button {
+	display: block; /* Pour permettre le centrage */
+	margin: 0 auto; /* Centre le bouton horizontalement */
+	padding: 10px 20px; /* Plus grand padding pour un plus grand bouton */
+	font-size: 16px; /* Taille de la police plus grande */
+	cursor: pointer; /* Change le curseur en main lors du survol */
+	/* Vous pouvez ajouter d'autres styles comme la couleur, les bordures, etc. */
+  }
+
+  .channel-info
+  {
+	width: 25%;
+	background-color: #F0F0F0;
+  }
+
+  .channel-info h3
+  {
+	  text-align: center;
+  }
