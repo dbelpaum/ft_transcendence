@@ -8,10 +8,11 @@ import { ChatModule } from './chat/chat.module';
 import { ChannelModule } from './channel/channel.module';
 import * as session from 'express-session';
 import { LogoutController } from './logout/logout.controller';
+import { UserController } from './user/user.controller';
 
 @Module({
   imports: [AuthentificationModule, ChatModule, ChannelModule],
-  controllers: [AppController, SamTestController, LogoutController],
+  controllers: [AppController, SamTestController, LogoutController, UserController],
   providers: [AppService, PrismaService],
 })
 
