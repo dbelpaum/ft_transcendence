@@ -71,6 +71,7 @@ const chat_module_1 = __webpack_require__(/*! ./chat/chat.module */ "./src/chat/
 const channel_module_1 = __webpack_require__(/*! ./channel/channel.module */ "./src/channel/channel.module.ts");
 const session = __webpack_require__(/*! express-session */ "express-session");
 const logout_controller_1 = __webpack_require__(/*! ./logout/logout.controller */ "./src/logout/logout.controller.ts");
+const user_controller_1 = __webpack_require__(/*! ./user/user.controller */ "./src/user/user.controller.ts");
 let AppModule = class AppModule {
     configure(consumer) {
         consumer
@@ -87,7 +88,7 @@ exports.AppModule = AppModule;
 exports.AppModule = AppModule = __decorate([
     (0, common_1.Module)({
         imports: [authentification_module_1.AuthentificationModule, chat_module_1.ChatModule, channel_module_1.ChannelModule],
-        controllers: [app_controller_1.AppController, sam_test_controller_1.SamTestController, logout_controller_1.LogoutController],
+        controllers: [app_controller_1.AppController, sam_test_controller_1.SamTestController, logout_controller_1.LogoutController, user_controller_1.UserController],
         providers: [app_service_1.AppService, prisma_service_1.PrismaService],
     })
 ], AppModule);
@@ -143,13 +144,17 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 var __param = (this && this.__param) || function (paramIndex, decorator) {
     return function (target, key) { decorator(target, key, paramIndex); }
 };
-var _a, _b, _c;
+var _a, _b, _c, _d;
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.AuthentificationController = void 0;
 const common_1 = __webpack_require__(/*! @nestjs/common */ "@nestjs/common");
 const passport_1 = __webpack_require__(/*! @nestjs/passport */ "@nestjs/passport");
 const express_1 = __webpack_require__(/*! express */ "express");
+const prisma_service_1 = __webpack_require__(/*! ../prisma.service */ "./src/prisma.service.ts");
 let AuthentificationController = class AuthentificationController {
+    constructor(prisma) {
+        this.prisma = prisma;
+    }
     async login42(req) {
     }
     async callback42(req, res, session) {
@@ -162,6 +167,27 @@ let AuthentificationController = class AuthentificationController {
         });
         const userData = await apiResponse.json();
         session.user = { id: userData.id, login: userData.login, email: userData.email, imageUrl: userData.image.link, firstname: userData.first_name, lastname: userData.last_name };
+        const checkUserid = await this.prisma.user.findUnique({
+            where: {
+                id42: userData.id,
+            },
+        });
+        if (checkUserid == null) {
+            await this.prisma.user.create({
+                data: {
+                    id42: userData.id,
+                    pseudo: userData.login,
+                    email: userData.email,
+                    firstname: userData.first_name,
+                    lastname: userData.last_name,
+                    imageURL: userData.image.link,
+                },
+            });
+            console.log("L'utilisateur n'existe pas dans la bdd");
+        }
+        else {
+            console.log("L'utilisateur existe deja dans la bdd");
+        }
         res.redirect('http://localhost:3000/profil');
     }
     async profilSession42(req, session) {
@@ -191,7 +217,7 @@ __decorate([
     __param(1, (0, common_1.Res)()),
     __param(2, (0, common_1.Session)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Object, typeof (_a = typeof express_1.Response !== "undefined" && express_1.Response) === "function" ? _a : Object, typeof (_b = typeof Record !== "undefined" && Record) === "function" ? _b : Object]),
+    __metadata("design:paramtypes", [Object, typeof (_b = typeof express_1.Response !== "undefined" && express_1.Response) === "function" ? _b : Object, typeof (_c = typeof Record !== "undefined" && Record) === "function" ? _c : Object]),
     __metadata("design:returntype", Promise)
 ], AuthentificationController.prototype, "callback42", null);
 __decorate([
@@ -199,11 +225,12 @@ __decorate([
     __param(0, (0, common_1.Req)()),
     __param(1, (0, common_1.Session)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Object, typeof (_c = typeof Record !== "undefined" && Record) === "function" ? _c : Object]),
+    __metadata("design:paramtypes", [Object, typeof (_d = typeof Record !== "undefined" && Record) === "function" ? _d : Object]),
     __metadata("design:returntype", Promise)
 ], AuthentificationController.prototype, "profilSession42", null);
 exports.AuthentificationController = AuthentificationController = __decorate([
-    (0, common_1.Controller)('authentification')
+    (0, common_1.Controller)('authentification'),
+    __metadata("design:paramtypes", [typeof (_a = typeof prisma_service_1.PrismaService !== "undefined" && prisma_service_1.PrismaService) === "function" ? _a : Object])
 ], AuthentificationController);
 
 
@@ -227,13 +254,14 @@ exports.AuthentificationModule = void 0;
 const common_1 = __webpack_require__(/*! @nestjs/common */ "@nestjs/common");
 const authentification_controller_1 = __webpack_require__(/*! ./authentification.controller */ "./src/authentification/authentification.controller.ts");
 const fortytwo_service_1 = __webpack_require__(/*! ./fortytwo/fortytwo.service */ "./src/authentification/fortytwo/fortytwo.service.ts");
+const prisma_service_1 = __webpack_require__(/*! src/prisma.service */ "./src/prisma.service.ts");
 let AuthentificationModule = class AuthentificationModule {
 };
 exports.AuthentificationModule = AuthentificationModule;
 exports.AuthentificationModule = AuthentificationModule = __decorate([
     (0, common_1.Module)({
         controllers: [authentification_controller_1.AuthentificationController],
-        providers: [fortytwo_service_1.FortyTwoService]
+        providers: [fortytwo_service_1.FortyTwoService, prisma_service_1.PrismaService],
     })
 ], AuthentificationModule);
 
@@ -726,6 +754,59 @@ exports.SamTestController = SamTestController = __decorate([
     (0, common_1.Controller)('sam-test'),
     __metadata("design:paramtypes", [typeof (_a = typeof prisma_service_1.PrismaService !== "undefined" && prisma_service_1.PrismaService) === "function" ? _a : Object])
 ], SamTestController);
+
+
+/***/ }),
+
+/***/ "./src/user/user.controller.ts":
+/*!*************************************!*\
+  !*** ./src/user/user.controller.ts ***!
+  \*************************************/
+/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
+
+
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+var __param = (this && this.__param) || function (paramIndex, decorator) {
+    return function (target, key) { decorator(target, key, paramIndex); }
+};
+var _a;
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.UserController = void 0;
+const common_1 = __webpack_require__(/*! @nestjs/common */ "@nestjs/common");
+const prisma_service_1 = __webpack_require__(/*! src/prisma.service */ "./src/prisma.service.ts");
+let UserController = class UserController {
+    constructor(prismaService) {
+        this.prismaService = prismaService;
+    }
+    async create(body) {
+        return this.prismaService.user.create({
+            data: {
+                username: body.username,
+                email: body.email,
+            }
+        });
+    }
+};
+exports.UserController = UserController;
+__decorate([
+    (0, common_1.Post)('create'),
+    __param(0, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", Promise)
+], UserController.prototype, "create", null);
+exports.UserController = UserController = __decorate([
+    (0, common_1.Controller)('user'),
+    __metadata("design:paramtypes", [typeof (_a = typeof prisma_service_1.PrismaService !== "undefined" && prisma_service_1.PrismaService) === "function" ? _a : Object])
+], UserController);
 
 
 /***/ }),

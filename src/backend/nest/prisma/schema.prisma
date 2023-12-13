@@ -12,9 +12,16 @@ datasource db {
 
 model User {
   id        Int      @id @default(autoincrement())
+  id42      Int      @unique
   pseudo  String   @unique
+  firstname String
+  lastname  String
+  email     String   @unique
+  bio       String?
   imageURL  String?
   createdAt DateTime @default(now())
 
   @@map("users")
 }
+
+
