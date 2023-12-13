@@ -1,18 +1,29 @@
 import { Injectable } from '@nestjs/common';
 import {
 	Channel,
-	User } from "../chat/chat.interface"
+	ChannelCreate,
+	User, 
+	joinResponse} from "../chat/chat.interface"
 
 @Injectable()
 export class ChannelService {
 	private channels: Channel[] = []
   
-	async addChannel(channelName: string, host: User): Promise<void> {
-	  const channel = await this.getChannelByName(channelName)
+	async addChannel(channelCreate: ChannelCreate): Promise<void> {
+	  const channel = await this.getChannelByName(channelCreate.name)
 	  if (channel === -1) {
-		await this.channels.push({ name: channelName, host: [host], users: [host] })
+		await this.channels.push(
+			{ 
+				name: channelCreate.name, 
+				host: [channelCreate.user], 
+				users: [channelCreate.user],
+				type: channelCreate.type,
+				mdp: channelCreate.mdp,
+				invited: []
+			})
 	  }
 	}
+
   
 	async removeChannel(channelName: string): Promise<void> {
 	  const findChannel = await this.getChannelByName(channelName)
@@ -30,17 +41,50 @@ export class ChannelService {
 	  const channelIndex = this.channels.findIndex((channel) => channel?.name === channelName)
 	  return channelIndex
 	}
-  
-	async addUserToChannel(channelName: string, user: User): Promise<void> {
-	  const channelIndex = await this.getChannelByName(channelName)
-	  if (channelIndex !== -1) {
-		this.channels[channelIndex].users.push(user)
-		}
-		else
-		{
-			await this.addChannel(channelName, user)
 
+	async userIsInvited(login: string, channel: Channel): Promise<boolean> {
+		return channel.invited.some(i => i.login === login)
+	}
+
+	async mdpIsValid(mdp: string, channel: Channel): Promise<boolean> {
+		return (mdp === channel.mdp)
+	}
+  
+	async addUserToChannel(channelCreate: ChannelCreate): Promise<joinResponse> {
+
+		// Si le channel existe
+		const channelIndex = await this.getChannelByName(channelCreate.name)
+		if (channelIndex !== -1) {
+			// Si le channel est private et qu'on est pas dans les invité, on ne rentre pas
+			if (this.channels[channelIndex].type === "private" && !this.userIsInvited(channelCreate.user.login, this.channels[channelIndex]))
+			{
+				return {
+					errorNumber: 20,
+					text: "L'utilisateur " + channelCreate.user.login + " essaie de rejoindre un channel privé sans avoir été invité : " + this.channels[channelIndex].name
+				};
+			}
+			// Si le channel est protected et que le mdp est pas ok, on ne rentre pqs
+			if (this.channels[channelIndex].type === "protected" && !this.mdpIsValid(channelCreate.mdp, this.channels[channelIndex]))
+			{
+
+				return {
+					errorNumber: 21,
+					text: "L'utilisateur " + channelCreate.user.login + " essaie de rejoindre un channel privé avec le mauvais mdp: " + this.channels[channelIndex].name
+				};
+			}
+				// Dans tout les autres cas, on ajoute l'utilisateur
+			this.channels[channelIndex].users.push(channelCreate.user)
+			return {
+				errorNumber: 0,
+				text: "Utilisateur ajouté dans le channel"
+			};
 		}
+		// Si le channel existe pas, on le créé
+		await this.addChannel(channelCreate)
+		return {
+			errorNumber: 0,
+			text: "Nouveau channel créé"
+		};
 	}
   
 
@@ -72,9 +116,13 @@ export class ChannelService {
 
 	  }
 	}
+
+	async getAllChannels(): Promise<Channel[]> {
+		return this.channels
+	  }
   
-	async getChannels(): Promise<Channel[]> {
-	  return this.channels
+	async getAccessibleChannels(login: string): Promise<Channel[]> {
+	  return this.channels.filter(c => c.type !== "private" || this.userIsInvited(login, c))
 	}
   }
   

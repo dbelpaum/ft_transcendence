@@ -43,7 +43,7 @@ const ChannelItem: React.FC<ChannelsItemsProps> = ({ channelUtility, channel }) 
 						<div className='status_indicator'></div>
 					</span>}
 				<span>
-					{channel.name}
+					{channel.name}{channel.type !== "public" && ` (${channel.type})`}
 				</span>
 			</div>
 			<LeaveIcon 

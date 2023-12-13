@@ -25,4 +25,19 @@ export interface Channel {
 	name: string
 	host: User[]
 	users: User[]
+	type: string
+	mdp: string
+	invited: User[]
+}
+
+export interface ChannelCreate {
+	name: string
+	user: User
+	type: string
+	mdp: string
+}
+
+export interface joinResponse {
+	errorNumber: number  //0 si tout vas bien
+	text: string
 }

@@ -314,20 +314,21 @@ let ChannelController = class ChannelController {
     constructor(channelService) {
         this.channelService = channelService;
     }
-    async getAllChannels() {
-        return await this.channelService.getChannels();
+    async getAllChannels(params) {
+        return await this.channelService.getAccessibleChannels(params.user);
     }
     async getChannel(params) {
-        const channels = await this.channelService.getChannels();
+        const channels = await this.channelService.getAllChannels();
         const channel = await this.channelService.getChannelByName(params.channel);
         return channels[channel];
     }
 };
 exports.ChannelController = ChannelController;
 __decorate([
-    (0, common_1.Get)('/all'),
+    (0, common_1.Get)('/all/:user'),
+    __param(0, (0, common_1.Param)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", []),
+    __metadata("design:paramtypes", [Object]),
     __metadata("design:returntype", typeof (_b = typeof Promise !== "undefined" && Promise) === "function" ? _b : Object)
 ], ChannelController.prototype, "getAllChannels", null);
 __decorate([
@@ -397,10 +398,17 @@ let ChannelService = class ChannelService {
     constructor() {
         this.channels = [];
     }
-    async addChannel(channelName, host) {
-        const channel = await this.getChannelByName(channelName);
+    async addChannel(channelCreate) {
+        const channel = await this.getChannelByName(channelCreate.name);
         if (channel === -1) {
-            await this.channels.push({ name: channelName, host: [host], users: [host] });
+            await this.channels.push({
+                name: channelCreate.name,
+                host: [channelCreate.user],
+                users: [channelCreate.user],
+                type: channelCreate.type,
+                mdp: channelCreate.mdp,
+                invited: []
+            });
         }
     }
     async removeChannel(channelName) {
@@ -417,14 +425,38 @@ let ChannelService = class ChannelService {
         const channelIndex = this.channels.findIndex((channel) => channel?.name === channelName);
         return channelIndex;
     }
-    async addUserToChannel(channelName, user) {
-        const channelIndex = await this.getChannelByName(channelName);
+    async userIsInvited(login, channel) {
+        return channel.invited.some(i => i.login === login);
+    }
+    async mdpIsValid(mdp, channel) {
+        return (mdp === channel.mdp);
+    }
+    async addUserToChannel(channelCreate) {
+        const channelIndex = await this.getChannelByName(channelCreate.name);
         if (channelIndex !== -1) {
-            this.channels[channelIndex].users.push(user);
+            if (this.channels[channelIndex].type === "private" && !this.userIsInvited(channelCreate.user.login, this.channels[channelIndex])) {
+                return {
+                    errorNumber: 20,
+                    text: "L'utilisateur " + channelCreate.user.login + " essaie de rejoindre un channel privé sans avoir été invité : " + this.channels[channelIndex].name
+                };
+            }
+            if (this.channels[channelIndex].type === "protected" && !this.mdpIsValid(channelCreate.mdp, this.channels[channelIndex])) {
+                return {
+                    errorNumber: 21,
+                    text: "L'utilisateur " + channelCreate.user.login + " essaie de rejoindre un channel privé avec le mauvais mdp: " + this.channels[channelIndex].name
+                };
+            }
+            this.channels[channelIndex].users.push(channelCreate.user);
+            return {
+                errorNumber: 0,
+                text: "Utilisateur ajouté dans le channel"
+            };
         }
-        else {
-            await this.addChannel(channelName, user);
-        }
+        await this.addChannel(channelCreate);
+        return {
+            errorNumber: 0,
+            text: "Nouveau channel créé"
+        };
     }
     async findChannelsByUserSocketId(socketId) {
         const filteredChannels = this.channels.filter((channel) => {
@@ -450,8 +482,11 @@ let ChannelService = class ChannelService {
             }
         }
     }
-    async getChannels() {
+    async getAllChannels() {
         return this.channels;
+    }
+    async getAccessibleChannels(login) {
+        return this.channels.filter(c => c.type !== "private" || this.userIsInvited(login, c));
     }
 };
 exports.ChannelService = ChannelService;
@@ -481,7 +516,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 var __param = (this && this.__param) || function (paramIndex, decorator) {
     return function (target, key) { decorator(target, key, paramIndex); }
 };
-var _a, _b, _c, _d;
+var _a, _b, _c, _d, _e, _f;
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.ChatGateway = void 0;
 const websockets_1 = __webpack_require__(/*! @nestjs/websockets */ "@nestjs/websockets");
@@ -505,7 +540,7 @@ let ChatGateway = class ChatGateway {
         if (payload.user.socketId) {
             this.logger.log(`${payload.user.socketId} is joining ${payload.name}`);
             await this.server.in(payload.user.socketId).socketsJoin(payload.name);
-            await this.channelService.addUserToChannel(payload.name, payload.user);
+            return await this.channelService.addUserToChannel(payload);
         }
     }
     async handleConnection(socket) {
@@ -532,8 +567,8 @@ __decorate([
     (0, websockets_1.SubscribeMessage)('join_channel'),
     __param(0, (0, websockets_1.MessageBody)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Object]),
-    __metadata("design:returntype", Promise)
+    __metadata("design:paramtypes", [typeof (_e = typeof chat_interface_1.ChannelCreate !== "undefined" && chat_interface_1.ChannelCreate) === "function" ? _e : Object]),
+    __metadata("design:returntype", typeof (_f = typeof Promise !== "undefined" && Promise) === "function" ? _f : Object)
 ], ChatGateway.prototype, "handleSetClientDataEvent", null);
 exports.ChatGateway = ChatGateway = __decorate([
     (0, websockets_1.WebSocketGateway)({
