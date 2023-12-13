@@ -9,7 +9,12 @@ import { error } from 'console';
 
 function Profil() {
     const { user } = useAuth();
-        
+    const userId = user?.id;
+    const userInfos = fetch(`http://localhost:4000/user/${userId}`,{method: 'GET'})
+    .then(data => data.json())
+    .then(data => console.log(data))
+    .catch(error => console.log(error));
+
     return (
         
         <main className="profil-container">

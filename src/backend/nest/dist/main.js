@@ -783,26 +783,24 @@ exports.UserController = void 0;
 const common_1 = __webpack_require__(/*! @nestjs/common */ "@nestjs/common");
 const prisma_service_1 = __webpack_require__(/*! src/prisma.service */ "./src/prisma.service.ts");
 let UserController = class UserController {
-    constructor(prismaService) {
-        this.prismaService = prismaService;
+    constructor(prisma) {
+        this.prisma = prisma;
     }
-    async create(body) {
-        return this.prismaService.user.create({
-            data: {
-                username: body.username,
-                email: body.email,
-            }
+    async getUserById(id) {
+        console.log(id);
+        return await this.prisma.user.findUnique({
+            where: { id42: Number(id) },
         });
     }
 };
 exports.UserController = UserController;
 __decorate([
-    (0, common_1.Post)('create'),
-    __param(0, (0, common_1.Body)()),
+    (0, common_1.Get)(':id'),
+    __param(0, (0, common_1.Param)('id')),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Object]),
+    __metadata("design:paramtypes", [String]),
     __metadata("design:returntype", Promise)
-], UserController.prototype, "create", null);
+], UserController.prototype, "getUserById", null);
 exports.UserController = UserController = __decorate([
     (0, common_1.Controller)('user'),
     __metadata("design:paramtypes", [typeof (_a = typeof prisma_service_1.PrismaService !== "undefined" && prisma_service_1.PrismaService) === "function" ? _a : Object])
