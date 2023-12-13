@@ -40,6 +40,7 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 
 	@SubscribeMessage(ClientEvents.Ping)
 	onPing(client: Socket): void {
+		console.log("Received event :" + ClientEvents.Ping);
 		client.emit(ServerEvents.Pong, {
 			message: 'pong',
 		});
@@ -47,6 +48,7 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 
 	@SubscribeMessage(ClientEvents.LobbyCreate)
 	onLobbyCreate(client: AuthenticatedSocket, data: LobbyCreateDto): WsResponse<ServerPayloads[ServerEvents.GameMessage]> {
+		console.log("Received event :" + ClientEvents.LobbyCreate);
 		const lobby = this.lobbyManager.createLobby(data.mode);
 		console.log('Created %s Lobby with id %s', data.mode, lobby.id);
 		lobby.addClient(client);
@@ -62,12 +64,14 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 
 	@SubscribeMessage(ClientEvents.LobbyJoin)
 	onLobbyJoin(client: AuthenticatedSocket, data: LobbyJoinDto): void {
+		console.log("Received event :" + ClientEvents.LobbyJoin);
 		console.log('Client %s joined lobby %s', client.id, data.lobbyId);
 		this.lobbyManager.joinLobby(data.lobbyId, client);
 	}
 
 	@SubscribeMessage(ClientEvents.LobbyLeave)
 	onLobbyLeave(client: AuthenticatedSocket): void {
+		console.log("Received event :" + ClientEvents.LobbyLeave);
 		client.data.lobby?.removeClient(client);
 	}
 }

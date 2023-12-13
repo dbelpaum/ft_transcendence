@@ -2,9 +2,10 @@ import React, { useState } from 'react';
 
 interface GameOnlineOptionButtonsProps {
 	onSelectMode: (mode: string, roomCode?: string) => void;
+	onCreateRoom: () => void;  // Add this prop
 }
 
-const GameOnlineOptionButtons: React.FC<GameOnlineOptionButtonsProps> = ({ onSelectMode }) => {
+const GameOnlineOptionButtons: React.FC<GameOnlineOptionButtonsProps> = ({ onSelectMode, onCreateRoom }) => {
 	const [roomCode, setRoomCode] = useState<string>('');
 
 	const handleMatchmakingClick = () => {
@@ -13,26 +14,7 @@ const GameOnlineOptionButtons: React.FC<GameOnlineOptionButtonsProps> = ({ onSel
 	};
 
 	const handleCreateRoomClick = async () => {
-		// Add logic for 'Create Room' button click
-		// Send a request to the server to create a room
-		try {
-			const response = await fetch('/api/createRoom', {
-				method: 'POST',
-				headers: {
-					'Content-Type': 'application/json',
-				},
-				body: JSON.stringify({}),
-			});
-
-			if (response.ok) {
-				const data = await response.json();
-				onSelectMode('create-room', data.roomCode);
-			} else {
-				console.error('Failed to create room');
-			}
-		} catch (error) {
-			console.error('Error creating room:', error);
-		}
+		onCreateRoom();  // Call the new prop function when "Create Room" is clicked
 	};
 
 	const handleJoinRoomClick = () => {
