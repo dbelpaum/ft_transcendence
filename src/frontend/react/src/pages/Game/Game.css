@@ -23,3 +23,64 @@
 	background: linear-gradient(to bottom, #f8f8f8, #e0e0e0);
 	box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2), inset 0 -2px 2px rgba(255, 255, 255, 0.5);
   }
+
+  .scoreRankingOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5); /* Fond semi-transparent */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 999; /* Assurez-vous que la surcouche est au-dessus du reste du contenu */
+
+  /* Animation d'apparition */
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s ease, visibility 0s linear 0.3s; /* Utilisation d'une transition pour le réglage du délai */
+}
+
+.scoreRankingOverlay.active {
+	opacity: 1;
+	visibility: visible;
+	transition: opacity 0.3s ease, visibility 0s linear; /* Annulation du délai de visibilité */
+  }
+
+.scoreRankingModal {
+  background-color: white;
+  padding: 20px;
+  border-radius: 5px;
+
+  /* Animation de disparition */
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s ease, visibility 0s linear 0.3s; /* Utilisation d'une transition pour le réglage du délai */
+}
+
+.scoreRankingModal.active {
+	opacity: 1;
+	visibility: visible;
+	transition: opacity 0.3s ease, visibility 0s linear; /* Annulation du délai de visibilité */
+  }
+
+
+/* Définition des animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes fadeOut {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
