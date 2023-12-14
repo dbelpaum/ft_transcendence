@@ -787,9 +787,14 @@ let UserController = class UserController {
         this.prisma = prisma;
     }
     async getUserById(id) {
-        console.log(id);
         return await this.prisma.user.findUnique({
             where: { id42: Number(id) },
+        });
+    }
+    async updateUserById(id, body) {
+        return await this.prisma.user.update({
+            where: { id42: Number(id) },
+            data: body,
         });
     }
 };
@@ -801,6 +806,14 @@ __decorate([
     __metadata("design:paramtypes", [String]),
     __metadata("design:returntype", Promise)
 ], UserController.prototype, "getUserById", null);
+__decorate([
+    (0, common_1.Patch)(':id'),
+    __param(0, (0, common_1.Param)('id')),
+    __param(1, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, Object]),
+    __metadata("design:returntype", Promise)
+], UserController.prototype, "updateUserById", null);
 exports.UserController = UserController = __decorate([
     (0, common_1.Controller)('user'),
     __metadata("design:paramtypes", [typeof (_a = typeof prisma_service_1.PrismaService !== "undefined" && prisma_service_1.PrismaService) === "function" ? _a : Object])

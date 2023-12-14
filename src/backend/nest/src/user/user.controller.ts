@@ -1,4 +1,4 @@
-import { Body, Controller, Post, Get, Param } from '@nestjs/common';
+import { Body, Controller, Post, Get, Param, Patch } from '@nestjs/common';
 import { PrismaService } from 'src/prisma.service';
 
 @Controller('user')
@@ -7,9 +7,16 @@ export class UserController {
 
     @Get(':id')
     async getUserById(@Param('id') id: string) {
-        console.log(id);
         return await this.prisma.user.findUnique({
             where: { id42: Number(id) },
+        });
+    }
+
+    @Patch(':id')
+    async updateUserById(@Param('id') id: string, @Body() body) {
+        return await this.prisma.user.update({
+            where: { id42: Number(id) },
+            data: body,
         });
     }
 }
