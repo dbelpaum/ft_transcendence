@@ -12,12 +12,15 @@ import { Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContexte'; 
 import { ErrorMessageProvider, useErrorMessage } from './context/ErrorContexte';
 import { ProtectedChat } from './pages/Chat/ProtectedChat';
+import { ReactNotifications, Store } from 'react-notifications-component'
+import 'react-notifications-component/dist/theme.css'
 
 
 
 function App() {
 	return (
 		<ErrorMessageProvider>
+			<ReactNotifications />
 			<AuthProvider>
 			
 			<Router>

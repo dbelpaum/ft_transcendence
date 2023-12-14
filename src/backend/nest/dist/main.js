@@ -506,7 +506,6 @@ let GameGateway = class GameGateway {
         return {
             event: ServerEvents_1.ServerEvents.GameMessage,
             data: {
-                color: 'green',
                 message: 'Lobby created',
             },
         };

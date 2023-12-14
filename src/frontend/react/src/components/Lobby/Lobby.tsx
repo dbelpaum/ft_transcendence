@@ -1,13 +1,12 @@
-// LobbyPage.tsx
 import React, { useEffect, useState } from 'react';
 
-interface LobbyPageProps {
+interface LobbyProps {
   roomId: string;
   socket: any;
   initialLobbyState: any;
 }
 
-const LobbyPage: React.FC<LobbyPageProps> = ({ roomId, socket, initialLobbyState }) => {
+const Lobby: React.FC<LobbyProps> = ({ roomId, socket, initialLobbyState }) => {
   const [lobbyState, setLobbyState] = useState<any>(initialLobbyState);
 
   useEffect(() => {
@@ -66,4 +65,4 @@ const LobbyPage: React.FC<LobbyPageProps> = ({ roomId, socket, initialLobbyState
   );
 };
 
-export default LobbyPage;
+export default Lobby;

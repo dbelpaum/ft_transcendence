@@ -56,7 +56,6 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 		return {
 			event: ServerEvents.GameMessage,
 			data: {
-				color: 'green',
 				message: 'Lobby created',
 			},
 		};

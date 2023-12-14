@@ -16,6 +16,5 @@ export type ServerPayloads = {
 
 	[ServerEvents.GameMessage]: {
 		message: string;
-		color?: 'green' | 'red' | 'white';
 	};
 };
