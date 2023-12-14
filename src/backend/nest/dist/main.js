@@ -682,14 +682,13 @@ __decorate([
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.Lobby = void 0;
-const uuid_1 = __webpack_require__(/*! uuid */ "uuid");
 const instance_1 = __webpack_require__(/*! ../instance/instance */ "./src/game/instance/instance.ts");
 const ServerEvents_1 = __webpack_require__(/*! ../shared/server/ServerEvents */ "./src/game/shared/server/ServerEvents.ts");
 class Lobby {
     constructor(server, mode) {
         this.server = server;
         this.mode = mode;
-        this.id = (0, uuid_1.v4)();
+        this.id = Math.floor(1000 + Math.random() * 9000).toString();
         this.maxClients = 2;
         this.createdAt = new Date();
         this.clients = new Map();
@@ -1040,16 +1039,6 @@ module.exports = require("passport-42");
 /***/ ((module) => {
 
 module.exports = require("socket.io");
-
-/***/ }),
-
-/***/ "uuid":
-/*!***********************!*\
-  !*** external "uuid" ***!
-  \***********************/
-/***/ ((module) => {
-
-module.exports = require("uuid");
 
 /***/ }),
 

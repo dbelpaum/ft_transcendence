@@ -1,4 +1,3 @@
-import { v4 } from 'uuid';
 import { AuthenticatedSocket } from '../types';
 import { Server, Socket } from 'socket.io';
 import { Instance } from '../instance/instance';
@@ -6,7 +5,7 @@ import { ServerEvents } from '../shared/server/ServerEvents';
 import { ServerPayloads } from '../shared/server/ServerPayloads';
 
 export class Lobby {
-	public readonly id: string = v4();
+	public readonly id: string = Math.floor(1000 + Math.random() * 9000).toString();
 
 	public readonly maxClients: number = 2;
 

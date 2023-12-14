@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 interface GameOnlineOptionButtonsProps {
 	onSelectMode: (mode: string, roomCode?: string) => void;
 	onCreateRoom: () => void;  // Add this prop
+	onJoinRoom: (lobbyId: string) => void;
 }
 
 const GameOnlineOptionButtons: React.FC<GameOnlineOptionButtonsProps> = ({ onSelectMode, onCreateRoom }) => {
