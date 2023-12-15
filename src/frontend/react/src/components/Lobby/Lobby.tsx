@@ -14,10 +14,12 @@ interface LobbyProps {
 		scores: Record<string, number>;
 		playersState: Record<string, boolean>;
 	};
+	isReady: boolean;
 	onLeaveLobby: () => void;
+	handleReadyToggle: () => void;
 }
 
-const Lobby: React.FC<LobbyProps> = ({ lobbyData, onLeaveLobby }) => {
+const Lobby: React.FC<LobbyProps> = ({ lobbyData, onLeaveLobby, handleReadyToggle, isReady }) => {
 	const socket = useContext(SocketContext) as unknown as Socket;
 
 	const handleLeaveLobby = () => {
@@ -35,6 +37,7 @@ const Lobby: React.FC<LobbyProps> = ({ lobbyData, onLeaveLobby }) => {
 			<p>Host: {lobbyData.hostId} {lobbyData.playersState[lobbyData.hostId] ? '✅' : '❌'}</p>
 			<p>Guest: {lobbyData.guestId ? `${lobbyData.guestId} ${lobbyData.playersState[lobbyData.guestId] ? '✅' : '❌'}` : 'Waiting for Opponent'}</p>
 			{/* <h3>Scores:</h3> */}
+			<button onClick={handleReadyToggle}>{isReady ? 'Unready' : 'Ready'}</button>
 			<ul>
 				{Object.entries(lobbyData.scores).map(([player, score]) => (
 					<li key={player}>

@@ -953,6 +953,7 @@ class LobbyManager {
         lobby.addClient(client);
     }
     lobbiesCleaner() {
+        console.log("Remaining lobbies : " + this.lobbies);
         console.log("Checking for empty lobbies...");
         for (const [lobbyId, lobby] of this.lobbies) {
             if (lobby.clients.size === 0) {
