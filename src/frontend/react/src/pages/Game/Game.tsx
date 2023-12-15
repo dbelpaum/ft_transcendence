@@ -3,6 +3,8 @@ import './Game.css';
 import SoloGameScene from '../../components/GameScene/SoloGameScene';
 import OnlineGameScene from '../../components/GameScene/OnlineGameScene';
 import GameModeButtons from '../../components/GameModeButtons/GameModeButtons';
+import ScorePage from './Scores/ScorePage';
+
 import io from 'socket.io-client';
 import Lobby from '../../components/Lobby/Lobby';
 import { showNotificationSuccess, showNotificationError, showNotificationWarning } from './Notification';
@@ -19,6 +21,12 @@ const Game: React.FC = () => {
 	const [socket, setSocket] = useState<any>(null);
 	const [inLobby, setInLobby] = useState<boolean>(false);
 	const [lobbyData, setLobbyData] = useState<any>(null);
+    const [showScoreRanking, setShowScoreRanking] = useState<boolean>(false); // Ajout d'un état pour afficher ou masquer la superposition du classement
+    
+      const toggleScoreRanking = () => {
+    setShowScoreRanking(!showScoreRanking);
+  };
+
 
 	useEffect(() => {
 		const socket = io('http://localhost:4000/game');
@@ -69,9 +77,23 @@ const Game: React.FC = () => {
 				{inLobby ? (<Lobby lobbyData={lobbyData} onLeaveLobby={handleLeaveLobby} />) : (<>
 					<GameModeButtons />
 					<button onClick={handlePing}>Ping</button> </>)}
+            {/* Bouton pour ouvrir/fermer la superposition du classement */}
+    <button onClick={toggleScoreRanking}>Voir le classement</button>
+      {/* Superposition modale du classement des scores */}
+      <div className={`scoreRankingOverlay ${showScoreRanking ? 'active' : ''}`}>
+        <div className={`scoreRankingModal ${showScoreRanking ? 'active' : ''}`}>
+          <button onClick={toggleScoreRanking}>Fermer</button>
+          {/* Affichage du classement des scores */}
+          <ScorePage />
+        </div>
+        </div>
 			</div>
 		</SocketContext.Provider>
 	);
+
 };
+
+
+
 
 export default Game;

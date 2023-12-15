@@ -5,6 +5,12 @@ body {
 	font-family: Arial, sans-serif;
   }
 
+  .leave_icon
+  {
+	width: 15px;
+  	height: auto;
+  }
+
 .chat-title
 {
 	text-align: center;;
@@ -19,6 +25,18 @@ body {
 	width: 25%;
 	background-color: #f0f0f0;
 	padding: 20px;
+  }
+
+  .write-chat {
+	width: 50%;
+	background-color: ghostwhite;
+	padding: 20px;
+  }
+
+  .channel_item{
+		display: flex;
+	justify-content: space-between;
+	align-items: center;
   }
   
   .channels ul {
@@ -46,6 +64,11 @@ body {
   
   .messages {
 	margin-bottom: 20px;
+  }
+
+  .messages.right
+  {
+	text-align: right;
   }
   
   .input-box {
@@ -82,3 +105,124 @@ body {
 	  height: 100%; /* Utilisez la hauteur souhaitée ou % pour centrer verticalement */
 	  text-align: center; /* Pour centrer horizontalement */
 	}
+
+.status_indicator {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%; /* Rend le div circulaire */
+  background-color: green; /* Couleur verte pour l'indicateur */
+  display: inline-block; /* Pour positionner correctement avec le texte */
+  margin-right: 5px; /* Espace entre l'indicateur et le nom du channel */
+}
+
+.write-chat h2
+{
+	text-align: center;
+}
+
+.join-channel-button {
+	display: block; /* Pour permettre le centrage */
+	margin: 0 auto; /* Centre le bouton horizontalement */
+	padding: 10px 20px; /* Plus grand padding pour un plus grand bouton */
+	font-size: 16px; /* Taille de la police plus grande */
+	cursor: pointer; /* Change le curseur en main lors du survol */
+	/* Vous pouvez ajouter d'autres styles comme la couleur, les bordures, etc. */
+  }
+
+  .channel-info
+  {
+	width: 25%;
+	background-color: #F0F0F0;
+  }
+
+.userChannel{
+	display: flex;
+  align-items: center;
+}
+
+  .channel-info h3
+  {
+	  text-align: center;
+  }
+
+  .userChannel>span{
+	margin: 0 10px;
+	font-size: 20px;
+  	font-weight: bold;
+  }
+
+  .userChannel .crownIcon
+  {
+	width: 20px;
+	position: relative;
+  	top: 3px;
+  }
+
+  .channel-form {
+	display: flex;
+	flex-direction: column;
+	gap: 10px; /* Espacement entre les champs */
+  }
+  
+  .channel-form input, .channel-form select {
+	padding: 8px;
+	border: 1px solid #ccc;
+	border-radius: 4px;
+  }
+  
+  .channel-form button {
+	padding: 10px;
+	background-color: blue;
+	color: white;
+	border: none;
+	border-radius: 4px;
+	cursor: pointer;
+  }
+  
+  .channel-form button:hover {
+	background-color: darkblue;
+  }
+  
+  .create-channel-button, .channel-form button {
+	padding: 10px;
+	background-color: blue;
+	color: white;
+	border: none;
+	border-radius: 4px;
+	cursor: pointer;
+	margin-top: 10px; /* Ajoutez une marge si nécessaire */
+	font-weight: bold;
+	letter-spacing: 1px;
+	font-size: 18px;
+  }
+  
+  .create-channel-button:hover, .channel-form button:hover {
+	background-color: darkblue;
+  }
+  
+  .create-form-container{
+	text-align: center;
+  }
+
+  .channel-info h3
+  {
+	font-size: 22px;
+  }
+
+  .channel-info p
+  {
+	text-align: center;
+  }
+
+  .userChannel .button
+  {
+	font-size: 12px;
+  }
+
+  .userChannel .button span
+  {
+	border: 2px solid black;
+	margin: 0 4px;
+	padding: 4px;
+	cursor: pointer;
+  }

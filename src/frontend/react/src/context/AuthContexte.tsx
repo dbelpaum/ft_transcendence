@@ -1,14 +1,8 @@
 import React, { ReactNode, createContext, useContext, useState, useEffect } from 'react';
+// import { useNavigate } from 'react-router-dom';
 import { useErrorMessage, ErrorMessageProvider } from './ErrorContexte';
+import { User } from './AuthInteface';
 
-export interface User {
-    id: number;
-    login: string;
-    email: string;
-    imageUrl: string;
-    firstname: string;
-    lastname: string;
-}
 
 
 
@@ -16,6 +10,7 @@ type AuthContextType = {
     user: User | null;
     setUser: React.Dispatch<React.SetStateAction<User | null>>;
     isLoading: boolean;
+    logout: () => void;
   };
 
 type AuthProviderProps = {
@@ -26,11 +21,26 @@ const AuthContext = createContext<AuthContextType | null>(null);
 
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 	const [user, setUser] = useState<User | null>(null);
-
   const { setErrorMessage } = useErrorMessage();
-
-
   const [isLoading, setIsLoading] = useState<boolean>(true);
+
+
+  const logout = () => {
+    fetch(process.env.REACT_APP_URL_SERVER + 'logout', { credentials: 'include' })
+        .then(response => {
+            if (response.ok) {
+              sessionStorage.clear();
+              setUser(null);
+              
+            } else {
+                console.error('Erreur lors de la déconnexion');
+            }
+        })
+        .catch(error => {
+            console.error('Erreur de réseau lors de la tentative de déconnexion', error);
+        });
+};
+
 
   useEffect(() => {
     const verifyUser = async () => {
@@ -57,7 +67,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
 
 return (
-    <AuthContext.Provider value={{ user, setUser, isLoading }}>
+    <AuthContext.Provider value={{ user, setUser, isLoading , logout}}>
       {children}
     </AuthContext.Provider>
   );

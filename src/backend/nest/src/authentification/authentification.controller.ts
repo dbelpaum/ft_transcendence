@@ -2,9 +2,12 @@
 import { Controller, Get, Req, Res, Session, UseGuards, Query } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { Request, Response } from 'express';
+import { PrismaService } from '../prisma.service';
 
 @Controller('authentification')
 export class AuthentificationController {
+  constructor (private prisma: PrismaService){}
+
   @Get('42')
   @UseGuards(AuthGuard('42'))
   async login42(@Req() req, ) {
@@ -33,7 +36,31 @@ export class AuthentificationController {
       // Ici j'ai enregistrer dans la session les infos que j'ai reçu
       // Tu peux aussi enregistrer celles qui t'interessent dans la bdd avec prisma, en une ligne ou 2
       session.user = { id: userData.id, login: userData.login, email: userData.email, imageUrl: userData.image.link, firstname: userData.first_name, lastname: userData.last_name};
-      console.log(session.user);
+      const checkUserid = await this.prisma.user.findUnique({
+        where: {
+          id42: userData.id,
+        },
+      });
+
+      if (checkUserid == null){
+        await this.prisma.user.create({
+          data: {
+            id42: userData.id,
+            pseudo: userData.login,
+            email: userData.email,
+            firstname: userData.first_name,
+            lastname: userData.last_name,
+            imageURL: userData.image.link,
+          },
+        });
+        console.log("L'utilisateur n'existe pas dans la bdd");
+        
+      }
+      else{
+        console.log("L'utilisateur existe deja dans la bdd");
+      }
+
+      
       res.redirect('http://localhost:3000/profil');
   }
 

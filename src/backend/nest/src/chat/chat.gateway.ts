@@ -1,11 +1,16 @@
-import { SubscribeMessage, WebSocketGateway, MessageBody,  WebSocketServer} from '@nestjs/websockets';
+import { SubscribeMessage, WebSocketGateway, MessageBody,  WebSocketServer, OnGatewayConnection, OnGatewayDisconnect,
+  } from '@nestjs/websockets';
 import { Logger } from '@nestjs/common';
 import {
   ServerToClientEvents,
   ClientToServerEvents,
   Message,
+  User,
+  ChannelCreate,
+  joinResponse
 } from './chat.interface';
-import { Server } from 'socket.io';
+import { Server, Socket } from 'socket.io';
+import { ChannelService } from 'src/channel/channel.service';
 
 
 @WebSocketGateway({
@@ -13,7 +18,10 @@ import { Server } from 'socket.io';
     origin: '*',
   },
 })
-export class ChatGateway {
+
+export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
+	constructor(private channelService: ChannelService) {}
+
   @WebSocketServer() server: Server = new Server<
     ServerToClientEvents,
     ClientToServerEvents
@@ -27,9 +35,32 @@ export class ChatGateway {
   ): Promise<Message> {
     this.logger.log(payload);
 	console.log(payload)
-    this.server.emit('chat', payload); // broadcast messages
+	//this.server.to(payload.name).emit('chat', payload)
+	this.server.to(payload.channelName).emit('chat', payload) 
     return payload;
   }
+
+  @SubscribeMessage('join_channel')
+  async handleSetClientDataEvent(
+    @MessageBody()
+    payload: ChannelCreate
+  ): Promise<joinResponse> {
+	  if (payload.user.socketId) {
+		this.logger.log(`${payload.user.socketId} is joining ${payload.name}`)
+		await this.server.in(payload.user.socketId).socketsJoin(payload.name)
+		return await this.channelService.addUserToChannel(payload)
+    }
+  }
+
+  async handleConnection(socket: Socket): Promise<void> {
+    this.logger.log(`Socket connected: ${socket.id}`)
+  }
+
+  async handleDisconnect(socket: Socket): Promise<void> {
+    await this.channelService.removeUserFromAllChannels(socket.id)
+    this.logger.log(`Socket disconnected: ${socket.id}`)
+  }
+
 }
 
 
