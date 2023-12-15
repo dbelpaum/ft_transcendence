@@ -21,6 +21,9 @@ export interface Channel {
 	name: string
 	host: User[]
 	users: User[]
+	type: string
+	mdp: string
+	invited: User[]
 }
 
 export interface Message {
@@ -43,4 +46,6 @@ export interface ChannelUtility {
 export interface ChannelCreate {
 	name: string
 	user: User
+	type: string
+	mdp: string
 }
