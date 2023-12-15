@@ -1,68 +1,48 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useContext } from 'react';
+import { SocketContext } from '../../pages/Game/SocketContext';
+import { Socket } from 'socket.io-client';
 
 interface LobbyProps {
-  roomId: string;
-  socket: any;
-  initialLobbyState: any;
-}
+	lobbyData: {
+	  lobbyId: string;
+	  hasStarted: boolean;
+	  hasFinished: boolean;
+	  isSuspended: boolean;
+	  playersCount: number;
+	  scores: Record<string, number>;
+	};
+	onLeaveLobby: () => void;
+  }
 
-const Lobby: React.FC<LobbyProps> = ({ roomId, socket, initialLobbyState }) => {
-  const [lobbyState, setLobbyState] = useState<any>(initialLobbyState);
+const Lobby: React.FC<LobbyProps> = ({ lobbyData, onLeaveLobby }) => {
+	const socket = useContext(SocketContext) as unknown as Socket;
 
-  useEffect(() => {
-    if (socket) {
-      socket.on('server.lobby.state', (data: any) => {
-        console.log('Received Lobby State:', data);
-        setLobbyState(data);
-      });
-    }
+	const handleLeaveLobby = () => {
+		if (socket) {
+			socket.emit('client.lobby.leave');
+		}
+		onLeaveLobby();
+	};
 
-    return () => {
-      if (socket) {
-        socket.off('server.lobby.state');
-      }
-    };
-  }, [socket]);
-
-  return (
-    <div>
-      <h2>Lobby: {roomId}</h2>
-      {lobbyState && (
-        <div>
-          <p>Has Started: {lobbyState.hasStarted ? 'Yes' : 'No'}</p>
-          <p>Has Finished: {lobbyState.hasFinished ? 'Yes' : 'No'}</p>
-          <p>Is Suspended: {lobbyState.isSuspended ? 'Yes' : 'No'}</p>
-          <p>Players Count: {lobbyState.playersCount}</p>
-          <p>Scores:</p>
-          <ul>
-            {lobbyState.scores &&
-              Object.entries(lobbyState.scores).map(([playerId, score]) => (
-                <li key={playerId}>{`Player ${playerId}: ${score}`}</li>
-              ))}
-          </ul>
-        </div>
-      )}
-      <div style={{ display: 'flex' }}>
-        {/* Left side: Current user */}
-        <div style={{ flex: 1 }}>
-          <h3>Your Information</h3>
-          {lobbyState?.players &&
-            lobbyState.players.map((player: any) => (
-              <div key={player.id}>{player.name}</div>
-            ))}
-        </div>
-
-        {/* Right side: Opponent(s) */}
-        <div style={{ flex: 1 }}>
-          <h3>Opponent(s) Information</h3>
-          {lobbyState?.players &&
-            lobbyState.players.map((player: any) => (
-              <div key={player.id}>{player.name}</div>
-            ))}
-        </div>
-      </div>
-    </div>
-  );
+	return (
+		<div>
+			<h2>Lobby Information</h2>
+			<p>Room code: {lobbyData.lobbyId}</p>
+			<p>Started: {lobbyData.hasStarted ? 'Yes' : 'No'}</p>
+			<p>Finished: {lobbyData.hasFinished ? 'Yes' : 'No'}</p>
+			<p>Suspended: {lobbyData.isSuspended ? 'Yes' : 'No'}</p>
+			<p>Players Count: {lobbyData.playersCount}</p>
+			<h3>Scores:</h3>
+			<ul>
+				{Object.entries(lobbyData.scores).map(([player, score]) => (
+					<li key={player}>
+						{player}: {score}
+					</li>
+				))}
+			</ul>
+			<button onClick={handleLeaveLobby}>Leave Lobby</button>
+		</div>
+	);
 };
 
 export default Lobby;

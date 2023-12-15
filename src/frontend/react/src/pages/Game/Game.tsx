@@ -17,7 +17,8 @@ const DebugPanel: React.FC<{ variables: Record<string, any> }> = ({ variables })
 
 const Game: React.FC = () => {
 	const [socket, setSocket] = useState<any>(null);
-
+	const [inLobby, setInLobby] = useState<boolean>(false);
+	const [lobbyData, setLobbyData] = useState<any>(null);
 
 	useEffect(() => {
 		const socket = io('http://localhost:4000/game');
@@ -29,6 +30,13 @@ const Game: React.FC = () => {
 
 		socket.on('server.game.message', (data: any) => {
 			showNotificationSuccess('', data.message);
+		});
+
+
+		socket.on('server.lobby.state', (data: any) => {
+			console.log('Received Lobby State:', data);
+			setInLobby(true);
+			setLobbyData(data);
 		});
 
 		return () => {
@@ -49,12 +57,18 @@ const Game: React.FC = () => {
 		}
 	};
 
+	const handleLeaveLobby = () => {
+		setInLobby(false);
+		setLobbyData(null);
+	};
+
 	return (
 		<SocketContext.Provider value={socket}>
 			<div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100vh' }}>
 				{/* <DebugPanel variables={{ selectedGameMode }} /> */}
-				<GameModeButtons />
-				<button onClick={handlePing}>Ping</button>
+				{inLobby ? (<Lobby lobbyData={lobbyData} onLeaveLobby={handleLeaveLobby} />) : (<>
+					<GameModeButtons />
+					<button onClick={handlePing}>Ping</button> </>)}
 			</div>
 		</SocketContext.Provider>
 	);
