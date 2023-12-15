@@ -9,6 +9,7 @@
 	font-size: 32px;
 	border-radius: 5px;
 	z-index: 1000;
+
 }
 
 .keycap {
@@ -83,4 +84,5 @@
   to {
     opacity: 0;
   }
+
 }
