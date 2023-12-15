@@ -37,8 +37,11 @@ export class Lobby {
 
 	public removeClient(client: AuthenticatedSocket): void {
 		this.clients.delete(client.id);
-		if (client.id === this.hostSocketId)
-			this.hostSocketId = null;
+		// Si l'hôte leave, alors le guest devient hôte
+		if (client.id === this.hostSocketId) {
+			this.hostSocketId = this.guestSocketId ? this.guestSocketId : null;
+			this.guestSocketId = null;
+		}
 		else
 			this.guestSocketId = null;
 		client.leave(this.id);
@@ -81,7 +84,6 @@ export class Lobby {
 			isSuspended: this.instance.isSuspended,
 			scores: this.instance.scores,
 		};
-		console.log(this.readyStatus);
 
 		this.dispatchToLobby(ServerEvents.LobbyState, payload);
 	}

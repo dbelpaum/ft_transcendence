@@ -953,11 +953,18 @@ class LobbyManager {
         lobby.addClient(client);
     }
     lobbiesCleaner() {
+        console.log("Checking for empty lobbies...");
+        for (const [lobbyId, lobby] of this.lobbies) {
+            if (lobby.clients.size === 0) {
+                this.lobbies.delete(lobbyId);
+                console.log("Removed empty lobby %s", lobbyId);
+            }
+        }
     }
 }
 exports.LobbyManager = LobbyManager;
 __decorate([
-    (0, schedule_1.Cron)('*/5 * * * *'),
+    (0, schedule_1.Cron)('*/3 * * * *'),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", []),
     __metadata("design:returntype", void 0)
@@ -1001,8 +1008,10 @@ class Lobby {
     }
     removeClient(client) {
         this.clients.delete(client.id);
-        if (client.id === this.hostSocketId)
-            this.hostSocketId = null;
+        if (client.id === this.hostSocketId) {
+            this.hostSocketId = this.guestSocketId ? this.guestSocketId : null;
+            this.guestSocketId = null;
+        }
         else
             this.guestSocketId = null;
         client.leave(this.id);
@@ -1038,7 +1047,6 @@ class Lobby {
             isSuspended: this.instance.isSuspended,
             scores: this.instance.scores,
         };
-        console.log(this.readyStatus);
         this.dispatchToLobby(ServerEvents_1.ServerEvents.LobbyState, payload);
     }
     dispatchToLobby(event, payload) {

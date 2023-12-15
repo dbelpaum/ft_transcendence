@@ -41,7 +41,14 @@ export class LobbyManager {
 	}
 
 	// Periodically clean up lobbies
-	@Cron('*/5 * * * *')
+	@Cron('*/3 * * * *')
 	private lobbiesCleaner(): void {
+		console.log("Checking for empty lobbies...");
+		for (const [lobbyId, lobby] of this.lobbies) {
+			if (lobby.clients.size === 0) {
+				this.lobbies.delete(lobbyId);
+				console.log("Removed empty lobby %s", lobbyId);
+			}
+		}
 	}
 }
