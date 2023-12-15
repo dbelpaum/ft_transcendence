@@ -73,4 +73,16 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 		console.log("Received event :" + ClientEvents.LobbyLeave);
 		client.data.lobby?.removeClient(client);
 	}
+
+	@SubscribeMessage(ClientEvents.ClientReady)
+	onClientReady(client: AuthenticatedSocket): void {
+		console.log("Received event :" + ClientEvents.ClientReady);
+		client.data.lobby?.setReadyStatus(client, true);
+	}
+
+	@SubscribeMessage(ClientEvents.ClientUnready)
+	onClientUnready(client: AuthenticatedSocket): void {
+		console.log("Received event :" + ClientEvents.ClientUnready);
+		client.data.lobby?.setReadyStatus(client, false);
+	}
 }

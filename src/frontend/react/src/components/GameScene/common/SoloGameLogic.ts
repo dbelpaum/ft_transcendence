@@ -1,31 +1,31 @@
 import * as THREE from 'three';
 
 export class SoloGameLogic {
-	private scene: THREE.Scene;
-	private camera: THREE.PerspectiveCamera;
-	private camera3D: THREE.PerspectiveCamera;
-	private renderer: THREE.WebGLRenderer;
-	private paddleWidth: number = 80;
-	private paddleHeight: number = 10;
-	private paddleDepth: number = 15;
-	private paddleVelocity: number = 2;
-	private ballRadius: number = 5;
-	private gameTick: number = 0;
-	private ballSpeedModifier: number = 1;
-	private cameraInUse: { camera: THREE.PerspectiveCamera; id: number } = { camera: new THREE.PerspectiveCamera(), id: 0 };
-	private playerScore: number = 0;
-	private opponentScore: number = 0;
-	private mainLight: THREE.HemisphereLight;
-	private ground: THREE.Mesh;
-	private player: THREE.Mesh;
-	private opponent: THREE.Mesh;
-	private ball: THREE.Mesh;
-	private width: number;
-	private height: number;
-	private ballVelX: number;
-	private ballVelY: number;
-	private paddleLeftSpeed: number = 0;
-	private paddleRightSpeed: number = 0;
+	protected scene: THREE.Scene;
+	protected camera: THREE.PerspectiveCamera;
+	protected camera3D: THREE.PerspectiveCamera;
+	protected renderer: THREE.WebGLRenderer;
+	protected paddleWidth: number = 80;
+	protected paddleHeight: number = 10;
+	protected paddleDepth: number = 15;
+	protected paddleVelocity: number = 2;
+	protected ballRadius: number = 5;
+	protected gameTick: number = 0;
+	protected ballSpeedModifier: number = 1;
+	protected cameraInUse: { camera: THREE.PerspectiveCamera; id: number } = { camera: new THREE.PerspectiveCamera(), id: 0 };
+	protected playerScore: number = 0;
+	protected opponentScore: number = 0;
+	protected mainLight: THREE.HemisphereLight;
+	protected ground: THREE.Mesh;
+	protected player: THREE.Mesh;
+	protected opponent: THREE.Mesh;
+	protected ball: THREE.Mesh;
+	protected width: number;
+	protected height: number;
+	protected ballVelX: number;
+	protected ballVelY: number;
+	protected paddleLeftSpeed: number = 0;
+	protected paddleRightSpeed: number = 0;
 
 	constructor(canvas: HTMLCanvasElement, width: number, height: number) {
 		this.width = width;
@@ -75,7 +75,7 @@ export class SoloGameLogic {
 		this.scene.add(this.ground, this.player, this.opponent, this.ball);
 	}
 
-	private handleKeyDown(event: KeyboardEvent) {
+	protected handleKeyDown(event: KeyboardEvent) {
 		switch (event.key) {
 			case 'ArrowLeft':
 			case 'a':
@@ -94,7 +94,7 @@ export class SoloGameLogic {
 		}
 	}
 
-	private handleKeyUp(event: KeyboardEvent) {
+	protected handleKeyUp(event: KeyboardEvent) {
 		switch (event.key) {
 			case 'ArrowLeft':
 			case 'a':
@@ -110,7 +110,7 @@ export class SoloGameLogic {
 		}
 	}
 
-	private switchCamera() {
+	protected switchCamera() {
 		if (this.cameraInUse.id == 0) {
 			this.cameraInUse.camera = this.camera3D;
 			this.cameraInUse.id = 1;
@@ -120,7 +120,7 @@ export class SoloGameLogic {
 		}
 	}
 
-	private checkCollisions(paddle: THREE.Mesh): boolean {
+	protected checkCollisions(paddle: THREE.Mesh): boolean {
 		return (
 			this.ball.position.x >= paddle.position.x - this.paddleWidth / 2 &&
 			this.ball.position.x <= paddle.position.x + this.paddleWidth / 2 &&
@@ -129,7 +129,7 @@ export class SoloGameLogic {
 		);
 	}
 
-	private newRound() {
+	protected newRound() {
 		this.ball.position.x = 0;
 		this.ball.position.y = 0;
 		this.player.position.x = 0;
@@ -142,7 +142,7 @@ export class SoloGameLogic {
 		this.ballVelY = -Math.cos(randomAngle);
 	}
 
-	private isValidMovement(posX: number, offset: number): boolean {
+	protected isValidMovement(posX: number, offset: number): boolean {
 		return (
 			posX + offset > -this.camera.position.z + this.paddleWidth / 2 &&
 			posX + offset < this.camera.position.z - this.paddleWidth / 2
@@ -223,7 +223,7 @@ export class SoloGameLogic {
 		this.gameTick++;
 	}
 
-	private animate() {
+	protected animate() {
 		requestAnimationFrame(this.animate.bind(this));
 		this.renderScene();
 	}

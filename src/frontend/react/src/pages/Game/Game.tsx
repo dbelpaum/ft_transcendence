@@ -4,7 +4,6 @@ import SoloGameScene from '../../components/GameScene/SoloGameScene';
 import OnlineGameScene from '../../components/GameScene/OnlineGameScene';
 import GameModeButtons from '../../components/GameModeButtons/GameModeButtons';
 import ScorePage from './Scores/ScorePage';
-
 import io from 'socket.io-client';
 import Lobby from '../../components/Lobby/Lobby';
 import { showNotificationSuccess, showNotificationError, showNotificationWarning } from './Notification';
@@ -21,11 +20,23 @@ const Game: React.FC = () => {
 	const [socket, setSocket] = useState<any>(null);
 	const [inLobby, setInLobby] = useState<boolean>(false);
 	const [lobbyData, setLobbyData] = useState<any>(null);
-    const [showScoreRanking, setShowScoreRanking] = useState<boolean>(false); // Ajout d'un état pour afficher ou masquer la superposition du classement
-    
-      const toggleScoreRanking = () => {
-    setShowScoreRanking(!showScoreRanking);
-  };
+	const [gameStarted, setGameStarted] = useState<boolean>(false);
+	const [showScoreRanking, setShowScoreRanking] = useState<boolean>(false); // Ajout d'un état pour afficher ou masquer la superposition du classement
+	const [isReady, setIsReady] = useState<boolean>(false);
+
+	const toggleScoreRanking = () => {
+		setShowScoreRanking(!showScoreRanking);
+	};
+
+	const handleReadyToggle = () => {
+		if (socket && !isReady) {
+			socket.emit('client.lobby.ready', { isReady: !isReady });
+		}
+		else if (socket) {
+			socket.emit('client.lobby.unready', { isReady: !isReady });
+		}
+		setIsReady(!isReady);
+	};
 
 
 	useEffect(() => {
@@ -45,6 +56,11 @@ const Game: React.FC = () => {
 			console.log('Received Lobby State:', data);
 			setInLobby(true);
 			setLobbyData(data);
+		});
+
+		socket.on('server.game.start', (data: any) => {
+			if (!gameStarted)
+				setGameStarted(true);
 		});
 
 		return () => {
@@ -68,25 +84,31 @@ const Game: React.FC = () => {
 	const handleLeaveLobby = () => {
 		setInLobby(false);
 		setLobbyData(null);
+		setIsReady(false);
 	};
 
 	return (
 		<SocketContext.Provider value={socket}>
 			<div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100vh' }}>
-				{/* <DebugPanel variables={{ selectedGameMode }} /> */}
-				{inLobby ? (<Lobby lobbyData={lobbyData} onLeaveLobby={handleLeaveLobby} />) : (<>
-					<GameModeButtons />
-					<button onClick={handlePing}>Ping</button> </>)}
-            {/* Bouton pour ouvrir/fermer la superposition du classement */}
-    <button onClick={toggleScoreRanking}>Voir le classement</button>
-      {/* Superposition modale du classement des scores */}
-      <div className={`scoreRankingOverlay ${showScoreRanking ? 'active' : ''}`}>
-        <div className={`scoreRankingModal ${showScoreRanking ? 'active' : ''}`}>
-          <button onClick={toggleScoreRanking}>Fermer</button>
-          {/* Affichage du classement des scores */}
-          <ScorePage />
-        </div>
-        </div>
+				<DebugPanel variables={{ gameStarted }} />
+				{/*Rendering du du Menu OU du Lobby OU de rien car on est in game*/}
+				{!gameStarted && (<>{inLobby ? (
+					<Lobby lobbyData={lobbyData} onLeaveLobby={handleLeaveLobby} />) : (<>
+						<GameModeButtons />
+						<button onClick={handlePing}>Ping</button></>)}</>)}
+				{inLobby && !gameStarted && <button onClick={handleReadyToggle}>{isReady ? 'Unready' : 'Ready'}</button>}
+				{gameStarted && <OnlineGameScene width={800} height={600} />}
+
+				{/* Bouton pour ouvrir/fermer la superposition du classement */}
+				<button onClick={toggleScoreRanking}>Voir le classement</button>
+				{/* Superposition modale du classement des scores */}
+				<div className={`scoreRankingOverlay ${showScoreRanking ? 'active' : ''}`}>
+					<div className={`scoreRankingModal ${showScoreRanking ? 'active' : ''}`}>
+						<button onClick={toggleScoreRanking}>Fermer</button>
+						{/* Affichage du classement des scores */}
+						<ScorePage />
+					</div>
+				</div>
 			</div>
 		</SocketContext.Provider>
 	);
