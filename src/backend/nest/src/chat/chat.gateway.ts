@@ -7,7 +7,10 @@ import {
   Message,
   User,
   ChannelCreate,
-  joinResponse
+  joinResponse,
+  Channel,
+  InviteToChannel,
+  addAdminInfo,
 } from './chat.interface';
 import { Server, Socket } from 'socket.io';
 import { ChannelService } from 'src/channel/channel.service';
@@ -28,14 +31,45 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   >();
   private logger = new Logger('ChatGateway');
 
+  @SubscribeMessage('remove_admin')
+  async delete_admin(
+    @MessageBody()
+    payload: addAdminInfo,
+  ): Promise<void> {
+    this.logger.log(payload);
+
+	//this.server.to(payload.name).emit('chat', payload)
+	await this.channelService.removeAdminToChannel(payload)
+  }
+
+  @SubscribeMessage('add_admin')
+  async addAdmin(
+    @MessageBody()
+    payload: addAdminInfo,
+  ): Promise<void> {
+    this.logger.log(payload);
+
+	//this.server.to(payload.name).emit('chat', payload)
+	await this.channelService.addAdminToChannel(payload)
+  }
+
+  @SubscribeMessage('invite')
+  async handleInvite(
+    @MessageBody()
+    payload: InviteToChannel,
+  ): Promise<void> {
+    this.logger.log(payload);
+
+	//this.server.to(payload.name).emit('chat', payload)
+	await this.channelService.addInviteToChannel(payload)
+  }
+
   @SubscribeMessage('chat')
   async handleEvent(
     @MessageBody()
     payload: Message,
   ): Promise<Message> {
     this.logger.log(payload);
-	console.log(payload)
-	//this.server.to(payload.name).emit('chat', payload)
 	this.server.to(payload.channelName).emit('chat', payload) 
     return payload;
   }
@@ -48,7 +82,19 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	  if (payload.user.socketId) {
 		this.logger.log(`${payload.user.socketId} is joining ${payload.name}`)
 		await this.server.in(payload.user.socketId).socketsJoin(payload.name)
-		return await this.channelService.addUserToChannel(payload)
+
+		const response =  await this.channelService.addUserToChannel(payload)
+		if (response.errorNumber === 0)
+		{
+			this.server.to(payload.name).emit('chat', 
+			{
+				user: payload.user,
+				timeSent: null,
+				message: `${payload.user.login} jump in ${payload.name}`,
+				channelName: payload.name,
+			}) 
+		}
+		return response
     }
   }
 
