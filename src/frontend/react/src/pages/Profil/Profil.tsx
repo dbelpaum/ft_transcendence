@@ -85,7 +85,6 @@ function Profil() {
               value={userInfo.lastname}
               onSave={(value) => saveField('lastname', value)}
             />
-            {/* Répétez pour d'autres champs si nécessaire */}
             
           </>
         )}
