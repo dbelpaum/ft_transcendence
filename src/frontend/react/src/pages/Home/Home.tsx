@@ -21,11 +21,6 @@ function Home(props: HomeProps) {
             </section>
             <div className="button_auth">
                 <ButtonNav text="Login with 42" color="DarkTurquoise" path="http://localhost:4000/authentification/42" />
-            {/* <a href="https://localhost:4000/authentification/42" target="_blank" rel="noopener noreferrer">{"auth42"}</a> */}
-                {/* <br/>
-                <ButtonNav text="Login with Google" color="IndianRed" />
-                <br/>
-                <ButtonNav text="Sign in" color="purple" /> */}
             </div>
         </main>
     );
