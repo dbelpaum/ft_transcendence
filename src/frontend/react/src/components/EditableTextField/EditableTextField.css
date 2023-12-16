@@ -34,3 +34,14 @@
   
   /* Vous pouvez ajouter d'autres styles pour améliorer l'apparence et la réactivité */
   
+
+   /* Style pour le bouton Sauvegarder */
+   .save-button {
+    background-color: #4CAF50; /* Vert */
+    color: white;
+  }
+  
+  .save-button:hover {
+    background-color: #45a049; /* Vert plus foncé au survol */
+  }
+  

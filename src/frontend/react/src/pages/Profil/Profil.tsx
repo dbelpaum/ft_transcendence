@@ -1,48 +1,52 @@
-import React, {useState, useEffect} from 'react';
+import React, { useState, useEffect } from 'react';
 import './Profil.css';
-// import { useNavigate } from 'react-router-dom';
-import Title from '../../components/Title/Title';
-import { useAuth } from '../../context/AuthContexte';
-import '../../components/LogoutButton/LogoutButton';
 import LogoutButton from '../../components/LogoutButton/LogoutButton';
-import { error } from 'console';
 import EditableTextField from '../../components/EditableTextField/EditableTextField';
+import { useAuth } from '../../context/AuthContexte';
 
 interface UserInfo {
-    pseudo: string;
-    email: string;
-    id: number;
-    lastname: string;
-    firstname: string;
-    imageURL: string;
-    }
+  pseudo: string;
+  email: string;
+  id: number;
+  lastname: string;
+  firstname: string;
+  imageURL: string;
+}
 
 function Profil() {
   const { user } = useAuth();
   const userId = user?.id;
   const [userInfo, setUserInfo] = useState<UserInfo | null>(null);
-  const [isEdited, setIsEdited] = useState(false);
 
   useEffect(() => {
     if (userId) {
-      fetch(`http://localhost:4000/user/${userId}`, { method: 'GET' })
+      fetch(`http://localhost:4000/user/${userId}`)
         .then(response => response.json())
         .then(data => setUserInfo(data))
         .catch(error => console.log(error));
     }
   }, [userId]);
 
-  const handleFieldChange = (field: keyof UserInfo, value: string) => {
-    if (userInfo) {
-      setUserInfo({ ...userInfo, [field]: value });
-      setIsEdited(true);
+  const saveField = (field: keyof UserInfo, value: string) => {
+    if (userId && userInfo) {
+      const updatedUserInfo = { ...userInfo, [field]: value };
+      setUserInfo(updatedUserInfo);
+      
+      fetch(`http://localhost:4000/user/${userId}/${field}`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ [field]: value }),
+      })
+      .then(response => response.json())
+      .then(data => {
+        console.log('Field updated:', data);
+      })
+      .catch(error => {
+        console.error('Error updating field:', error);
+      });
     }
-  };
-
-  const handleSave = () => {
-    console.log("Saving changes:", userInfo);
-    // Ici, ajoutez la logique pour sauvegarder les changements dans la base de données
-    setIsEdited(false);
   };
 
   return (
@@ -61,28 +65,31 @@ function Profil() {
             <EditableTextField
               label="Pseudo"
               value={userInfo.pseudo}
-              onChange={(value) => handleFieldChange('pseudo', value)}
-              onEdit={(edited) => setIsEdited(edited)}
-              editable
+              onSave={(value) => saveField('pseudo', value)}
             />
 
             <EditableTextField
               label="Email"
               value={userInfo.email}
-              onChange={(value) => handleFieldChange('email', value)}
-              onEdit={(edited) => setIsEdited(edited)}
-              editable
+              onSave={(value) => saveField('email', value)}
             />
 
+            <EditableTextField
+              label="Prenom"
+              value={userInfo.firstname}
+              onSave={(value) => saveField('firstname', value)}
+            />
+
+            <EditableTextField
+              label="Nom"
+              value={userInfo.lastname}
+              onSave={(value) => saveField('lastname', value)}
+            />
+            {/* Répétez pour d'autres champs si nécessaire */}
+            
           </>
         )}
       </div>
-
-      {isEdited && (
-        <button onClick={handleSave} className="save-button">
-          Sauvegarder les Changements
-        </button>
-      )}
     </main>
   );
 }

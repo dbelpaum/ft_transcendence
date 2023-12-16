@@ -1,4 +1,4 @@
-import { Body, Controller, Post, Get, Param, Patch } from '@nestjs/common';
+import { Body, Controller, Get, Param, Patch } from '@nestjs/common';
 import { PrismaService } from 'src/prisma.service';
 
 @Controller('user')
@@ -12,11 +12,38 @@ export class UserController {
         });
     }
 
-    @Patch(':id')
-    async updateUserById(@Param('id') id: string, @Body() body) {
+    @Patch(':id/pseudo')
+    async updatePseudo(@Param('id') id: string, @Body('pseudo') pseudo: string) {
         return await this.prisma.user.update({
             where: { id42: Number(id) },
-            data: body,
+            data: { pseudo },
         });
     }
+
+    @Patch(':id/email')
+    async updateEmail(@Param('id') id: string, @Body('email') email: string) {
+        return await this.prisma.user.update({
+            where: { id42: Number(id) },
+            data: { email },
+        });
+    }
+
+    @Patch(':id/firstname')
+    async updateFirstName(@Param('id') id : string, @Body('firstname') firstname: string) {
+        return await this.prisma.user.update({
+            where: { id42: Number(id) },
+            data: { firstname },
+        });
+    }
+
+    @Patch(':id/lastname')
+    async updateLastName(@Param('id') id : string, @Body('lastname') lastname: string) {
+        return await this.prisma.user.update({
+            where: { id42: Number(id) },
+            data: { lastname },
+        });
+    }
+
+    
+
 }

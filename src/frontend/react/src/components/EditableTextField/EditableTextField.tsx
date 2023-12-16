@@ -4,55 +4,36 @@ import './EditableTextField.css';
 interface EditableTextFieldProps {
   label: string;
   value: string;
-  onChange: (value: string) => void;
-  onEdit?: (edited: boolean) => void;
+  onSave: (value: string) => void;
   editable?: boolean;
 }
 
-function EditableTextField({ label, value, onChange, onEdit, editable = false }: EditableTextFieldProps) {
-  const [isEditing, setIsEditing] = useState(false);
+function EditableTextField({ label, value, onSave, editable = true }: EditableTextFieldProps) {
   const [inputValue, setInputValue] = useState(value);
-
-  const handleEdit = () => {
-    if (editable) {
-      setIsEditing(true);
-    }
-  };
-
-  const handleSave = () => {
-    console.log("Saving changes:", inputValue);
-    if (inputValue.length === 0) {
-      setInputValue(value);
-    }
-    if (inputValue !== value) {
-      onChange(inputValue);
-    }
-    if (onEdit) {
-      onEdit(false);
-    }
-    setIsEditing(false);
-  };
+  const [isEdited, setIsEdited] = useState(false);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setInputValue(e.target.value);
-    if (onEdit) {
-      onEdit(e.target.value !== value);
-    }
+    setIsEdited(true);
+  };
+
+  const handleSave = () => {
+    onSave(inputValue);
+    setIsEdited(false);
   };
 
   return (
     <div className="editable-text-field">
       <label>{label}: </label>
-      {isEditing ? (
-        <input
-          type="text"
-          value={inputValue}
-          onChange={handleChange}
-          onBlur={handleSave}
-          autoFocus
-        />
+      {editable ? (
+        <>
+          <input type="text" value={inputValue} onChange={handleChange} />
+          {isEdited && (
+            <button className='save-button' onClick={handleSave}>Sauvegarder</button>
+          )}
+        </>
       ) : (
-        <span onClick={handleEdit}>{value}</span>
+        <span>{value}</span>
       )}
     </div>
   );
