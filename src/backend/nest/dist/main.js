@@ -431,11 +431,12 @@ let ChannelService = class ChannelService {
         if (channel === -1) {
             await this.channels.push({
                 name: channelCreate.name,
-                host: [channelCreate.user],
+                host: [channelCreate.user.login],
+                owner: channelCreate.user,
                 users: [channelCreate.user],
                 type: channelCreate.type,
                 mdp: channelCreate.mdp,
-                invited: []
+                invited: [channelCreate.user.login]
             });
         }
     }
@@ -453,26 +454,62 @@ let ChannelService = class ChannelService {
         const channelIndex = this.channels.findIndex((channel) => channel?.name === channelName);
         return channelIndex;
     }
-    async userIsInvited(login, channel) {
-        return channel.invited.some(i => i.login === login);
+    userIsInvited(login, channel) {
+        return channel.invited.some(l => l === login);
     }
-    async mdpIsValid(mdp, channel) {
+    mdpIsValid(mdp, channel) {
         return (mdp === channel.mdp);
+    }
+    userIsHost(user_login, channel) {
+        return channel.host.some(l => l == user_login);
+    }
+    async addInviteToChannel(inviteInfo) {
+        const channelIndex = await this.getChannelByName(inviteInfo.channel_name);
+        if (channelIndex === -1)
+            return;
+        if (!this.userIsHost(inviteInfo.user.login, this.channels[channelIndex]))
+            return;
+        this.channels[channelIndex].invited.push(inviteInfo.invited_name);
+    }
+    async addAdminToChannel(adminInfo) {
+        const channelIndex = await this.getChannelByName(adminInfo.channel);
+        if (channelIndex === -1)
+            return;
+        if (!this.userIsHost(adminInfo.user.login, this.channels[channelIndex]))
+            return;
+        this.channels[channelIndex].host.push(adminInfo.new_admin_name);
+    }
+    async removeAdminToChannel(adminInfo) {
+        const channelIndex = await this.getChannelByName(adminInfo.channel);
+        if (channelIndex === -1)
+            return;
+        if (!this.userIsHost(adminInfo.user.login, this.channels[channelIndex]))
+            return;
+        if (adminInfo.new_admin_name === adminInfo.user.login)
+            return;
+        const adminIndex = this.channels[channelIndex].host.indexOf(adminInfo.new_admin_name);
+        if (adminIndex !== -1) {
+            this.channels[channelIndex].host.splice(adminIndex, 1);
+        }
     }
     async addUserToChannel(channelCreate) {
         const channelIndex = await this.getChannelByName(channelCreate.name);
         if (channelIndex !== -1) {
-            if (this.channels[channelIndex].type === "private" && !this.userIsInvited(channelCreate.user.login, this.channels[channelIndex])) {
-                return {
-                    errorNumber: 20,
-                    text: "L'utilisateur " + channelCreate.user.login + " essaie de rejoindre un channel privé sans avoir été invité : " + this.channels[channelIndex].name
-                };
+            if (this.channels[channelIndex].type === "private") {
+                if (!this.userIsInvited(channelCreate.user.login, this.channels[channelIndex])) {
+                    return {
+                        errorNumber: 20,
+                        text: "L'utilisateur " + channelCreate.user.login + " essaie de rejoindre un channel privé sans avoir été invité : " + this.channels[channelIndex].name
+                    };
+                }
             }
-            if (this.channels[channelIndex].type === "protected" && !this.mdpIsValid(channelCreate.mdp, this.channels[channelIndex])) {
-                return {
-                    errorNumber: 21,
-                    text: "L'utilisateur " + channelCreate.user.login + " essaie de rejoindre un channel privé avec le mauvais mdp: " + this.channels[channelIndex].name
-                };
+            if (this.channels[channelIndex].type === "protected") {
+                if (!this.mdpIsValid(channelCreate.mdp, this.channels[channelIndex])) {
+                    return {
+                        errorNumber: 21,
+                        text: "L'utilisateur " + channelCreate.user.login + " essaie de rejoindre un channel privé avec le mauvais mdp: " + this.channels[channelIndex].name
+                    };
+                }
             }
             this.channels[channelIndex].users.push(channelCreate.user);
             return {
@@ -544,7 +581,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 var __param = (this && this.__param) || function (paramIndex, decorator) {
     return function (target, key) { decorator(target, key, paramIndex); }
 };
-var _a, _b, _c, _d, _e, _f;
+var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m;
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.ChatGateway = void 0;
 const websockets_1 = __webpack_require__(/*! @nestjs/websockets */ "@nestjs/websockets");
@@ -558,9 +595,20 @@ let ChatGateway = class ChatGateway {
         this.server = new socket_io_1.Server();
         this.logger = new common_1.Logger('ChatGateway');
     }
+    async delete_admin(payload) {
+        this.logger.log(payload);
+        await this.channelService.removeAdminToChannel(payload);
+    }
+    async addAdmin(payload) {
+        this.logger.log(payload);
+        await this.channelService.addAdminToChannel(payload);
+    }
+    async handleInvite(payload) {
+        this.logger.log(payload);
+        await this.channelService.addInviteToChannel(payload);
+    }
     async handleEvent(payload) {
         this.logger.log(payload);
-        console.log(payload);
         this.server.to(payload.channelName).emit('chat', payload);
         return payload;
     }
@@ -568,7 +616,16 @@ let ChatGateway = class ChatGateway {
         if (payload.user.socketId) {
             this.logger.log(`${payload.user.socketId} is joining ${payload.name}`);
             await this.server.in(payload.user.socketId).socketsJoin(payload.name);
-            return await this.channelService.addUserToChannel(payload);
+            const response = await this.channelService.addUserToChannel(payload);
+            if (response.errorNumber === 0) {
+                this.server.to(payload.name).emit('chat', {
+                    user: payload.user,
+                    timeSent: null,
+                    message: `${payload.user.login} jump in ${payload.name}`,
+                    channelName: payload.name,
+                });
+            }
+            return response;
         }
     }
     async handleConnection(socket) {
@@ -585,18 +642,39 @@ __decorate([
     __metadata("design:type", typeof (_b = typeof socket_io_1.Server !== "undefined" && socket_io_1.Server) === "function" ? _b : Object)
 ], ChatGateway.prototype, "server", void 0);
 __decorate([
+    (0, websockets_1.SubscribeMessage)('remove_admin'),
+    __param(0, (0, websockets_1.MessageBody)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [typeof (_c = typeof chat_interface_1.addAdminInfo !== "undefined" && chat_interface_1.addAdminInfo) === "function" ? _c : Object]),
+    __metadata("design:returntype", typeof (_d = typeof Promise !== "undefined" && Promise) === "function" ? _d : Object)
+], ChatGateway.prototype, "delete_admin", null);
+__decorate([
+    (0, websockets_1.SubscribeMessage)('add_admin'),
+    __param(0, (0, websockets_1.MessageBody)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [typeof (_e = typeof chat_interface_1.addAdminInfo !== "undefined" && chat_interface_1.addAdminInfo) === "function" ? _e : Object]),
+    __metadata("design:returntype", typeof (_f = typeof Promise !== "undefined" && Promise) === "function" ? _f : Object)
+], ChatGateway.prototype, "addAdmin", null);
+__decorate([
+    (0, websockets_1.SubscribeMessage)('invite'),
+    __param(0, (0, websockets_1.MessageBody)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [typeof (_g = typeof chat_interface_1.InviteToChannel !== "undefined" && chat_interface_1.InviteToChannel) === "function" ? _g : Object]),
+    __metadata("design:returntype", typeof (_h = typeof Promise !== "undefined" && Promise) === "function" ? _h : Object)
+], ChatGateway.prototype, "handleInvite", null);
+__decorate([
     (0, websockets_1.SubscribeMessage)('chat'),
     __param(0, (0, websockets_1.MessageBody)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [typeof (_c = typeof chat_interface_1.Message !== "undefined" && chat_interface_1.Message) === "function" ? _c : Object]),
-    __metadata("design:returntype", typeof (_d = typeof Promise !== "undefined" && Promise) === "function" ? _d : Object)
+    __metadata("design:paramtypes", [typeof (_j = typeof chat_interface_1.Message !== "undefined" && chat_interface_1.Message) === "function" ? _j : Object]),
+    __metadata("design:returntype", typeof (_k = typeof Promise !== "undefined" && Promise) === "function" ? _k : Object)
 ], ChatGateway.prototype, "handleEvent", null);
 __decorate([
     (0, websockets_1.SubscribeMessage)('join_channel'),
     __param(0, (0, websockets_1.MessageBody)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [typeof (_e = typeof chat_interface_1.ChannelCreate !== "undefined" && chat_interface_1.ChannelCreate) === "function" ? _e : Object]),
-    __metadata("design:returntype", typeof (_f = typeof Promise !== "undefined" && Promise) === "function" ? _f : Object)
+    __metadata("design:paramtypes", [typeof (_l = typeof chat_interface_1.ChannelCreate !== "undefined" && chat_interface_1.ChannelCreate) === "function" ? _l : Object]),
+    __metadata("design:returntype", typeof (_m = typeof Promise !== "undefined" && Promise) === "function" ? _m : Object)
 ], ChatGateway.prototype, "handleSetClientDataEvent", null);
 exports.ChatGateway = ChatGateway = __decorate([
     (0, websockets_1.WebSocketGateway)({
@@ -822,7 +900,7 @@ let UserController = class UserController {
         this.prismaService = prismaService;
     }
     async create(body) {
-        return this.prismaService.user.create({
+        return this.prismaService.users.create({
             data: {
                 username: body.username,
                 email: body.email,

@@ -5,6 +5,7 @@ import {
 import { useLocation } from 'react-router-dom';
 import MessageComponent from './Message';
 import { ChannelCreate } from './chat.interface';
+import { Channel } from './chat.interface';
 
 
 interface ChannelWriteProps {
@@ -12,6 +13,9 @@ interface ChannelWriteProps {
   }
   
 const ChannelWrite: React.FC<ChannelWriteProps> = ({ channelUtility }) => {
+
+	const [password, setPassword] = useState('');
+
 	const useQuery = () => {
 		return new URLSearchParams(useLocation().search);
 	};
@@ -22,25 +26,46 @@ const ChannelWrite: React.FC<ChannelWriteProps> = ({ channelUtility }) => {
 	const isUserInChannel = channelUtility.channels.some(channel => 
 		channel.name === channelUrl && channel.users.some(user => user.socketId === channelUtility.me?.socketId));
 
-	const handleJoinChannel = () => {
-		if (channelUrl && channelUtility.me)
+	const channelIsProtected = channelUtility.channels.some(channel => 
+			channel.name === channelUrl && channel.type === 'protected');
+
+	const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+		setPassword(e.target.value);
+		};
+	
+	var channelInfo : Channel|undefined = channelUtility.channels.find(c => c.name === channelUrl);
+	
+	const handleJoinChannel = (e: React.FormEvent<HTMLFormElement>) => {
+		e.preventDefault();
+		channelInfo = channelUtility.channels.find(c => c.name === channelUrl);
+
+		if (channelUrl && channelUtility.me && channelInfo)
 		{
+
 			const channelJoin : ChannelCreate = {
 				name: channelUrl,
 				user: channelUtility.me,
-				type: "public",
-				mdp: "",
+				type: channelInfo.type,
+				mdp: password,
 			}
-			channelUtility.socket.emit('join_channel', channelJoin);
 
-			const savedChannels: {name: string}[] = JSON.parse(sessionStorage.getItem('channels') || '[]');
-			const newChannels: {name: string}[]  = [...savedChannels, { name: channelUrl }];
+			const savedChannels: ChannelCreate[] = JSON.parse(sessionStorage.getItem('channels') || '[]');
+			const newChannels: ChannelCreate[]  = [...savedChannels, channelJoin];
 			sessionStorage.setItem('channels', JSON.stringify(newChannels));
 			window.location.reload();
-
+			
 			};
 		}
 		
+	if (!channelUrl)
+	{
+		return (
+			<div className="write-chat no-channel">
+				<p>Creez ou rejoignez un channel de discussion</p>
+			</div>
+		)
+	}
+
 	return (
 		<div className='write-chat'>
 			<h2>{channelUrl}</h2>
@@ -50,7 +75,17 @@ const ChannelWrite: React.FC<ChannelWriteProps> = ({ channelUtility }) => {
 					<MessageComponent channelUtility={channelUtility} message={message} key={index} channelUrl={channelUrl} />
 				))
 				) : (
-				<button onClick={handleJoinChannel} className="join-channel-button">Rejoindre le Channel</button>
+					<form onSubmit={handleJoinChannel} className="join-channel-form">
+					{channelIsProtected && (
+					  <input
+						type="password"
+						placeholder="Mot de passe du channel"
+						value={password}
+						onChange={handlePasswordChange}
+					  />
+					)}
+					<button type="submit" className="join-channel-button">Rejoindre le Channel</button>
+				  </form>
 				)}
 				</div>
 		</div>

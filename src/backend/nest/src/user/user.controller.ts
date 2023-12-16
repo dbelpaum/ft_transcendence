@@ -7,7 +7,7 @@ export class UserController {
 
     @Post('create')
     async create(@Body() body: {username: string; email: string}) {
-        return this.prismaService.user.create({
+        return this.prismaService.users.create({
             data: {
                 username: body.username,
                 email: body.email,

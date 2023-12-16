@@ -14,12 +14,15 @@ export interface ServerToClientEvents {
 export interface ClientToServerEvents {
     chat: (e: Message) => void;
 	join_channel: (e: ChannelCreate) => void
-
+	invite: (e: InviteToChannel) => void
+	add_admin: (e: addAdminInfo) => void
+	remove_admin: (e: addAdminInfo) => void
 }
 
 export interface Channel {
 	name: string
-	host: User[]
+	host: string[]
+	owner: User;
 	users: User[]
 	type: string
 	mdp: string
@@ -48,4 +51,18 @@ export interface ChannelCreate {
 	user: User
 	type: string
 	mdp: string
+}
+
+export interface InviteToChannel
+{
+	channel_name: string,
+	invited_name: string,
+	user: User
+}
+
+export interface addAdminInfo
+{
+	channel: string
+	new_admin_name: string
+	user: User
 }

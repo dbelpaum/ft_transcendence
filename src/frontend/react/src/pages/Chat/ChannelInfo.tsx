@@ -5,6 +5,8 @@ import {
 import { useLocation } from 'react-router-dom';
 import UserInfo from './UserInfo';
 import { User } from '../../context/AuthInteface';
+import InviteChannel from './InviteChannel';
+
 
 interface ChannelWriteProps {
 	channelUtility: ChannelUtility;
@@ -13,15 +15,16 @@ interface ChannelWriteProps {
 interface UserAndAdmin {
 	user: User;
 	isAdmin: boolean;
+	isOwner: boolean;
 }
   
 const ChannelInfo: React.FC<ChannelWriteProps> = ({ channelUtility }) => {
+
 	const useQuery = () => {
 		return new URLSearchParams(useLocation().search);
 	};
 	const query = useQuery();
 	const channelUrl = query.get('channel'); 
-	
 	  if (!channelUrl) {
 		return null;
 	  }
@@ -41,14 +44,19 @@ const ChannelInfo: React.FC<ChannelWriteProps> = ({ channelUtility }) => {
 	
 	  const uniqueUsers = Array.from(uniqueUsersMap.values());
 
-	  function isAdmin(user:User, admin:User[]) : boolean
+	  function isAdmin(user:User, admin:string[]) : boolean
 	  {
-		  return (admin.some(u => user.login === u.login))
+		  return (admin.some(l => user.login === l))
+	  }
+	  function isOwner(user:User, owner:User) : boolean
+	  {
+		  return (user.socketId === owner.socketId)
 	  }
   
 	  const userAndAdmin : UserAndAdmin[] = uniqueUsers.map(u => ({
 			user: u,
 			isAdmin: isAdmin(u, currentChannel.host),
+			isOwner: isOwner(u, currentChannel.owner)
 		}))
 
 	return (
@@ -62,6 +70,7 @@ const ChannelInfo: React.FC<ChannelWriteProps> = ({ channelUtility }) => {
 				))}
 			</>
 			) : null}
+			<InviteChannel channelUrl={channelUrl} channelUtility={channelUtility} currentChannel={currentChannel}/>
 		</div>
 	)
 };

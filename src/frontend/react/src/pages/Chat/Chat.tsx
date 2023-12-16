@@ -51,17 +51,17 @@ function Chat(){
 				setIsConnected(true);
 				const updatedUser = { ...user, socketId: socket.id };
 				setUser(updatedUser); 
-				const savedChannels: {name: string}[] = JSON.parse(sessionStorage.getItem('channels') || '[]');
-				if (savedChannels && updatedUser)
+				const savedChannels: ChannelCreate[] = JSON.parse(sessionStorage.getItem('channels') || '[]');
+				const updatedChannels = savedChannels.map(channel => {
+					return {
+						...channel, 
+						user: updatedUser
+					};
+				});
+				if (updatedChannels && updatedUser)
 				{
-					savedChannels.forEach((channel) => {
-						const channelJoin : ChannelCreate = {
-							name: channel.name,
-							user: updatedUser,
-							type: "public",
-							mdp: ""
-						}
-						socket.emit('join_channel', channelJoin);
+					updatedChannels.forEach((channel) => {
+						socket.emit('join_channel', channel);
 					});
 				}
 
@@ -73,8 +73,7 @@ function Chat(){
 			});
 		
 			socket.on('chat', (e) => {
-				setMessages((messages) => [e, ...messages]);
-				console.log(messages)
+				setMessages((messages) => [...messages, e]);
 				
 			});
 		

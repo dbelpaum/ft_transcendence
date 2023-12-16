@@ -23,11 +23,12 @@ export interface ServerToClientEvents {
 
 export interface Channel {
 	name: string
-	host: User[]
+	host: string[]
+	owner: User;
 	users: User[]
 	type: string
 	mdp: string
-	invited: User[]
+	invited: string[]
 }
 
 export interface ChannelCreate {
@@ -40,4 +41,18 @@ export interface ChannelCreate {
 export interface joinResponse {
 	errorNumber: number  //0 si tout vas bien
 	text: string
+}
+
+export interface InviteToChannel
+{
+	channel_name: string,
+	invited_name: string,
+	user: User
+}
+
+export interface addAdminInfo
+{
+	channel: string
+	new_admin_name: string
+	user: User
 }
