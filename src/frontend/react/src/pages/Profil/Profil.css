@@ -1,25 +1,70 @@
+/* Style de base pour le profil */
 .profil-container {
-    /* max-width: 600px; */
+    font-family: 'Arial', sans-serif;
+    color: #333;
+    max-width: 600px;
     margin: 20px auto;
     padding: 20px;
-    background-color: #473434;
+    background-color: #e6f7ff; /* Couleur de fond plus douce */
     border-radius: 10px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-}
-
-.profil-details {
-    text-align: center;
-}
-
-.profil-image-container img {
-    width: 150px; /* Redimensionner l'image */
-    height: 150px;
-    border-radius: 50%; /* Rendre l'image ronde */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    position: relative; /* Pour le positionnement absolu du bouton de déconnexion */
+  }
+  
+  /* Positionnement du bouton de déconnexion */
+  .decoBut {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+  }
+  
+  .decoBut button {
+    background-color: #f44336;
+    color: white;
+    padding: 5px 10px; /* Ajuster le padding si nécessaire */
+    font-size: 14px; /* Ajuster la taille de police si nécessaire */
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  
+  .decoBut button:hover {
+    background-color: #d32f2f;
+  }
+  
+  /* Style commun pour les boutons */
+  button {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.3s ease;
+    margin-right: 10px; /* Espace entre les boutons */
+  }
+  
+ 
+  /* Style pour les champs modifiables */
+  .editable-text-field {
+    margin-bottom: 15px;
+  }
+  
+  .editable-text-field label {
+    font-weight: bold;
+    margin-right: 10px;
+  }
+  
+  /* Style pour l'image de profil */
+  .profil-image-container {
+    margin-top: 20px;
+    text-align: center; /* Centrer l'image */
+  }
+  
+  .profil-image-container img {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
     object-fit: cover;
-    border: 3px solid #007bff;
-    margin: 10px 0;
-}
-
-.decoBut{
-    margin-left: 90%;
-}
+  }
+  
