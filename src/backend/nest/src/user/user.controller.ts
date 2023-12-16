@@ -5,22 +5,11 @@ import { PrismaService } from 'src/prisma.service';
 export class UserController {
     constructor(private prisma: PrismaService) {}
 
-<<<<<<< HEAD
-    @Post('create')
-    async create(@Body() body: {username: string; email: string}) {
-        return this.prismaService.users.create({
-            data: {
-                username: body.username,
-                email: body.email,
-            }
-        })
-=======
     @Get(':id')
     async getUserById(@Param('id') id: string) {
         return await this.prisma.user.findUnique({
             where: { id42: Number(id) },
         });
->>>>>>> master
     }
 
     @Patch(':id/pseudo')
