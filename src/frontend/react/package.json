@@ -12,6 +12,7 @@
     "@types/react-dom": "^18.2.16",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
+    "react-notifications-component": "^4.0.1",
     "react-router-dom": "^6.19.0",
     "react-scripts": "5.0.1",
     "socket.io": "^4.7.2",

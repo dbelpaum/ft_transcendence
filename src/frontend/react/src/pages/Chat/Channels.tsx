@@ -22,7 +22,7 @@ const Channels: React.FC<ChannelsProps> = ({ channelUtility }) => {
 			<CreateChannel channelUtility={channelUtility}/>
 			<ul className='channel_list'>
 				{channelUtility.channels.map((channel, index) => (
-					<ChannelItem channelUtility={channelUtility} channel={channel} key={channel.name}/>
+					<ChannelItem channelUtility={channelUtility} channel={channel} key={index}/>
 				))}
 			</ul>
 			</div>

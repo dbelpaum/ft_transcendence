@@ -57,7 +57,9 @@ function Chat(){
 					savedChannels.forEach((channel) => {
 						const channelJoin : ChannelCreate = {
 							name: channel.name,
-							user: updatedUser
+							user: updatedUser,
+							type: "public",
+							mdp: ""
 						}
 						socket.emit('join_channel', channelJoin);
 					});

@@ -5,7 +5,9 @@ import {
   ServerToClientEvents,
   ClientToServerEvents,
   Message,
-  User
+  User,
+  ChannelCreate,
+  joinResponse
 } from './chat.interface';
 import { Server, Socket } from 'socket.io';
 import { ChannelService } from 'src/channel/channel.service';
@@ -41,15 +43,12 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @SubscribeMessage('join_channel')
   async handleSetClientDataEvent(
     @MessageBody()
-    payload: {
-      name: string
-      user: User
-    }
-  ) {
+    payload: ChannelCreate
+  ): Promise<joinResponse> {
 	  if (payload.user.socketId) {
-      this.logger.log(`${payload.user.socketId} is joining ${payload.name}`)
-      await this.server.in(payload.user.socketId).socketsJoin(payload.name)
-      await this.channelService.addUserToChannel(payload.name, payload.user)
+		this.logger.log(`${payload.user.socketId} is joining ${payload.name}`)
+		await this.server.in(payload.user.socketId).socketsJoin(payload.name)
+		return await this.channelService.addUserToChannel(payload)
     }
   }
 

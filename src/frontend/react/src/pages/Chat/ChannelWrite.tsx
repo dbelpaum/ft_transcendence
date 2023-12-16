@@ -27,7 +27,9 @@ const ChannelWrite: React.FC<ChannelWriteProps> = ({ channelUtility }) => {
 		{
 			const channelJoin : ChannelCreate = {
 				name: channelUrl,
-				user: channelUtility.me
+				user: channelUtility.me,
+				type: "public",
+				mdp: "",
 			}
 			channelUtility.socket.emit('join_channel', channelJoin);
 

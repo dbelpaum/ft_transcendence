@@ -4,10 +4,16 @@ import {
   } from './chat.interface';
 import { useLocation } from 'react-router-dom';
 import UserInfo from './UserInfo';
+import { User } from '../../context/AuthInteface';
 
 interface ChannelWriteProps {
 	channelUtility: ChannelUtility;
   }
+
+interface UserAndAdmin {
+	user: User;
+	isAdmin: boolean;
+}
   
 const ChannelInfo: React.FC<ChannelWriteProps> = ({ channelUtility }) => {
 	const useQuery = () => {
@@ -34,13 +40,27 @@ const ChannelInfo: React.FC<ChannelWriteProps> = ({ channelUtility }) => {
 	  });
 	
 	  const uniqueUsers = Array.from(uniqueUsersMap.values());
+
+	  function isAdmin(user:User, admin:User[]) : boolean
+	  {
+		  return (admin.some(u => user.login === u.login))
+	  }
+  
+	  const userAndAdmin : UserAndAdmin[] = uniqueUsers.map(u => ({
+			user: u,
+			isAdmin: isAdmin(u, currentChannel.host),
+		}))
+
 	return (
 		<div className='channel-info'>
-			<h3>Info</h3>
+			<h3>Info : {currentChannel.name}</h3>
 			{currentChannel ? (
-				uniqueUsers.map((userInChannel, index) => (
-					<UserInfo channelUtility={channelUtility} userInChannel={userInChannel} key={index} channelUrl={channelUrl}/>
-				))
+			<>
+				<p>{currentChannel.type}</p>
+				{userAndAdmin.map((user, index) => (
+					<UserInfo channelUtility={channelUtility} userAndAdmin={user} key={index} channelUrl={channelUrl} />
+				))}
+			</>
 			) : null}
 		</div>
 	)

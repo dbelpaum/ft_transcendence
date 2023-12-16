@@ -1,40 +1,51 @@
-import React from 'react';
+import React, { useContext, useState } from 'react';
+import './GameModeButtons.css';
+import { SocketContext } from '../../pages/Game/SocketContext';
+import { Socket } from 'socket.io-client';
 
-interface GameModeButtonsProps {
-  onSelectMode: (mode: string) => void;
-}
+const GameModeButtons: React.FC = () => {
+	const socket = useContext(SocketContext) as unknown as Socket;
+	const [roomCode, setRoomCode] = useState<string>('');
 
-const GameModeButtons: React.FC<GameModeButtonsProps> = ({ onSelectMode }) => {
+	const handleRoomCodeChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+		setRoomCode(event.target.value);
+	};
+
+	const handleCreateRoom = () => {
+		if (socket) {
+			socket.emit('client.lobby.create', { mode: 'vanilla' });
+		}
+	};
+
+	const handleJoinRoom = () => {
+		if (socket) {
+			socket.emit('client.lobby.join', { mode: 'vanilla', lobbyId: roomCode });
+		}
+	}
+
+
 	return (
-	  <div style={{ textAlign: 'center', marginTop: '20px' }}>
-		<button
-		  style={buttonStyle}
-		  onClick={() => onSelectMode('solo')}
-		>
-		  Play alone
-		</button>
-		<button
-		  style={buttonStyle}
-		  onClick={() => onSelectMode('online')}
-		>
-		  Play online
-		</button>
-	  </div>
-	);
-  };
+		<div className="buttonContainer">
+			<div><button className='buttonStyle'>
+				Solo
+			</button></div>
 
-const buttonStyle: React.CSSProperties = {
-	backgroundColor: '#4CAF50', /* Green background color */
-	border: 'none', /* Remove borders */
-	color: 'white', /* White text color */
-	padding: '15px 32px', /* Set padding */
-	textAlign: 'center', /* Center text */
-	textDecoration: 'none', /* Remove underline */
-	display: 'inline-block', /* Make the button a block element */
-	fontSize: '16px', /* Set font size */
-	borderRadius: '8px', /* Rounded corners */
-	cursor: 'pointer', /* Add a pointer cursor on hover */
-	margin: '10px' /* Add some margin between buttons */
-  };
+			<div className="buttonColumn">
+			<div><button className='buttonStyle' onClick={handleCreateRoom}>
+				Create Room
+			</button></div>
+
+			<div><button className='buttonStyle' onClick={handleJoinRoom}>
+				Join Room
+			</button></div>
+			<input placeholder='Room Code' className='inputBar' value={roomCode} onChange={handleRoomCodeChange}></input>
+			</div>
+			
+			<div><button className='buttonStyle'>
+				Matchmaking
+			</button></div>
+		</div>
+	);
+};
 
 export default GameModeButtons;
