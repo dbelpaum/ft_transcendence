@@ -15,10 +15,12 @@ interface UserInfo {
 
 function Profil() {
   const { user } = useAuth();
-  const userId = user?.id;
+  const userId = user?.id42;
   const [userInfo, setUserInfo] = useState<UserInfo | null>(null);
 
   useEffect(() => {
+	console.log("le user id")
+	console.log(userId)
     if (userId) {
       fetch(`http://localhost:4000/user/${userId}`)
         .then(response => response.json())

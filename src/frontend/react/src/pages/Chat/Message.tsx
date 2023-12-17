@@ -24,7 +24,7 @@ const MessageComponent: React.FC<MessageProps> = ({ channelUtility, message, cha
     !isUserMessage ? 
       (
         <div className='messages'>
-          <span>{message.user.login} : {message.message}</span>
+          <span>{message.user.pseudo} : {message.message}</span>
         </div>
       ) 
       : 

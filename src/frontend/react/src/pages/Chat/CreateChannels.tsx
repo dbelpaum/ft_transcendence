@@ -63,7 +63,7 @@ const CreateChannel: React.FC<CreateChannelsProps> = ({ channelUtility }) => {
 			{
 
 				try {
-					const response = await fetch('http://localhost:4000/channel/all/' + channelUtility.me.login); // URL de votre API
+					const response = await fetch('http://localhost:4000/channel/all/' + channelUtility.me.pseudo); // URL de votre API
 					if (!response.ok) {
 						throw new Error(`Erreur HTTP : ${response.status}`);
 					}

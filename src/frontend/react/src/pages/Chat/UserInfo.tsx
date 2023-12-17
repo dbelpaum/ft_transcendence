@@ -39,7 +39,7 @@ const UserInfo: React.FC<userInfoProps> = ({ channelUtility, userAndAdmin, chann
 			const adminInfo : addAdminInfo =
 			{
 				channel: channelUrl,
-				new_admin_name: userAndAdmin.user.login,
+				new_admin_name: userAndAdmin.user.pseudo,
 				user: channelUtility.me,
 			}
 			channelUtility.socket.emit('add_admin', adminInfo);
@@ -54,7 +54,7 @@ const UserInfo: React.FC<userInfoProps> = ({ channelUtility, userAndAdmin, chann
 			const adminInfo : addAdminInfo =
 			{
 				channel: channelUrl,
-				new_admin_name: userAndAdmin.user.login,
+				new_admin_name: userAndAdmin.user.pseudo,
 				user: channelUtility.me,
 			}
 			channelUtility.socket.emit('remove_admin', adminInfo);
@@ -80,7 +80,7 @@ const UserInfo: React.FC<userInfoProps> = ({ channelUtility, userAndAdmin, chann
           	<span 
 				title={userAndAdmin.isOwner ? "owner" : ""}
 				className={userAndAdmin.isOwner ? "owner" : ""}>
-				{userAndAdmin.user.login}
+				{userAndAdmin.user.pseudo}
 			</span>
 			<div className="container_button">
 				<button className="action-button" onClick={toggleModal}>Actions</button>

@@ -35,7 +35,7 @@ export class AuthentificationController {
 
       // Ici j'ai enregistrer dans la session les infos que j'ai reçu
       // Tu peux aussi enregistrer celles qui t'interessent dans la bdd avec prisma, en une ligne ou 2
-      session.user = { id: userData.id, login: userData.login, email: userData.email, imageUrl: userData.image.link, firstname: userData.first_name, lastname: userData.last_name};
+    //   session.user = { id: userData.id, login: userData.login, email: userData.email, imageUrl: userData.image.link, firstname: userData.first_name, lastname: userData.last_name};
       const checkUserid = await this.prisma.user.findUnique({
         where: {
           id42: userData.id,
@@ -43,20 +43,23 @@ export class AuthentificationController {
       });
 
       if (checkUserid == null){
-        await this.prisma.user.create({
-          data: {
-            id42: userData.id,
+		var newUser = {
+			id42: userData.id,
             pseudo: userData.login,
             email: userData.email,
             firstname: userData.first_name,
             lastname: userData.last_name,
             imageURL: userData.image.link,
-          },
+		}
+        newUser = await this.prisma.user.create({
+          data: newUser,
         });
+		session.user = newUser
         console.log("L'utilisateur n'existe pas dans la bdd");
         
       }
       else{
+		session.user = checkUserid
         console.log("L'utilisateur existe deja dans la bdd");
       }
 
