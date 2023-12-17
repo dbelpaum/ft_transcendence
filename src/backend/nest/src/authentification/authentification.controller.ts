@@ -62,8 +62,6 @@ export class AuthentificationController {
 		session.user = checkUserid
         console.log("L'utilisateur existe deja dans la bdd");
       }
-
-      
       res.redirect('http://localhost:3000/profil');
   }
 
@@ -78,7 +76,16 @@ export class AuthentificationController {
     if (session.user)
     {
       console.log("Il y a un utilisateur connecté")
-      return session.user;
+	  const userBdd = await this.prisma.user.findUnique({
+        where: {
+          id42: session.user.id42,
+        },
+      });
+	  if (userBdd)
+	  {
+		session.user = userBdd
+	  }
+	  return session.user
     }
     else
     {

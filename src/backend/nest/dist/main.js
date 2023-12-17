@@ -197,6 +197,14 @@ let AuthentificationController = class AuthentificationController {
     async profilSession42(req, session) {
         if (session.user) {
             console.log("Il y a un utilisateur connecté");
+            const userBdd = await this.prisma.user.findUnique({
+                where: {
+                    id42: session.user.id42,
+                },
+            });
+            if (userBdd) {
+                session.user = userBdd;
+            }
             return session.user;
         }
         else {
