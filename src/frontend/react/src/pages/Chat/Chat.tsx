@@ -94,7 +94,7 @@ function Chat(){
 
 	return (
 		<div>
-			<h1 className="chat-title">Bienvenue sur le chat {user?.login} !</h1>
+			<h1 className="chat-title">Bienvenue sur le chat {user?.pseudo} !</h1>
 			<div className='container'>
 				<Channels channelUtility={channelUtility}/>
 				<ChannelWrite channelUtility={channelUtility}/>
@@ -102,7 +102,7 @@ function Chat(){
 
 			</div>
 			<div className='chat'>
-				<ChatContainer username={user?.login} messages={messages} setMessages={setMessages} socket={socket}/>
+				<ChatContainer username={user?.pseudo} messages={messages} setMessages={setMessages} socket={socket}/>
 			</div>
 	  </div>
 	  )}

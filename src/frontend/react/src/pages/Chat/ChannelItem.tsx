@@ -33,7 +33,7 @@ const ChannelItem: React.FC<ChannelsItemsProps> = ({ channelUtility, channel }) 
 
 	const userInChannel = channel.users.some(u => u.socketId === channelUtility!.me!.socketId);
 
-	const userIsAdmin = channel.host.some(l => l === channelUtility.me?.login);
+	const userIsAdmin = channel.host.some(l => l === channelUtility.me?.pseudo);
 
 	return (
 		<li className='channel_item' onClick={handleChannelClick}>

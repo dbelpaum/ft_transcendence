@@ -37,8 +37,8 @@ const ChannelInfo: React.FC<ChannelWriteProps> = ({ channelUtility }) => {
 	  const uniqueUsersMap = new Map();
 	
 	  currentChannel.users.forEach(user => {
-		if (!uniqueUsersMap.has(user.login)) {
-		  uniqueUsersMap.set(user.login, user);
+		if (!uniqueUsersMap.has(user.pseudo)) {
+		  uniqueUsersMap.set(user.pseudo, user);
 		}
 	  });
 	
@@ -46,7 +46,7 @@ const ChannelInfo: React.FC<ChannelWriteProps> = ({ channelUtility }) => {
 
 	  function isAdmin(user:User, admin:string[]) : boolean
 	  {
-		  return (admin.some(l => user.login === l))
+		  return (admin.some(l => user.pseudo === l))
 	  }
 	  function isOwner(user:User, owner:User) : boolean
 	  {
