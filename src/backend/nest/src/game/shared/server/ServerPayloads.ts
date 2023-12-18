@@ -20,4 +20,24 @@ export type ServerPayloads = {
 	[ServerEvents.GameMessage]: {
 		message: string;
 	};
+
+	[ServerEvents.GameState]: {
+		ballPosition: {
+			x: number;
+			y: number;
+			z: number;
+		};
+		ballSpeedModifier: number;
+		paddleOpponent: {
+			x: number;
+			y: number;
+			z: number;
+		};
+		paddlePlayer: {
+			x: number;
+			y: number;
+			z: number;
+		};
+		scores: Record<string, number>;
+	};
 };

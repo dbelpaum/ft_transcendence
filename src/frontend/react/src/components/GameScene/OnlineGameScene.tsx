@@ -38,7 +38,7 @@ const OnlineGameScene: React.FC<OnlineGameSceneProps> = ({
 				}
 			};
 		}
-	}, [width, height, socket, isHost]);
+	}, [width, height, isHost]);
 
 	return (
 		<canvas ref={canvasRef} width={width} height={height} tabIndex={0} />

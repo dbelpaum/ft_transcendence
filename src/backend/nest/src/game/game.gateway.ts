@@ -7,7 +7,7 @@ import { ClientEvents } from 'src/game/shared/client/ClientEvents';
 import { ServerPayloads } from 'src/game/shared/server/ServerPayloads';
 import { LobbyManager } from './lobby/lobby.manager';
 import { AuthenticatedSocket } from './types';
-import { LobbyCreateDto, LobbyJoinDto } from './dtos';
+import { ClientMovementDto, LobbyCreateDto, LobbyJoinDto } from './dtos';
 
 @UsePipes(new WsValidationPipe())
 @WebSocketGateway({ namespace: 'game' })
@@ -84,5 +84,10 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 	onClientUnready(client: AuthenticatedSocket): void {
 		console.log("Received event :" + ClientEvents.ClientUnready);
 		client.data.lobby?.setReadyStatus(client, false);
+	}
+
+	@SubscribeMessage(ClientEvents.ClientMovement)
+	onClientMovement(client: AuthenticatedSocket, data: ClientMovementDto): void {
+		client.data.lobby?.instance.clientMove(client.id, data);
 	}
 }

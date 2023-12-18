@@ -696,7 +696,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.LobbyJoinDto = exports.LobbyCreateDto = void 0;
+exports.ClientMovementDto = exports.LobbyJoinDto = exports.LobbyCreateDto = void 0;
 const class_validator_1 = __webpack_require__(/*! class-validator */ "class-validator");
 class LobbyCreateDto {
 }
@@ -712,6 +712,17 @@ __decorate([
     (0, class_validator_1.IsString)(),
     __metadata("design:type", String)
 ], LobbyJoinDto.prototype, "lobbyId", void 0);
+class ClientMovementDto {
+}
+exports.ClientMovementDto = ClientMovementDto;
+__decorate([
+    (0, class_validator_1.IsBoolean)(),
+    __metadata("design:type", Boolean)
+], ClientMovementDto.prototype, "movingLeft", void 0);
+__decorate([
+    (0, class_validator_1.IsBoolean)(),
+    __metadata("design:type", Boolean)
+], ClientMovementDto.prototype, "movingRight", void 0);
 
 
 /***/ }),
@@ -732,7 +743,7 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
-var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k;
+var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m;
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.GameGateway = void 0;
 const websockets_1 = __webpack_require__(/*! @nestjs/websockets */ "@nestjs/websockets");
@@ -793,6 +804,9 @@ let GameGateway = class GameGateway {
         console.log("Received event :" + ClientEvents_1.ClientEvents.ClientUnready);
         client.data.lobby?.setReadyStatus(client, false);
     }
+    onClientMovement(client, data) {
+        client.data.lobby?.instance.clientMove(client.id, data);
+    }
 };
 exports.GameGateway = GameGateway;
 __decorate([
@@ -831,6 +845,12 @@ __decorate([
     __metadata("design:paramtypes", [typeof (_k = typeof types_1.AuthenticatedSocket !== "undefined" && types_1.AuthenticatedSocket) === "function" ? _k : Object]),
     __metadata("design:returntype", void 0)
 ], GameGateway.prototype, "onClientUnready", null);
+__decorate([
+    (0, websockets_1.SubscribeMessage)(ClientEvents_1.ClientEvents.ClientMovement),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [typeof (_l = typeof types_1.AuthenticatedSocket !== "undefined" && types_1.AuthenticatedSocket) === "function" ? _l : Object, typeof (_m = typeof dtos_1.ClientMovementDto !== "undefined" && dtos_1.ClientMovementDto) === "function" ? _m : Object]),
+    __metadata("design:returntype", void 0)
+], GameGateway.prototype, "onClientMovement", null);
 exports.GameGateway = GameGateway = __decorate([
     (0, common_1.UsePipes)(new validation_pipe_1.WsValidationPipe()),
     (0, websockets_1.WebSocketGateway)({ namespace: 'game' }),
@@ -883,6 +903,8 @@ exports.GameModule = GameModule = __decorate([
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.Instance = void 0;
 const ServerEvents_1 = __webpack_require__(/*! ../shared/server/ServerEvents */ "./src/game/shared/server/ServerEvents.ts");
+const TICK_RATE = 1000 / 60;
+const PADDLE_SPEED = 3.5;
 class Instance {
     constructor(lobby) {
         this.lobby = lobby;
@@ -890,6 +912,28 @@ class Instance {
         this.hasFinished = false;
         this.isSuspended = false;
         this.scores = {};
+        this.gameTick = 0;
+        this.updateInterval = null;
+        this.ball = {
+            radius: 5,
+            speedModifier: 1,
+            velocity: { x: 0, y: 0, z: 0 },
+            position: { x: 0, y: 0, z: 0 },
+        };
+        this.paddleGuest = {
+            width: 80,
+            height: 10,
+            depth: 15,
+            position: { x: 0, y: 0, z: 0 },
+            movement: 0,
+        };
+        this.paddleHost = {
+            width: 80,
+            height: 10,
+            depth: 15,
+            position: { x: 0, y: 0, z: 0 },
+            movement: 0,
+        };
     }
     triggerStart() {
         if (this.hasStarted) {
@@ -897,6 +941,118 @@ class Instance {
         }
         this.hasStarted = true;
         this.lobby.dispatchToLobby(ServerEvents_1.ServerEvents.GameStart, {});
+        this.newRound();
+        this.startGameRuntime();
+    }
+    clientMove(clientId, data) {
+        if (clientId === this.lobby.hostSocketId) {
+            this.paddleHost.movement = data.movingLeft ? -1 : (data.movingRight ? 1 : 0);
+        }
+        else {
+            this.paddleGuest.movement = data.movingLeft ? -1 : (data.movingRight ? 1 : 0);
+        }
+    }
+    startGameRuntime() {
+        if (this.updateInterval === null) {
+            this.updateInterval = setInterval(() => {
+                this.gameRuntime();
+            }, TICK_RATE);
+        }
+    }
+    stopGameRuntime() {
+        if (this.updateInterval !== null) {
+            clearInterval(this.updateInterval);
+            this.updateInterval = null;
+        }
+    }
+    newRound() {
+        this.ball.position = { x: 0, y: 0, z: 0 };
+        this.ball.speedModifier = 1;
+        this.paddleGuest.position.x = 0;
+        this.paddleHost.position.x = 0;
+        const randomAngle = (Math.PI / 3) * (Math.random() * 2 - 1);
+        this.ball.velocity.x = Math.sin(randomAngle);
+        this.ball.velocity.y = -Math.cos(randomAngle);
+    }
+    makePaddleMove() {
+        if (this.paddleHost.position.x + this.paddleHost.movement * PADDLE_SPEED >= -300 + this.paddleHost.width / 2
+            && this.paddleHost.position.x + this.paddleHost.movement * PADDLE_SPEED <= 300 - this.paddleHost.width / 2)
+            this.paddleHost.position.x -= -this.paddleHost.movement * PADDLE_SPEED;
+        if (this.paddleGuest.position.x + this.paddleGuest.movement * PADDLE_SPEED <= 300 - this.paddleGuest.width / 2
+            && this.paddleGuest.position.x + this.paddleGuest.movement * PADDLE_SPEED >= -300 + this.paddleGuest.width / 2)
+            this.paddleGuest.position.x += this.paddleGuest.movement * PADDLE_SPEED;
+    }
+    checkCollisions() {
+        if (this.ball.position.x >= this.paddleHost.position.x + this.paddleHost.width / 2
+            && this.ball.position.x <= this.paddleHost.position.x + this.paddleHost.width / 2
+            && this.ball.position.y >= this.paddleHost.position.y - this.paddleHost.height / 2 - this.ball.radius
+            && this.ball.position.y <= this.paddleHost.position.y + this.paddleHost.height / 2 + this.ball.radius) {
+            this.ball.velocity.x = -this.ball.velocity.x;
+            this.ball.velocity.y = -this.ball.velocity.y;
+        }
+        else if (this.ball.position.x >= this.paddleGuest.position.x - this.paddleGuest.width / 2
+            && this.ball.position.x <= this.paddleGuest.position.x + this.paddleGuest.width / 2
+            && this.ball.position.y >= this.paddleGuest.position.y - this.paddleGuest.height / 2 - this.ball.radius
+            && this.ball.position.y <= this.paddleGuest.position.y + this.paddleGuest.height / 2 + this.ball.radius) {
+            this.ball.velocity.x = -this.ball.velocity.x;
+            this.ball.velocity.y = -this.ball.velocity.y;
+        }
+    }
+    gameRuntime() {
+        this.gameTick++;
+        this.ball.position.x += this.ball.velocity.x * this.ball.speedModifier;
+        this.ball.position.y += this.ball.velocity.y * this.ball.speedModifier;
+        this.makePaddleMove();
+        this.sendGameState();
+        if (this.hasFinished) {
+            this.stopGameRuntime();
+        }
+    }
+    sendGameState() {
+        this.lobby.sendToUser(this.lobby.hostSocketId, ServerEvents_1.ServerEvents.GameState, {
+            ballPosition: {
+                x: this.ball.position.x,
+                y: this.ball.position.y,
+                z: this.ball.position.z
+            },
+            ballSpeedModifier: this.ball.speedModifier,
+            paddleOpponent: {
+                x: this.paddleGuest.position.x,
+                y: this.paddleGuest.position.y,
+                z: this.paddleGuest.position.z
+            },
+            paddlePlayer: {
+                x: this.paddleHost.position.x,
+                y: this.paddleHost.position.y,
+                z: this.paddleHost.position.z
+            },
+            scores: {
+                [this.lobby.hostSocketId]: this.scores[this.lobby.hostSocketId],
+                [this.lobby.guestSocketId]: this.scores[this.lobby.guestSocketId],
+            }
+        });
+        this.lobby.sendToUser(this.lobby.guestSocketId, ServerEvents_1.ServerEvents.GameState, {
+            ballPosition: {
+                x: -this.ball.position.x,
+                y: -this.ball.position.y,
+                z: this.ball.position.z
+            },
+            ballSpeedModifier: this.ball.speedModifier,
+            paddleOpponent: {
+                x: this.paddleHost.position.x,
+                y: this.paddleHost.position.y,
+                z: this.paddleHost.position.z
+            },
+            paddlePlayer: {
+                x: this.paddleGuest.position.x,
+                y: this.paddleGuest.position.y,
+                z: this.paddleGuest.position.z
+            },
+            scores: {
+                [this.lobby.hostSocketId]: this.scores[this.lobby.hostSocketId],
+                [this.lobby.guestSocketId]: this.scores[this.lobby.guestSocketId],
+            }
+        });
     }
 }
 exports.Instance = Instance;
@@ -1081,6 +1237,7 @@ var ClientEvents;
     ClientEvents["LobbyCreate"] = "client.lobby.create";
     ClientEvents["LobbyJoin"] = "client.lobby.join";
     ClientEvents["LobbyLeave"] = "client.lobby.leave";
+    ClientEvents["ClientMovement"] = "client.game.move";
 })(ClientEvents || (exports.ClientEvents = ClientEvents = {}));
 
 

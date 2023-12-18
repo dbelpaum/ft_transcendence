@@ -75,9 +75,12 @@ const Game: React.FC = () => {
 		});
 
 		return () => {
-			if (socket) {
-				socket.disconnect();
-			}
+			// changer la dépendance gameStarted pour arreter de deco quand le jeu se lance
+			// if (socket) {
+			// 	socket.disconnect();
+			// 	setSocket(null); // Set socket to null after disconnecting
+			// 	console.log("zeubi");
+			// }
 		};
 	}, [gameStarted]);
 

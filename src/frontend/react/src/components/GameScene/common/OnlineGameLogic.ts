@@ -26,8 +26,8 @@ export class OnlineGameLogic {
 	private ball: THREE.Mesh;
 	private width: number;
 	private height: number;
-	private ballVelX: number;
-	private ballVelY: number;
+	private ballVelX = 0;
+	private ballVelY = 0;
 	private paddleLeftSpeed = 0;
 	private paddleRightSpeed = 0;
 	private socket: Socket;
@@ -103,13 +103,13 @@ export class OnlineGameLogic {
 			32,
 			32
 		);
-		const ballMaterial = new THREE.MeshLambertMaterial({ color: 0xc45c23 });
+		const ballMaterial = new THREE.MeshLambertMaterial({ color: 0xcccccc });
 		this.ball = new THREE.Mesh(sphereGeometry, ballMaterial);
 		this.ball.position.z = 0;
 
-		const randomAngle = (Math.PI / 3) * (Math.random() * 2 - 1);
-		this.ballVelX = Math.sin(randomAngle);
-		this.ballVelY = -Math.cos(randomAngle);
+		// const randomAngle = (Math.PI / 3) * (Math.random() * 2 - 1);
+		// this.ballVelX = Math.sin(randomAngle);
+		// this.ballVelY = -Math.cos(randomAngle);
 
 		this.scene.add(this.ground, this.player, this.opponent, this.ball);
 	}
@@ -119,11 +119,17 @@ export class OnlineGameLogic {
 			case "ArrowLeft":
 			case "a":
 			case "q":
+				if (this.paddleLeftSpeed === this.paddleVelocity)
+					break;
 				this.paddleLeftSpeed = this.paddleVelocity;
+				this.socket.emit("client.game.move", { movingLeft: true, movingRight: false });
 				break;
 			case "ArrowRight":
 			case "d":
+				if (this.paddleRightSpeed === this.paddleVelocity)
+					break;
 				this.paddleRightSpeed = this.paddleVelocity;
+				this.socket.emit("client.game.move", { movingLeft: false, movingRight: true });
 				break;
 			case "r":
 				this.switchCamera();
@@ -139,10 +145,12 @@ export class OnlineGameLogic {
 			case "a":
 			case "q":
 				this.paddleLeftSpeed = 0;
+				this.socket.emit("client.game.move", { movingLeft: false, movingRight: (this.paddleRightSpeed != 0) });
 				break;
 			case "ArrowRight":
 			case "d":
 				this.paddleRightSpeed = 0;
+				this.socket.emit("client.game.move", { movingLeft: (this.paddleLeftSpeed != 0), movingRight: false });
 				break;
 			default:
 				break;
@@ -159,29 +167,29 @@ export class OnlineGameLogic {
 		}
 	}
 
-	private checkCollisions(paddle: THREE.Mesh): boolean {
-		return (
-			this.ball.position.x >= paddle.position.x - this.paddleWidth / 2 &&
-			this.ball.position.x <= paddle.position.x + this.paddleWidth / 2 &&
-			this.ball.position.y >=
-				paddle.position.y - this.paddleHeight / 2 - this.ballRadius &&
-			this.ball.position.y <=
-				paddle.position.y + this.paddleHeight / 2 + this.ballRadius
-		);
-	}
+	// private checkCollisions(paddle: THREE.Mesh): boolean {
+	// 	return (
+	// 		this.ball.position.x >= paddle.position.x - this.paddleWidth / 2 &&
+	// 		this.ball.position.x <= paddle.position.x + this.paddleWidth / 2 &&
+	// 		this.ball.position.y >=
+	// 			paddle.position.y - this.paddleHeight / 2 - this.ballRadius &&
+	// 		this.ball.position.y <=
+	// 			paddle.position.y + this.paddleHeight / 2 + this.ballRadius
+	// 	);
+	// }
 
-	private newRound() {
-		this.ball.position.x = 0;
-		this.ball.position.y = 0;
-		this.player.position.x = 0;
-		this.opponent.position.x = 0;
-		this.gameTick = 0;
-		this.ballSpeedModifier = 1;
+	// private newRound() {
+	// 	this.ball.position.x = 0;
+	// 	this.ball.position.y = 0;
+	// 	this.player.position.x = 0;
+	// 	this.opponent.position.x = 0;
+	// 	this.gameTick = 0;
+	// 	this.ballSpeedModifier = 1;
 
-		const randomAngle = (Math.PI / 3) * (Math.random() * 2 - 1);
-		this.ballVelX = Math.sin(randomAngle);
-		this.ballVelY = -Math.cos(randomAngle);
-	}
+	// 	const randomAngle = (Math.PI / 3) * (Math.random() * 2 - 1);
+	// 	this.ballVelX = Math.sin(randomAngle);
+	// 	this.ballVelY = -Math.cos(randomAngle);
+	// }
 
 	private isValidMovement(posX: number, offset: number): boolean {
 		return (
@@ -201,18 +209,18 @@ export class OnlineGameLogic {
 				" Opponent";
 		}
 
-		if (this.ball.position.x > 300 || this.ball.position.x < -300) {
-			this.ballVelX = -this.ballVelX;
-		}
+		// if (this.ball.position.x > 300 || this.ball.position.x < -300) {
+		// 	this.ballVelX = -this.ballVelX;
+		// }
 
-		if (this.ball.position.y < -230 || this.ball.position.y > 230) {
-			if (this.ball.position.y < -230) {
-				this.opponentScore++;
-			} else {
-				this.playerScore++;
-			}
-			this.newRound();
-		}
+		// if (this.ball.position.y < -230 || this.ball.position.y > 230) {
+		// 	if (this.ball.position.y < -230) {
+		// 		this.opponentScore++;
+		// 	} else {
+		// 		this.playerScore++;
+		// 	}
+		// 	this.newRound();
+		// }
 
 		this.ball.position.x += this.ballVelX * this.ballSpeedModifier;
 		this.ball.position.y += this.ballVelY * this.ballSpeedModifier;
@@ -220,25 +228,25 @@ export class OnlineGameLogic {
 		this.ball.position.z =
 			(185 + -0.004 * this.ball.position.y ** 2) * this.cameraInUse.id;
 
-		if (this.checkCollisions(this.player)) {
-			const hitIndex =
-				(this.ball.position.x - this.player.position.x) /
-				(this.paddleWidth / 2);
-			const maxReflectionAngle = Math.PI / 3;
-			const reflectionAngle = hitIndex * maxReflectionAngle;
-			this.ballVelX = Math.sin(reflectionAngle);
-			this.ballVelY = Math.cos(reflectionAngle);
-			this.ballSpeedModifier = Math.exp(this.gameTick / 5000);
-		} else if (this.checkCollisions(this.opponent)) {
-			const hitIndex =
-				(this.ball.position.x - this.opponent.position.x) /
-				(this.paddleWidth / 2);
-			const maxReflectionAngle = Math.PI / 3;
-			const reflectionAngle = hitIndex * maxReflectionAngle;
-			this.ballVelX = Math.sin(reflectionAngle);
-			this.ballVelY = -Math.cos(reflectionAngle);
-			this.ballSpeedModifier = Math.exp(this.gameTick / 5000);
-		}
+		// if (this.checkCollisions(this.player)) {
+		// 	const hitIndex =
+		// 		(this.ball.position.x - this.player.position.x) /
+		// 		(this.paddleWidth / 2);
+		// 	const maxReflectionAngle = Math.PI / 3;
+		// 	const reflectionAngle = hitIndex * maxReflectionAngle;
+		// 	this.ballVelX = Math.sin(reflectionAngle);
+		// 	this.ballVelY = Math.cos(reflectionAngle);
+		// 	this.ballSpeedModifier = Math.exp(this.gameTick / 5000);
+		// } else if (this.checkCollisions(this.opponent)) {
+		// 	const hitIndex =
+		// 		(this.ball.position.x - this.opponent.position.x) /
+		// 		(this.paddleWidth / 2);
+		// 	const maxReflectionAngle = Math.PI / 3;
+		// 	const reflectionAngle = hitIndex * maxReflectionAngle;
+		// 	this.ballVelX = Math.sin(reflectionAngle);
+		// 	this.ballVelY = -Math.cos(reflectionAngle);
+		// 	this.ballSpeedModifier = Math.exp(this.gameTick / 5000);
+		// }
 
 		if (
 			this.isValidMovement(
@@ -258,9 +266,17 @@ export class OnlineGameLogic {
 		this.gameTick++;
 	}
 
-	private sendGameState() {}
+	private sendGameState() { }
 
-	private receiveGameState(data: any) {}
+	private receiveGameState(data: any) {
+		this.ball.position.x = data.ballPosition.x;
+		this.ball.position.y = data.ballPosition.y;
+		this.ball.position.z = data.ballPosition.z;
+		this.ballSpeedModifier = data.ballSpeedModifier;
+		this.player.position.x = data.paddlePlayer.x;
+		this.opponent.position.x = data.paddleOpponent.x;
+		// this.playerScore = data.scores[this.socket.id];
+	}
 
 	private animate() {
 		requestAnimationFrame(this.animate.bind(this));
@@ -272,7 +288,7 @@ export class OnlineGameLogic {
 			this.receiveGameState(data);
 		});
 
-		this.newRound();
+		// this.newRound();
 		this.animate();
 
 		// Add event listeners for keydown and keyup
