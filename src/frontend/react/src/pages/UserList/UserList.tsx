@@ -3,8 +3,9 @@ import './UserList.css';
 
 interface User {
     id42: number;
-    name: string;
+    pseudo: string;
     email: string;
+    imageURL: string;
     // Ajoutez d'autres champs selon la structure de vos données utilisateur
 }
 
@@ -12,7 +13,7 @@ const UserList: React.FC = () => {
     const [users, setUsers] = useState<User[]>([]);
 
     useEffect(() => {
-        fetch('http://localhost:4000/user/GetAllUsers') // Remplacez par l'URL de votre API
+        fetch('http://localhost:4000/user/GetAllUsers') 
             .then(response => response.json())
             .then((data: User[]) => setUsers(data))
             .catch(error => console.error(error));
@@ -22,8 +23,10 @@ const UserList: React.FC = () => {
         <div className="user-list">
             {users.map(user => (
                 <div key={user.id42} className="user-item">
-                    <h3>{user.name}</h3>
+                    <img src={user.imageURL} alt="Profile" className="profile-pic" />
+                    <h3><a href={`/user/${user.id42}`}>{user.pseudo}</a></h3>  {/* Remplacer par composant react */}
                     <p>{user.email}</p>
+                    
                     {/* Autres détails de l'utilisateur */}
                 </div>
             ))}

@@ -1,28 +1,47 @@
-/* UserList.css */
-
 .user-list {
+    margin-top: 7%; /* Ajustez cette valeur selon l'espace désiré */
+    padding: 20px;
     display: flex;
     flex-direction: column;
-    align-items: center;
-    padding: 20px;
+    gap: 15px;
+    
 }
 
 .user-item {
-    background-color: #f2f2f2;
-    border: 1px solid #ddd;
+    background-color: #ffffff; /* Fond clair pour contraster avec le bleu foncé */
     padding: 15px;
-    margin: 10px 0;
-    width: 80%;
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    border-radius: 10px; /* Coins arrondis pour un aspect plus doux */
+    display: flex;
+    align-items: center;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1); /* Ombre subtile pour un effet de profondeur */
+    transition: transform 0.3s ease, box-shadow 0.3s ease; /* Transition pour l'interaction */
+}
+
+.user-item:hover {
+    transform: translateY(-5px);
+    box-shadow: 0px 6px 12px rgba(0, 0, 0, 0.15);
+}
+
+.profile-pic {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    margin-right: 15px; /* Espace entre l'image et le texte */
 }
 
 .user-item h3 {
     margin: 0;
-    color: #333;
+    color: #333333; /* Couleur du texte pour le pseudo */
+    font-size: 1.2em;
+    margin-bottom: 5px; /* Espacement entre le pseudo et l'adresse e-mail */
+}
+
+.user-item h3 a {
+    text-decoration: none;
+    color: inherit; /* Hérite la couleur du parent (h3) */
 }
 
 .user-item p {
-    margin: 5px 0 0;
-    color: #666;
+    margin: 0;
+    color: #555555; /* Couleur plus légère pour l'adresse e-mail */
 }
