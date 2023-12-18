@@ -30,9 +30,10 @@ const ChannelInfo: React.FC<ChannelWriteProps> = ({ channelUtility }) => {
 	  }
 	
 	  const currentChannel = channelUtility.channels.find(channel => channel.name === channelUrl);
-	  if (!currentChannel) {
-		return null;
-	  }
+	  if (!currentChannel)	return null;
+
+	  if (!channelUtility || !channelUtility.me) return null
+	
 	
 	  const uniqueUsersMap = new Map();
 	
@@ -52,13 +53,15 @@ const ChannelInfo: React.FC<ChannelWriteProps> = ({ channelUtility }) => {
 	  {
 		  return (user.socketId === owner.socketId)
 	  }
+
+	const iAmAdmin : boolean = isAdmin(channelUtility.me, currentChannel.host)
   
+		
 	  const userAndAdmin : UserAndAdmin[] = uniqueUsers.map(u => ({
 			user: u,
 			isAdmin: isAdmin(u, currentChannel.host),
 			isOwner: isOwner(u, currentChannel.owner)
 		}))
-
 	return (
 		<div className='channel-info'>
 			<h3>Info : {currentChannel.name}</h3>
@@ -66,7 +69,7 @@ const ChannelInfo: React.FC<ChannelWriteProps> = ({ channelUtility }) => {
 			<>
 				<p>{currentChannel.type}</p>
 				{userAndAdmin.map((user, index) => (
-					<UserInfo channelUtility={channelUtility} userAndAdmin={user} key={index} channelUrl={channelUrl} />
+					<UserInfo channelUtility={channelUtility} userAndAdmin={user} key={index} channelUrl={channelUrl} iAmAdmin={iAmAdmin} currentChannel={currentChannel}/>
 				))}
 			</>
 			) : null}

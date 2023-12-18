@@ -43,6 +43,7 @@ export interface ChannelUtility {
 	channels: Channel[];
 	setChannels: Dispatch<SetStateAction<Channel[]>>;
 	message: Message[],
+	recharger: () => void
 
   }
 

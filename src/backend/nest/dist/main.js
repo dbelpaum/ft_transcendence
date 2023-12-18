@@ -176,7 +176,7 @@ let AuthentificationController = class AuthentificationController {
         if (checkUserid == null) {
             var newUser = {
                 id42: userData.id,
-                pseudo: userData.login,
+                pseudo: userData.pseudo,
                 email: userData.email,
                 firstname: userData.first_name,
                 lastname: userData.last_name,
@@ -443,12 +443,12 @@ let ChannelService = class ChannelService {
         if (channel === -1) {
             await this.channels.push({
                 name: channelCreate.name,
-                host: [channelCreate.user.login],
+                host: [channelCreate.user.pseudo],
                 owner: channelCreate.user,
                 users: [channelCreate.user],
                 type: channelCreate.type,
                 mdp: channelCreate.mdp,
-                invited: [channelCreate.user.login]
+                invited: [channelCreate.user.pseudo]
             });
         }
     }
@@ -466,20 +466,20 @@ let ChannelService = class ChannelService {
         const channelIndex = this.channels.findIndex((channel) => channel?.name === channelName);
         return channelIndex;
     }
-    userIsInvited(login, channel) {
-        return channel.invited.some(l => l === login);
+    userIsInvited(pseudo, channel) {
+        return channel.invited.some(l => l === pseudo);
     }
     mdpIsValid(mdp, channel) {
         return (mdp === channel.mdp);
     }
-    userIsHost(user_login, channel) {
-        return channel.host.some(l => l == user_login);
+    userIsHost(user_pseudo, channel) {
+        return channel.host.some(l => l == user_pseudo);
     }
     async addInviteToChannel(inviteInfo) {
         const channelIndex = await this.getChannelByName(inviteInfo.channel_name);
         if (channelIndex === -1)
             return;
-        if (!this.userIsHost(inviteInfo.user.login, this.channels[channelIndex]))
+        if (!this.userIsHost(inviteInfo.user.pseudo, this.channels[channelIndex]))
             return;
         this.channels[channelIndex].invited.push(inviteInfo.invited_name);
     }
@@ -487,7 +487,7 @@ let ChannelService = class ChannelService {
         const channelIndex = await this.getChannelByName(adminInfo.channel);
         if (channelIndex === -1)
             return;
-        if (!this.userIsHost(adminInfo.user.login, this.channels[channelIndex]))
+        if (!this.userIsHost(adminInfo.user.pseudo, this.channels[channelIndex]))
             return;
         this.channels[channelIndex].host.push(adminInfo.new_admin_name);
     }
@@ -495,9 +495,9 @@ let ChannelService = class ChannelService {
         const channelIndex = await this.getChannelByName(adminInfo.channel);
         if (channelIndex === -1)
             return;
-        if (!this.userIsHost(adminInfo.user.login, this.channels[channelIndex]))
+        if (!this.userIsHost(adminInfo.user.pseudo, this.channels[channelIndex]))
             return;
-        if (adminInfo.new_admin_name === adminInfo.user.login)
+        if (adminInfo.new_admin_name === adminInfo.user.pseudo)
             return;
         const adminIndex = this.channels[channelIndex].host.indexOf(adminInfo.new_admin_name);
         if (adminIndex !== -1) {
@@ -507,11 +507,17 @@ let ChannelService = class ChannelService {
     async addUserToChannel(channelCreate) {
         const channelIndex = await this.getChannelByName(channelCreate.name);
         if (channelIndex !== -1) {
+            if (this.channels[channelIndex].users.some(user => user.socketId === channelCreate.user.socketId)) {
+                return {
+                    errorNumber: 25,
+                    text: "L'utilisateur " + channelCreate.user.pseudo + " essaie de rejoindre un channel alors qu'il est deja dedans : " + this.channels[channelIndex].name
+                };
+            }
             if (this.channels[channelIndex].type === "private") {
-                if (!this.userIsInvited(channelCreate.user.login, this.channels[channelIndex])) {
+                if (!this.userIsInvited(channelCreate.user.pseudo, this.channels[channelIndex])) {
                     return {
                         errorNumber: 20,
-                        text: "L'utilisateur " + channelCreate.user.login + " essaie de rejoindre un channel privé sans avoir été invité : " + this.channels[channelIndex].name
+                        text: "L'utilisateur " + channelCreate.user.pseudo + " essaie de rejoindre un channel privé sans avoir été invité : " + this.channels[channelIndex].name
                     };
                 }
             }
@@ -519,7 +525,7 @@ let ChannelService = class ChannelService {
                 if (!this.mdpIsValid(channelCreate.mdp, this.channels[channelIndex])) {
                     return {
                         errorNumber: 21,
-                        text: "L'utilisateur " + channelCreate.user.login + " essaie de rejoindre un channel privé avec le mauvais mdp: " + this.channels[channelIndex].name
+                        text: "L'utilisateur " + channelCreate.user.pseudo + " essaie de rejoindre un channel privé avec le mauvais mdp: " + this.channels[channelIndex].name
                     };
                 }
             }
@@ -562,8 +568,8 @@ let ChannelService = class ChannelService {
     async getAllChannels() {
         return this.channels;
     }
-    async getAccessibleChannels(login) {
-        return this.channels.filter(c => c.type !== "private" || this.userIsInvited(login, c));
+    async getAccessibleChannels(pseudo) {
+        return this.channels.filter(c => c.type !== "private" || this.userIsInvited(pseudo, c));
     }
 };
 exports.ChannelService = ChannelService;
@@ -633,7 +639,7 @@ let ChatGateway = class ChatGateway {
                 this.server.to(payload.name).emit('chat', {
                     user: payload.user,
                     timeSent: null,
-                    message: `${payload.user.login} jump in ${payload.name}`,
+                    message: `${payload.user.pseudo} jump in ${payload.name}`,
                     channelName: payload.name,
                 });
             }
