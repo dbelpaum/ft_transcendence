@@ -39,8 +39,12 @@ function Chat(){
 	const [isConnected, setIsConnected] = useState(socket.connected);
 	
 	const [channels, setChannels] = useState<Channel[]>([]);
+	const [forceReload, setForceReload] = useState<number>(0);
 
-	
+
+	const recharger = (): void => {
+		setForceReload(prev => prev + 1);
+	};
 	useEffect(() => {
 	
 		if (user)
@@ -90,6 +94,7 @@ function Chat(){
 		channels: channels,
 		setChannels: setChannels,
 		message: messages,
+		recharger: recharger,
 	  };
 
 	return (

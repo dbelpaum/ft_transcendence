@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import {
+	Channel,
   ChannelUtility,
 	Message,
 	addAdminInfo,
@@ -14,15 +15,27 @@ interface UserAndAdmin {
 }
 
 interface userInfoProps {
-  channelUtility: ChannelUtility;
-  userAndAdmin: UserAndAdmin;
+	channelUtility: ChannelUtility;
+	userAndAdmin: UserAndAdmin;
 	channelUrl: string|null;
+	iAmAdmin: boolean;
+	currentChannel: Channel
 }
 
-const UserInfo: React.FC<userInfoProps> = ({ channelUtility, userAndAdmin, channelUrl }) => {
+const UserInfo: React.FC<userInfoProps> = ({ channelUtility, userAndAdmin, channelUrl, iAmAdmin, currentChannel}) => {
 	const [showModal, setShowModal] = useState(false);
 	const modalRef = useRef<HTMLDivElement | null>(null)
 
+	useEffect(() => {
+        // Attacher l'écouteur d'événement
+        document.addEventListener("mousedown", handleClickOutside);
+        return () => {
+            // Nettoyer l'écouteur d'événement
+            document.removeEventListener("mousedown", handleClickOutside);
+        };
+    }, []);
+	
+	if (!channelUtility.me) return null
 	const toggleModal = () => {
         setShowModal(!showModal);
     };
@@ -44,6 +57,7 @@ const UserInfo: React.FC<userInfoProps> = ({ channelUtility, userAndAdmin, chann
 			}
 			channelUtility.socket.emit('add_admin', adminInfo);
             setShowModal(false);
+			channelUtility.recharger()
 
 		}
 	}
@@ -59,18 +73,12 @@ const UserInfo: React.FC<userInfoProps> = ({ channelUtility, userAndAdmin, chann
 			}
 			channelUtility.socket.emit('remove_admin', adminInfo);
             setShowModal(false);
+			channelUtility.recharger()
 
 		}
 	}
 
-	useEffect(() => {
-        // Attacher l'écouteur d'événement
-        document.addEventListener("mousedown", handleClickOutside);
-        return () => {
-            // Nettoyer l'écouteur d'événement
-            document.removeEventListener("mousedown", handleClickOutside);
-        };
-    }, []);
+
 
 
   return (
@@ -83,7 +91,9 @@ const UserInfo: React.FC<userInfoProps> = ({ channelUtility, userAndAdmin, chann
 				{userAndAdmin.user.pseudo}
 			</span>
 			<div className="container_button">
+			{(iAmAdmin && (channelUtility.me.pseudo !== userAndAdmin.user.pseudo)) && (
 				<button className="action-button" onClick={toggleModal}>Actions</button>
+			)}
 				{showModal && (
 					<div className="modal" ref={modalRef}>
 						<span>Kick</span>

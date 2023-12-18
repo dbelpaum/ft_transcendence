@@ -90,7 +90,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 			{
 				user: payload.user,
 				timeSent: null,
-				message: `${payload.user.login} jump in ${payload.name}`,
+				message: `${payload.user.pseudo} jump in ${payload.name}`,
 				channelName: payload.name,
 			}) 
 		}

@@ -21,12 +21,12 @@ export class ChannelService {
 		await this.channels.push(
 			{ 
 				name: channelCreate.name, 
-				host: [channelCreate.user.login],
+				host: [channelCreate.user.pseudo],
 				owner: channelCreate.user,
 				users: [channelCreate.user],
 				type: channelCreate.type,
 				mdp: channelCreate.mdp,
-				invited: [channelCreate.user.login]
+				invited: [channelCreate.user.pseudo]
 			})
 	  }
 	}
@@ -49,17 +49,17 @@ export class ChannelService {
 	  return channelIndex
 	}
 
-	userIsInvited(login: string, channel: Channel): boolean {
-		return channel.invited.some(l => l === login)
+	userIsInvited(pseudo: string, channel: Channel): boolean {
+		return channel.invited.some(l => l === pseudo)
 	}
 
 	mdpIsValid(mdp: string, channel: Channel): boolean {
 		return (mdp === channel.mdp)
 	}
 
-	userIsHost(user_login: string, channel: Channel)
+	userIsHost(user_pseudo: string, channel: Channel)
 	{
-		return channel.host.some(l => l == user_login)
+		return channel.host.some(l => l == user_pseudo)
 	}
 
 	async addInviteToChannel(inviteInfo: InviteToChannel) : Promise<void>
@@ -70,7 +70,7 @@ export class ChannelService {
 
 
 		// Si l'utilisateur n'est pas administrateur, on ne fait rien
-		if (!this.userIsHost(inviteInfo.user.login,this.channels[channelIndex])) return
+		if (!this.userIsHost(inviteInfo.user.pseudo,this.channels[channelIndex])) return
 
 		// Sinon, on ajoute le nom a la liste des invités
 		this.channels[channelIndex].invited.push(inviteInfo.invited_name)
@@ -85,7 +85,7 @@ export class ChannelService {
 
 
 		// Si l'utilisateur n'est pas administrateur, on ne fait rien
-		if (!this.userIsHost(adminInfo.user.login,this.channels[channelIndex])) return
+		if (!this.userIsHost(adminInfo.user.pseudo,this.channels[channelIndex])) return
 
 		// Sinon, on ajoute le nom a la liste des admins
 		this.channels[channelIndex].host.push(adminInfo.new_admin_name)
@@ -100,10 +100,10 @@ export class ChannelService {
 
 
 		// Si l'utilisateur n'est pas administrateur, on ne fait rien
-		if (!this.userIsHost(adminInfo.user.login,this.channels[channelIndex])) return
+		if (!this.userIsHost(adminInfo.user.pseudo,this.channels[channelIndex])) return
 
 		// Si l'utilisateur a supprimer des admins est nous meme, on ne fait rien
-		if (adminInfo.new_admin_name === adminInfo.user.login) return
+		if (adminInfo.new_admin_name === adminInfo.user.pseudo) return
 
 		// Sinon, on ajoute le nom a la liste des admins
 
@@ -120,14 +120,23 @@ export class ChannelService {
 		// Si le channel existe
 		const channelIndex = await this.getChannelByName(channelCreate.name)
 		if (channelIndex !== -1) {
+			// Si l'utilisateur est déja dans le channel, inutile de l'invité
+			if (this.channels[channelIndex].users.some(user => user.socketId === channelCreate.user.socketId))
+			{
+				return {
+					errorNumber: 25,
+					text: "L'utilisateur " + channelCreate.user.pseudo + " essaie de rejoindre un channel alors qu'il est deja dedans : " + this.channels[channelIndex].name
+				};
+			}
+
 			// Si le channel est private et qu'on est pas dans les invité, on ne rentre pas
 			if (this.channels[channelIndex].type === "private")
 			{
-				if (!this.userIsInvited(channelCreate.user.login, this.channels[channelIndex]))
+				if (!this.userIsInvited(channelCreate.user.pseudo, this.channels[channelIndex]))
 				{
 					return {
 						errorNumber: 20,
-						text: "L'utilisateur " + channelCreate.user.login + " essaie de rejoindre un channel privé sans avoir été invité : " + this.channels[channelIndex].name
+						text: "L'utilisateur " + channelCreate.user.pseudo + " essaie de rejoindre un channel privé sans avoir été invité : " + this.channels[channelIndex].name
 					};
 
 				}
@@ -139,7 +148,7 @@ export class ChannelService {
 				{
 					return {
 						errorNumber: 21,
-						text: "L'utilisateur " + channelCreate.user.login + " essaie de rejoindre un channel privé avec le mauvais mdp: " + this.channels[channelIndex].name
+						text: "L'utilisateur " + channelCreate.user.pseudo + " essaie de rejoindre un channel privé avec le mauvais mdp: " + this.channels[channelIndex].name
 					};
 
 				}
@@ -193,8 +202,8 @@ export class ChannelService {
 		return this.channels
 	  }
   
-	async getAccessibleChannels(login: string): Promise<Channel[]> {
-	  return this.channels.filter(c => c.type !== "private" || this.userIsInvited(login, c))
+	async getAccessibleChannels(pseudo: string): Promise<Channel[]> {
+	  return this.channels.filter(c => c.type !== "private" || this.userIsInvited(pseudo, c))
 	}
   }
   
