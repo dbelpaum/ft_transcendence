@@ -945,10 +945,10 @@ class LobbyManager {
     joinLobby(lobbyId, client) {
         const lobby = this.lobbies.get(lobbyId);
         if (!lobby) {
-            throw new ServerExceptions_1.ServerException(SocketExceptions_1.SocketExceptions.LobbyError, 'Lobby not found');
+            throw new ServerExceptions_1.ServerException(SocketExceptions_1.SocketExceptions.LobbyError, "Lobby not found");
         }
         if (lobby.clients.size >= lobby.maxClients) {
-            throw new ServerExceptions_1.ServerException(SocketExceptions_1.SocketExceptions.LobbyError, 'Lobby already full');
+            throw new ServerExceptions_1.ServerException(SocketExceptions_1.SocketExceptions.LobbyError, "Lobby already full");
         }
         lobby.addClient(client);
     }
@@ -965,7 +965,7 @@ class LobbyManager {
 }
 exports.LobbyManager = LobbyManager;
 __decorate([
-    (0, schedule_1.Cron)('*/3 * * * *'),
+    (0, schedule_1.Cron)("*/3 * * * *"),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", []),
     __metadata("design:returntype", void 0)
@@ -1102,6 +1102,7 @@ var ServerEvents;
     ServerEvents["GameStart"] = "server.game.start";
     ServerEvents["GameMessage"] = "server.game.message";
     ServerEvents["GameState"] = "server.game.state";
+    ServerEvents["GameGuestPosition"] = "server.game.guestposition";
 })(ServerEvents || (exports.ServerEvents = ServerEvents = {}));
 
 

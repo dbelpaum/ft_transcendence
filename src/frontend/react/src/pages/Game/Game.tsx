@@ -79,7 +79,7 @@ const Game: React.FC = () => {
 				socket.disconnect();
 			}
 		};
-	}, []);
+	}, [gameStarted]);
 
 	const handleLeaveLobby = () => {
 		setInLobby(false);
@@ -98,7 +98,7 @@ const Game: React.FC = () => {
 					height: "100vh",
 				}}
 			>
-				<DebugPanel variables={{ gameStarted }} />
+				{/* <DebugPanel variables={{ gameStarted }} /> */}
 				{/*Rendering du du Menu OU du Lobby OU de rien car on est in game*/}
 				{!gameStarted && (
 					<>
@@ -116,7 +116,13 @@ const Game: React.FC = () => {
 						)}
 					</>
 				)}
-				{gameStarted && <OnlineGameScene width={800} height={600} />}
+				{gameStarted && (
+					<OnlineGameScene
+						width={800}
+						height={600}
+						isHost={lobbyData.hostId === socket.id}
+					/>
+				)}
 
 				{/* Bouton pour ouvrir/fermer la superposition du classement */}
 				<button onClick={toggleScoreRanking}>Voir le classement</button>

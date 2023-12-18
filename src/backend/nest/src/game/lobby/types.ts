@@ -1,1 +1,1 @@
-export type LobbyMode = 'vanilla' | 'special';
+export type LobbyMode = "vanilla" | "special";

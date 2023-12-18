@@ -2,6 +2,7 @@ import { Socket } from "socket.io";
 import { Lobby } from "../lobby/lobby";
 import { ServerPayloads } from "../shared/server/ServerPayloads";
 import { ServerEvents } from "../shared/server/ServerEvents";
+import { Server } from "http";
 
 export class Instance {
 	public hasStarted: boolean = false;
@@ -10,10 +11,8 @@ export class Instance {
 
 	public isSuspended: boolean = false;
 
-	public scores: Record<Socket['id'], number> = {};
-	constructor(
-		private readonly lobby: Lobby,
-	) { }
+	public scores: Record<Socket["id"], number> = {};
+	constructor(private readonly lobby: Lobby) {}
 
 	public triggerStart(): void {
 		if (this.hasStarted) {
@@ -22,7 +21,5 @@ export class Instance {
 
 		this.hasStarted = true;
 		this.lobby.dispatchToLobby(ServerEvents.GameStart, {});
-
-		
 	}
 }

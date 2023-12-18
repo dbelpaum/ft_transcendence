@@ -1,10 +1,10 @@
-import {  Store } from 'react-notifications-component';
+import { Store } from "react-notifications-component";
 
-export const showNotificationSuccess = ( title: string, message: string ) => {
+export const showNotificationSuccess = (title: string, message: string) => {
 	Store.addNotification({
 		title: title,
 		message: message,
-		type: 'success',
+		type: "success",
 		insert: "top",
 		container: "top-right",
 		animationIn: ["animate__animated", "animate__fadeIn"],
@@ -13,15 +13,15 @@ export const showNotificationSuccess = ( title: string, message: string ) => {
 			duration: 5000,
 			onScreen: true,
 			showIcon: true,
-		}
+		},
 	});
-}
+};
 
-export const showNotificationError = ( title: string, message: string ) => {
+export const showNotificationError = (title: string, message: string) => {
 	Store.addNotification({
 		title: title,
 		message: message,
-		type: 'danger',
+		type: "danger",
 		insert: "top",
 		container: "top-right",
 		animationIn: ["animate__animated", "animate__fadeIn"],
@@ -29,16 +29,16 @@ export const showNotificationError = ( title: string, message: string ) => {
 		dismiss: {
 			duration: 10000,
 			onScreen: true,
-			showIcon: true
-		}
+			showIcon: true,
+		},
 	});
-}
+};
 
-export const showNotificationWarning = ( title: string, message: string ) => {
+export const showNotificationWarning = (title: string, message: string) => {
 	Store.addNotification({
 		title: title,
 		message: message,
-		type: 'warning',
+		type: "warning",
 		insert: "top",
 		container: "top-right",
 		animationIn: ["animate__animated", "animate__fadeIn"],
@@ -46,7 +46,7 @@ export const showNotificationWarning = ( title: string, message: string ) => {
 		dismiss: {
 			duration: 5000,
 			onScreen: true,
-			showIcon: true
-		}
+			showIcon: true,
+		},
 	});
-}
+};

@@ -1,7 +1,7 @@
 import { Server } from "socket.io";
 import { Lobby } from "./lobby";
 import { AuthenticatedSocket } from "../types";
-import { Cron } from '@nestjs/schedule'
+import { Cron } from "@nestjs/schedule";
 import { ServerException } from "../ServerExceptions";
 import { SocketExceptions } from "../shared/server/SocketExceptions";
 import { LobbyMode } from "./types";
@@ -9,7 +9,10 @@ import { LobbyMode } from "./types";
 export class LobbyManager {
 	public server: Server;
 
-	private readonly lobbies: Map<Lobby['id'], Lobby> = new Map<Lobby['id'], Lobby>();
+	private readonly lobbies: Map<Lobby["id"], Lobby> = new Map<
+		Lobby["id"],
+		Lobby
+	>();
 
 	public initializeSocket(client: AuthenticatedSocket): void {
 		client.data.lobby = null;
@@ -30,18 +33,24 @@ export class LobbyManager {
 		const lobby = this.lobbies.get(lobbyId);
 
 		if (!lobby) {
-			throw new ServerException(SocketExceptions.LobbyError, 'Lobby not found');
+			throw new ServerException(
+				SocketExceptions.LobbyError,
+				"Lobby not found"
+			);
 		}
 
 		if (lobby.clients.size >= lobby.maxClients) {
-			throw new ServerException(SocketExceptions.LobbyError, 'Lobby already full');
+			throw new ServerException(
+				SocketExceptions.LobbyError,
+				"Lobby already full"
+			);
 		}
 
 		lobby.addClient(client);
 	}
 
 	// Periodically clean up lobbies
-	@Cron('*/3 * * * *')
+	@Cron("*/3 * * * *")
 	private lobbiesCleaner(): void {
 		console.log("Remaining lobbies : " + this.lobbies);
 		console.log("Checking for empty lobbies...");
