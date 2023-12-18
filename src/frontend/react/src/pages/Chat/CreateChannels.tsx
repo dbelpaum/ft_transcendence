@@ -1,5 +1,6 @@
 import React, { useState, useEffect, ChangeEvent, FormEvent  } from 'react';
-import { ChannelCreate, ChannelUtility } from './chat.interface';
+import { Channel, ChannelCreate, ChannelUtility } from './chat.interface';
+import { useLocation } from 'react-router-dom';
 
 
 interface CreateChannelsProps {
@@ -11,6 +12,11 @@ const CreateChannel: React.FC<CreateChannelsProps> = ({ channelUtility }) => {
 	const [channelName, setChannelName] = useState<string>('');
 	const [channelType, setChannelType] = useState('public');
 	const [password, setPassword] = useState('');
+	const useQuery = () => {
+		return new URLSearchParams(useLocation().search);
+	};
+	const query = useQuery();
+	const channelUrl = query.get('channel'); 
 	
 	const handleCreateClick = () => {
 		setShowForm(true);
@@ -29,8 +35,8 @@ const CreateChannel: React.FC<CreateChannelsProps> = ({ channelUtility }) => {
 			}
 			channelUtility.socket.emit('join_channel', newChannel);
 			
-			const savedChannels: {name: string}[] = JSON.parse(sessionStorage.getItem('channels') || '[]');
-			const newChannels: {name: string}[]  = [...savedChannels, { name: channelName }];
+			const savedChannels: ChannelCreate[] = JSON.parse(sessionStorage.getItem('channels') || '[]');
+			const newChannels: ChannelCreate[]  = [...savedChannels, newChannel];
 			sessionStorage.setItem('channels', JSON.stringify(newChannels));
 		}
 		setChannelName("");
@@ -57,12 +63,20 @@ const CreateChannel: React.FC<CreateChannelsProps> = ({ channelUtility }) => {
 			{
 
 				try {
-					const response = await fetch('http://localhost:4000/channel/all/' + channelUtility.me.login); // URL de votre API
+					const response = await fetch('http://localhost:4000/channel/all/' + channelUtility.me.pseudo); // URL de votre API
 					if (!response.ok) {
 						throw new Error(`Erreur HTTP : ${response.status}`);
 					}
-					const data = await response.json();
+					const data : Channel[]= await response.json();
 					channelUtility.setChannels(data); // Mise à jour de l'état avec les données de l'API
+
+					if (channelUrl)
+					{
+						if (!data.some(c => c.name === channelUrl))
+							window.location.href = 'http://localhost:3000/chat';
+
+					}
+
 		 		} catch (error) {
 			  		console.error("Erreur lors de la récupération des channels:", error);
 		  		}
@@ -84,7 +98,7 @@ const CreateChannel: React.FC<CreateChannelsProps> = ({ channelUtility }) => {
 		return () => {
 		  clearTimeout(timeoutId);
 		};
-	  }, [channelName, setChannelName]);
+	  }, [channelName, setChannelName, channelUtility.recharger]);
 	  
 
 	  return (

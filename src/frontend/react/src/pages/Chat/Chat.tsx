@@ -39,8 +39,12 @@ function Chat(){
 	const [isConnected, setIsConnected] = useState(socket.connected);
 	
 	const [channels, setChannels] = useState<Channel[]>([]);
+	const [forceReload, setForceReload] = useState<number>(0);
 
-	
+
+	const recharger = (): void => {
+		setForceReload(prev => prev + 1);
+	};
 	useEffect(() => {
 	
 		if (user)
@@ -51,17 +55,17 @@ function Chat(){
 				setIsConnected(true);
 				const updatedUser = { ...user, socketId: socket.id };
 				setUser(updatedUser); 
-				const savedChannels: {name: string}[] = JSON.parse(sessionStorage.getItem('channels') || '[]');
-				if (savedChannels && updatedUser)
+				const savedChannels: ChannelCreate[] = JSON.parse(sessionStorage.getItem('channels') || '[]');
+				const updatedChannels = savedChannels.map(channel => {
+					return {
+						...channel, 
+						user: updatedUser
+					};
+				});
+				if (updatedChannels && updatedUser)
 				{
-					savedChannels.forEach((channel) => {
-						const channelJoin : ChannelCreate = {
-							name: channel.name,
-							user: updatedUser,
-							type: "public",
-							mdp: ""
-						}
-						socket.emit('join_channel', channelJoin);
+					updatedChannels.forEach((channel) => {
+						socket.emit('join_channel', channel);
 					});
 				}
 
@@ -73,8 +77,7 @@ function Chat(){
 			});
 		
 			socket.on('chat', (e) => {
-				setMessages((messages) => [e, ...messages]);
-				console.log(messages)
+				setMessages((messages) => [...messages, e]);
 				
 			});
 		
@@ -91,11 +94,12 @@ function Chat(){
 		channels: channels,
 		setChannels: setChannels,
 		message: messages,
+		recharger: recharger,
 	  };
 
 	return (
 		<div>
-			<h1 className="chat-title">Bienvenue sur le chat {user?.login} !</h1>
+			<h1 className="chat-title">Bienvenue sur le chat {user?.pseudo} !</h1>
 			<div className='container'>
 				<Channels channelUtility={channelUtility}/>
 				<ChannelWrite channelUtility={channelUtility}/>
@@ -103,7 +107,7 @@ function Chat(){
 
 			</div>
 			<div className='chat'>
-				<ChatContainer username={user?.login} messages={messages} setMessages={setMessages} socket={socket}/>
+				<ChatContainer username={user?.pseudo} messages={messages} setMessages={setMessages} socket={socket}/>
 			</div>
 	  </div>
 	  )}

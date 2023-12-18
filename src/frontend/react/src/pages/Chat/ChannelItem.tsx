@@ -1,6 +1,7 @@
 import React from 'react';
 import {
 	Channel,
+	ChannelCreate,
 	ChannelUtility
   } from './chat.interface';
 import CreateChannel from './CreateChannels';
@@ -22,7 +23,7 @@ const ChannelItem: React.FC<ChannelsItemsProps> = ({ channelUtility, channel }) 
 	};
 
 	const handleSubmitLeaveChannel = () => {
-		const savedChannels: {name: string}[] = JSON.parse(sessionStorage.getItem('channels') || '[]');
+		const savedChannels: ChannelCreate[] = JSON.parse(sessionStorage.getItem('channels') || '[]');
 		const updatedChannels = savedChannels.filter(the_channel => the_channel.name !== channel.name);
 		sessionStorage.setItem('channels', JSON.stringify(updatedChannels));
 		window.location.reload();
@@ -32,7 +33,7 @@ const ChannelItem: React.FC<ChannelsItemsProps> = ({ channelUtility, channel }) 
 
 	const userInChannel = channel.users.some(u => u.socketId === channelUtility!.me!.socketId);
 
-	const userIsAdmin = channel.host.some(u => u.id === channelUtility.me?.id);
+	const userIsAdmin = channel.host.some(l => l === channelUtility.me?.pseudo);
 
 	return (
 		<li className='channel_item' onClick={handleChannelClick}>

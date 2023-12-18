@@ -52,6 +52,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         const userData = await response.json();
         if (Object.keys(userData).length != 0) {
 			setUser(userData); // Utilisateur connecté
+			console.log("the user data")
         }
         else
           setUser(null)

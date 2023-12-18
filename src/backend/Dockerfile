@@ -9,6 +9,7 @@ RUN chmod 777 /var/*.pem
 COPY ./conf/start.sh /tmp/start.sh
 RUN chmod +x /tmp/start.sh
 EXPOSE 4000
+
 CMD ["/tmp/start.sh"]
 
 

@@ -137,7 +137,8 @@ body {
 
 .userChannel{
 	display: flex;
-  align-items: center;
+	align-items: center;
+	margin: 16px 0;
 }
 
   .channel-info h3
@@ -145,10 +146,15 @@ body {
 	  text-align: center;
   }
 
-  .userChannel>span{
+  .userChannel span{
 	margin: 0 10px;
 	font-size: 20px;
-  	font-weight: bold;
+	z-index: 20;
+  }
+
+  .userChannel span.owner
+  {
+	font-weight: bold;
   }
 
   .userChannel .crownIcon
@@ -156,6 +162,12 @@ body {
 	width: 20px;
 	position: relative;
   	top: 3px;
+	opacity: 0;
+  }
+
+  .userChannel .appear
+  {
+	opacity: 1;
   }
 
   .channel-form {
@@ -226,3 +238,157 @@ body {
 	padding: 4px;
 	cursor: pointer;
   }
+
+  .join-channel-form
+  {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+  }
+
+  .join-channel-form input
+  {
+	padding: 8px;
+	border: 1px solid #ccc;
+	border-radius: 4px;
+	max-width: 200px;
+	margin-bottom: 24px;
+  }
+
+  .write-chat.no-channel
+  {
+	display: flex;
+  	align-items: center;
+  	justify-content: center;
+  }
+
+  .write-chat.no-channel p{
+	font-size: 30px;
+  }
+
+  .invite-form {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 20px;
+}
+
+.invite-input {
+    padding: 10px;
+    margin-right: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+.invite-button {
+    padding: 10px 20px;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.invite-button:hover {
+    background-color: #45a049;
+}
+
+.invite-toggle-button {
+    margin-top: 20px;
+    padding: 10px 20px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    display: block;
+}
+
+.invite-toggle-button:hover {
+    background-color: #0056b3;
+}
+
+.invite-form {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 15px;
+}
+
+.invite-input {
+    padding: 10px;
+    margin-bottom: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+.invite-button {
+    padding: 10px 20px;
+    background-color: #28a745;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.invite-button:hover {
+    background-color: #218838;
+}
+
+.invite-container
+{
+	display: flex;
+	justify-content: col;
+	flex-direction: column;
+	align-items: center;
+}
+
+.userChannel {
+    /* styles existants */
+    position: relative; /* Pour positionner la modale */
+}
+
+.action-button {
+    padding: 5px 10px;
+    margin-left: 10px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.action-button:hover {
+    background-color: #0056b3;
+}
+
+.modal {
+    position: absolute;
+    right: 0;
+    top: 100%;
+    background-color: white;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    padding: 10px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    z-index: 10;
+}
+
+.modal span {
+    display: block;
+    padding: 5px 10px;
+    cursor: pointer;
+}
+
+.modal span:hover {
+    background-color: #f5f5f5;
+}
+
+.container_button
+{
+	position: relative;
+	flex-grow: 1;
+	display: flex;
+	justify-content: end;
+	margin-right: 16px;
+}
