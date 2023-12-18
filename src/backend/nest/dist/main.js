@@ -1360,6 +1360,34 @@ let UserController = class UserController {
             where: { id42: Number(id) },
         });
     }
+    async getPseudo(id) {
+        const user = await this.prisma.user.findUnique({
+            where: { id42: Number(id) },
+            select: { pseudo: true },
+        });
+        return user ? user.pseudo : null;
+    }
+    async getEmail(id) {
+        const user = await this.prisma.user.findUnique({
+            where: { id42: Number(id) },
+            select: { email: true },
+        });
+        return user ? user.email : null;
+    }
+    async getFirstName(id) {
+        const user = await this.prisma.user.findUnique({
+            where: { id42: Number(id) },
+            select: { firstname: true },
+        });
+        return user ? user.firstname : null;
+    }
+    async getLastName(id) {
+        const user = await this.prisma.user.findUnique({
+            where: { id42: Number(id) },
+            select: { lastname: true },
+        });
+        return user ? user.lastname : null;
+    }
     async updatePseudo(id, pseudo) {
         return await this.prisma.user.update({
             where: { id42: Number(id) },
@@ -1393,6 +1421,34 @@ __decorate([
     __metadata("design:paramtypes", [String]),
     __metadata("design:returntype", Promise)
 ], UserController.prototype, "getUserById", null);
+__decorate([
+    (0, common_1.Get)(':id/pseudo'),
+    __param(0, (0, common_1.Param)('id')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", Promise)
+], UserController.prototype, "getPseudo", null);
+__decorate([
+    (0, common_1.Get)(':id/email'),
+    __param(0, (0, common_1.Param)('id')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", Promise)
+], UserController.prototype, "getEmail", null);
+__decorate([
+    (0, common_1.Get)(':id/firstname'),
+    __param(0, (0, common_1.Param)('id')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", Promise)
+], UserController.prototype, "getFirstName", null);
+__decorate([
+    (0, common_1.Get)(':id/lastname'),
+    __param(0, (0, common_1.Param)('id')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", Promise)
+], UserController.prototype, "getLastName", null);
 __decorate([
     (0, common_1.Patch)(':id/pseudo'),
     __param(0, (0, common_1.Param)('id')),
