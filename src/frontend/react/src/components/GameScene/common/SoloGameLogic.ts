@@ -1,4 +1,4 @@
-import * as THREE from 'three';
+import * as THREE from "three";
 
 export class SoloGameLogic {
 	private scene: THREE.Scene;
@@ -12,7 +12,10 @@ export class SoloGameLogic {
 	private ballRadius: number = 5;
 	private gameTick: number = 0;
 	private ballSpeedModifier: number = 1;
-	private cameraInUse: { camera: THREE.PerspectiveCamera; id: number } = { camera: new THREE.PerspectiveCamera(), id: 0 };
+	private cameraInUse: { camera: THREE.PerspectiveCamera; id: number } = {
+		camera: new THREE.PerspectiveCamera(),
+		id: 0,
+	};
 	private playerScore: number = 0;
 	private opponentScore: number = 0;
 	private mainLight: THREE.HemisphereLight;
@@ -31,7 +34,12 @@ export class SoloGameLogic {
 		this.width = width;
 		this.height = height;
 		this.scene = new THREE.Scene();
-		this.camera = new THREE.PerspectiveCamera(75, width / height, 0.1, 1000);
+		this.camera = new THREE.PerspectiveCamera(
+			75,
+			width / height,
+			0.1,
+			1000
+		);
 		this.camera.position.z = height / 2;
 		this.camera.lookAt(this.scene.position);
 		this.camera3D = new THREE.PerspectiveCamera(90, 1, 0.1, 1000);
@@ -42,28 +50,48 @@ export class SoloGameLogic {
 		this.renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
 		this.renderer.setClearColor(0x9999ee, 1);
 
-		this.mainLight = new THREE.HemisphereLight(0xFFFFFF, 0x003300);
+		this.mainLight = new THREE.HemisphereLight(0xffffff, 0x003300);
 		this.mainLight.position.set(0, 0, 250);
 		this.scene.add(this.mainLight);
 
-		const groundGeometry = new THREE.BoxGeometry(width / 1.21, height / 1.21, 1);
+		const groundGeometry = new THREE.BoxGeometry(
+			width / 1.21,
+			height / 1.21,
+			1
+		);
 		const groundMaterial = new THREE.MeshBasicMaterial({ color: 0x006000 });
 		this.ground = new THREE.Mesh(groundGeometry, groundMaterial);
 		this.ground.position.set(0, 0, -25);
 
-		const playerPaddle = new THREE.BoxGeometry(this.paddleWidth, this.paddleHeight, this.paddleDepth);
-		const playerMaterial = new THREE.MeshLambertMaterial({ color: 0x0000CC });
+		const playerPaddle = new THREE.BoxGeometry(
+			this.paddleWidth,
+			this.paddleHeight,
+			this.paddleDepth
+		);
+		const playerMaterial = new THREE.MeshLambertMaterial({
+			color: 0x0000cc,
+		});
 		this.player = new THREE.Mesh(playerPaddle, playerMaterial);
 		this.player.position.y = -height / 2.7; // Place at the bottom
 		this.player.position.x = 0;
 
-		const opponentPaddle = new THREE.BoxGeometry(this.paddleWidth, this.paddleHeight, this.paddleDepth);
-		const opponentMaterial = new THREE.MeshLambertMaterial({ color: 0xCC0000 });
+		const opponentPaddle = new THREE.BoxGeometry(
+			this.paddleWidth,
+			this.paddleHeight,
+			this.paddleDepth
+		);
+		const opponentMaterial = new THREE.MeshLambertMaterial({
+			color: 0xcc0000,
+		});
 		this.opponent = new THREE.Mesh(opponentPaddle, opponentMaterial);
 		this.opponent.position.y = height / 2.7; // Place at the top
 		this.opponent.position.x = 0;
 
-		const sphereGeometry = new THREE.SphereGeometry(this.ballRadius, 32, 32);
+		const sphereGeometry = new THREE.SphereGeometry(
+			this.ballRadius,
+			32,
+			32
+		);
 		const ballMaterial = new THREE.MeshLambertMaterial({ color: 0xc45c23 });
 		this.ball = new THREE.Mesh(sphereGeometry, ballMaterial);
 		this.ball.position.z = 0;
@@ -77,16 +105,16 @@ export class SoloGameLogic {
 
 	private handleKeyDown(event: KeyboardEvent) {
 		switch (event.key) {
-			case 'ArrowLeft':
-			case 'a':
-			case 'q':
+			case "ArrowLeft":
+			case "a":
+			case "q":
 				this.paddleLeftSpeed = this.paddleVelocity;
 				break;
-			case 'ArrowRight':
-			case 'd':
+			case "ArrowRight":
+			case "d":
 				this.paddleRightSpeed = this.paddleVelocity;
 				break;
-			case 'r':
+			case "r":
 				this.switchCamera();
 				break;
 			default:
@@ -96,13 +124,13 @@ export class SoloGameLogic {
 
 	private handleKeyUp(event: KeyboardEvent) {
 		switch (event.key) {
-			case 'ArrowLeft':
-			case 'a':
-			case 'q':
+			case "ArrowLeft":
+			case "a":
+			case "q":
 				this.paddleLeftSpeed = 0;
 				break;
-			case 'ArrowRight':
-			case 'd':
+			case "ArrowRight":
+			case "d":
 				this.paddleRightSpeed = 0;
 				break;
 			default:
@@ -111,7 +139,7 @@ export class SoloGameLogic {
 	}
 
 	private switchCamera() {
-		if (this.cameraInUse.id == 0) {
+		if (this.cameraInUse.id === 0) {
 			this.cameraInUse.camera = this.camera3D;
 			this.cameraInUse.id = 1;
 		} else {
@@ -124,8 +152,10 @@ export class SoloGameLogic {
 		return (
 			this.ball.position.x >= paddle.position.x - this.paddleWidth / 2 &&
 			this.ball.position.x <= paddle.position.x + this.paddleWidth / 2 &&
-			this.ball.position.y >= paddle.position.y - this.paddleHeight / 2 - this.ballRadius &&
-			this.ball.position.y <= paddle.position.y + this.paddleHeight / 2 + this.ballRadius
+			this.ball.position.y >=
+				paddle.position.y - this.paddleHeight / 2 - this.ballRadius &&
+			this.ball.position.y <=
+				paddle.position.y + this.paddleHeight / 2 + this.ballRadius
 		);
 	}
 
@@ -149,32 +179,76 @@ export class SoloGameLogic {
 		);
 	}
 
-	protected opponentMovement() {
-		if (this.opponent.position.x < this.ball.position.x - 10 && this.isValidMovement(this.opponent.position.x, this.paddleVelocity))
+	private opponentMovement() {
+		if (
+			this.opponent.position.x < this.ball.position.x - 10 &&
+			this.isValidMovement(this.opponent.position.x, this.paddleVelocity)
+		)
 			this.opponent.position.x += this.paddleVelocity;
-		else if (this.opponent.position.x > this.ball.position.x + 10 && this.isValidMovement(this.opponent.position.x, -this.paddleVelocity))
+		else if (
+			this.opponent.position.x > this.ball.position.x + 10 &&
+			this.isValidMovement(this.opponent.position.x, -this.paddleVelocity)
+		)
 			this.opponent.position.x -= this.paddleVelocity;
 	}
 
 	public renderScene() {
 		if (this.gameTick % 25 === 0) {
-			const divInfo = document.getElementById('info');
+			const divInfo = document.getElementById("info");
 			if (divInfo) {
-				divInfo.innerHTML = 'camera	:' +
-					'Position: (' + this.camera.position.x.toFixed(2) + ', ' + this.camera.position.y.toFixed(2) + ', ' + this.camera.position.z.toFixed(2) + ') | ' +
-					'Rotation: (' + this.camera.rotation.x.toFixed(2) + ', ' + this.camera.rotation.y.toFixed(2) + ', ' + this.camera.rotation.z.toFixed(2) + ')' +
-					'<br>camera3D	:' +
-					'Position: (' + this.camera3D.position.x.toFixed(2) + ', ' + this.camera3D.position.y.toFixed(2) + ', ' + this.camera3D.position.z.toFixed(2) + ') | ' +
-					'Rotation: (' + this.camera3D.rotation.x.toFixed(2) + ', ' + this.camera3D.rotation.y.toFixed(2) + ', ' + this.camera3D.rotation.z.toFixed(2) + ') ' +
-					'<br>ball: ' +
-					'Speed: ' + this.ballSpeedModifier.toFixed(2) + ' | ' +
-					'Position: (' + this.ball.position.x.toFixed(2) + ', ' + this.ball.position.y.toFixed(2) + ', ' + this.ball.position.z.toFixed(2) + ') ';
+				divInfo.innerHTML =
+					"camera	:" +
+					"Position: (" +
+					this.camera.position.x.toFixed(2) +
+					", " +
+					this.camera.position.y.toFixed(2) +
+					", " +
+					this.camera.position.z.toFixed(2) +
+					") | " +
+					"Rotation: (" +
+					this.camera.rotation.x.toFixed(2) +
+					", " +
+					this.camera.rotation.y.toFixed(2) +
+					", " +
+					this.camera.rotation.z.toFixed(2) +
+					")" +
+					"<br>camera3D	:" +
+					"Position: (" +
+					this.camera3D.position.x.toFixed(2) +
+					", " +
+					this.camera3D.position.y.toFixed(2) +
+					", " +
+					this.camera3D.position.z.toFixed(2) +
+					") | " +
+					"Rotation: (" +
+					this.camera3D.rotation.x.toFixed(2) +
+					", " +
+					this.camera3D.rotation.y.toFixed(2) +
+					", " +
+					this.camera3D.rotation.z.toFixed(2) +
+					") " +
+					"<br>ball: " +
+					"Speed: " +
+					this.ballSpeedModifier.toFixed(2) +
+					" | " +
+					"Position: (" +
+					this.ball.position.x.toFixed(2) +
+					", " +
+					this.ball.position.y.toFixed(2) +
+					", " +
+					this.ball.position.z.toFixed(2) +
+					") ";
 			}
 		}
 
-		const divGameScore = document.getElementById('gameScore');
+		const divGameScore = document.getElementById("gameScore");
 		if (divGameScore) {
-			divGameScore.textContent = 'Player ' + this.playerScore + ' - ' + this.opponentScore + ' Opponent';
+			divGameScore.textContent =
+				"Player " +
+				this.playerScore +
+				" - " +
+				this.opponentScore +
+				" Opponent";
 		}
 
 		if (this.ball.position.x > 300 || this.ball.position.x < -300) {
@@ -193,17 +267,22 @@ export class SoloGameLogic {
 		this.ball.position.x += this.ballVelX * this.ballSpeedModifier;
 		this.ball.position.y += this.ballVelY * this.ballSpeedModifier;
 
-		this.ball.position.z = (185 + (-0.004 * (this.ball.position.y ** 2))) * this.cameraInUse.id;
+		this.ball.position.z =
+			(185 + -0.004 * this.ball.position.y ** 2) * this.cameraInUse.id;
 
 		if (this.checkCollisions(this.player)) {
-			const hitIndex = (this.ball.position.x - this.player.position.x) / (this.paddleWidth / 2);
+			const hitIndex =
+				(this.ball.position.x - this.player.position.x) /
+				(this.paddleWidth / 2);
 			const maxReflectionAngle = Math.PI / 3;
 			const reflectionAngle = hitIndex * maxReflectionAngle;
 			this.ballVelX = Math.sin(reflectionAngle);
 			this.ballVelY = Math.cos(reflectionAngle);
 			this.ballSpeedModifier = Math.exp(this.gameTick / 5000);
 		} else if (this.checkCollisions(this.opponent)) {
-			const hitIndex = (this.ball.position.x - this.opponent.position.x) / (this.paddleWidth / 2);
+			const hitIndex =
+				(this.ball.position.x - this.opponent.position.x) /
+				(this.paddleWidth / 2);
 			const maxReflectionAngle = Math.PI / 3;
 			const reflectionAngle = hitIndex * maxReflectionAngle;
 			this.ballVelX = Math.sin(reflectionAngle);
@@ -213,8 +292,14 @@ export class SoloGameLogic {
 
 		this.opponentMovement();
 
-		if (this.isValidMovement(this.player.position.x, this.paddleRightSpeed - this.paddleLeftSpeed)) {
-			this.player.position.x += this.paddleRightSpeed - this.paddleLeftSpeed;
+		if (
+			this.isValidMovement(
+				this.player.position.x,
+				this.paddleRightSpeed - this.paddleLeftSpeed
+			)
+		) {
+			this.player.position.x +=
+				this.paddleRightSpeed - this.paddleLeftSpeed;
 		}
 
 		this.camera3D.position.set(this.player.position.x, -300, 180);
@@ -231,14 +316,14 @@ export class SoloGameLogic {
 	public startGame() {
 		this.newRound();
 		this.animate();
-		
-		window.addEventListener('keydown', this.handleKeyDown.bind(this));
-		window.addEventListener('keyup', this.handleKeyUp.bind(this));
+
+		window.addEventListener("keydown", this.handleKeyDown.bind(this));
+		window.addEventListener("keyup", this.handleKeyUp.bind(this));
 	}
 
 	public dispose(): void {
-		window.removeEventListener('keydown', this.handleKeyDown);
-		window.removeEventListener('keyup', this.handleKeyUp);
+		window.removeEventListener("keydown", this.handleKeyDown);
+		window.removeEventListener("keyup", this.handleKeyUp);
 		// window.removeEventListener('resize', handleResize);
 		this.renderer.dispose();
 	}
