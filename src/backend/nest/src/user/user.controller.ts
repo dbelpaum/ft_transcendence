@@ -4,7 +4,13 @@ import { PrismaService } from 'src/prisma.service';
 @Controller('user')
 export class UserController {
     constructor(private prisma: PrismaService) {}
+    /* recuperer tous les users */
+    @Get('GetAllUsers')
+    async getAllUsers() {
+    return await this.prisma.user.findMany();
+    }
 
+    /* ----------------------------GET---------------------------- */
     @Get(':id')
     async getUserById(@Param('id') id: string) {
         return await this.prisma.user.findUnique({
@@ -48,6 +54,15 @@ export class UserController {
         return user ? user.lastname : null;
     }
     
+    @Get(':id/image')
+    async getImage(@Param('id') id: string) {
+        const user = await this.prisma.user.findUnique({
+            where: { id42: Number(id) },
+            select: { image: true },
+        });
+        return user ? user.image : null;
+    }
+
     /* -------------------------PATCH------------------------------ */
     
     @Patch(':id/pseudo')

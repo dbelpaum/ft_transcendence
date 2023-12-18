@@ -6,7 +6,7 @@ import Home from './pages/Home/Home';
 import Chat from './pages/Chat/Chat'; 
 import Game from './pages/Game/Game'; 
 import Profil from './pages/Profil/Profil';
-import OAuth from './pages/OAuth/OAuth';
+import UserList from './pages/UserList/UserList'
 // import Chat from './pages/Chat/Chat'; 
 import { Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContexte'; 
@@ -32,7 +32,8 @@ function App() {
 							<Route path="/game" element={<Game />} />
 							<Route path="/chat" element={<ProtectedChat><Chat /></ProtectedChat>} />
 							<Route path="/profil" element={<ProtectedChat><Profil /></ProtectedChat>} />
-							<Route path="/OAuth" element={<OAuth/>} />
+							<Route path="/userlist" element={<ProtectedChat><UserList /></ProtectedChat>} />
+
 						</Routes>
 					</div>
 				</Router>

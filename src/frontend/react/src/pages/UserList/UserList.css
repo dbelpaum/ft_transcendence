@@ -1,0 +1,28 @@
+/* UserList.css */
+
+.user-list {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+}
+
+.user-item {
+    background-color: #f2f2f2;
+    border: 1px solid #ddd;
+    padding: 15px;
+    margin: 10px 0;
+    width: 80%;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.user-item h3 {
+    margin: 0;
+    color: #333;
+}
+
+.user-item p {
+    margin: 5px 0 0;
+    color: #666;
+}

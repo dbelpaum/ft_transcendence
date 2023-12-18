@@ -1355,6 +1355,9 @@ let UserController = class UserController {
     constructor(prisma) {
         this.prisma = prisma;
     }
+    async getAllUsers() {
+        return await this.prisma.user.findMany();
+    }
     async getUserById(id) {
         return await this.prisma.user.findUnique({
             where: { id42: Number(id) },
@@ -1388,6 +1391,13 @@ let UserController = class UserController {
         });
         return user ? user.lastname : null;
     }
+    async getImage(id) {
+        const user = await this.prisma.user.findUnique({
+            where: { id42: Number(id) },
+            select: { image: true },
+        });
+        return user ? user.image : null;
+    }
     async updatePseudo(id, pseudo) {
         return await this.prisma.user.update({
             where: { id42: Number(id) },
@@ -1414,6 +1424,12 @@ let UserController = class UserController {
     }
 };
 exports.UserController = UserController;
+__decorate([
+    (0, common_1.Get)('GetAllUsers'),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", []),
+    __metadata("design:returntype", Promise)
+], UserController.prototype, "getAllUsers", null);
 __decorate([
     (0, common_1.Get)(':id'),
     __param(0, (0, common_1.Param)('id')),
@@ -1449,6 +1465,13 @@ __decorate([
     __metadata("design:paramtypes", [String]),
     __metadata("design:returntype", Promise)
 ], UserController.prototype, "getLastName", null);
+__decorate([
+    (0, common_1.Get)(':id/image'),
+    __param(0, (0, common_1.Param)('id')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", Promise)
+], UserController.prototype, "getImage", null);
 __decorate([
     (0, common_1.Patch)(':id/pseudo'),
     __param(0, (0, common_1.Param)('id')),
