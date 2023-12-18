@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import './UserList.css';
+import UserProfile from '../UserProfil/UserProfil';
 
 interface User {
     id42: number;

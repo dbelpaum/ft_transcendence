@@ -24,8 +24,10 @@ interface UserInfo {
         console.log("Aucun ID utilisateur fourni");
         return;
       }
+
+      console.log("Le Userid est: " + {userId});
   
-      fetch(`http://localhost:4000/${userId}`)
+      fetch(`http://localhost:4000/user/${userId}`)
         .then(response => response.json())
         .then((data: UserInfo) => {
           setUserInfo(data);
@@ -40,6 +42,7 @@ interface UserInfo {
   
     return (
       <main className="user-profile-container">
+        <br /><br /><br /><br />
         <h1>Profil de {userInfo.pseudo}</h1>
         <p>Email: {userInfo.email}</p>
         {/* ... autres détails ... */}
