@@ -3,6 +3,7 @@ import './Profil.css';
 import LogoutButton from '../../components/LogoutButton/LogoutButton';
 import EditableTextField from '../../components/EditableTextField/EditableTextField';
 import { useAuth } from '../../context/AuthContexte';
+import UserList from '../UserList/UserList';
 
 interface UserInfo {
   pseudo: string;
@@ -90,6 +91,10 @@ function Profil() {
             
           </>
         )}
+
+
+          <a href="/UserList"> Liste des joueurs</a>
+
       </div>
     </main>
   );
