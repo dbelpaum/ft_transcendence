@@ -7,7 +7,6 @@ interface User {
     pseudo: string;
     email: string;
     imageURL: string;
-    // Ajoutez d'autres champs selon la structure de vos données utilisateur
 }
 
 const UserList: React.FC = () => {
@@ -25,10 +24,9 @@ const UserList: React.FC = () => {
             {users.map(user => (
                 <div key={user.id42} className="user-item">
                     <img src={user.imageURL} alt="Profile" className="profile-pic" />
-                    <h3><a href={`/users/${user.pseudo}`}>{user.pseudo}</a></h3>  {/* Remplacer par composant react */}
+                    <h3><a href={`/users/${user.pseudo}`}>{user.pseudo}</a></h3>
                     <p>{user.email}</p>
                     
-                    {/* Autres détails de l'utilisateur */}
                 </div>
             ))}
         </div>

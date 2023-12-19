@@ -24,7 +24,7 @@ const UserProfile: React.FC = () => {
     const [userInfo, setUserInfo] = useState<UserInfo | null>(null);
     const [isFriend, setIsFriend] = useState<boolean>(false);
 
-    const { pseudo } = useParams<{ pseudo: string }>(); // Utilisation de useParams pour récupérer le pseudo
+    const { pseudo } = useParams<{ pseudo: string }>();
 
     useEffect(() => {
         if (!pseudo) {
@@ -60,7 +60,7 @@ const UserProfile: React.FC = () => {
               <h2>À propos de moi</h2>
               <p>Pseudo: {userInfo.pseudo}</p>
               <p>Membre depuis: {new Date(userInfo.createdAt).toLocaleDateString()}</p>
-              {/* Autres détails ici */}
+             
           </div>
           <div className="friend-action">
               {userInfo.isFriend ? (
