@@ -158,6 +158,27 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     }
   }
 
+  @SubscribeMessage('modify_channel')
+  async handleModifyChannelEvent(
+    @MessageBody()
+    payload: ChannelCreate
+  ): Promise<void> {
+	  if (payload.user.socketId) {
+		this.logger.log(`${payload.user.socketId} modified the settings of ${payload.name}`)
+		await this.server.in(payload.user.socketId).socketsJoin(payload.name)
+
+		await this.channelService.modifyChannel(payload)
+		this.server.to(payload.name).emit('chat', 
+		{
+			user: payload.user,
+			timeSent: null,
+			message: `${payload.user.pseudo} modified the settings of ${payload.name}`,
+			channelName: payload.name,
+		}) 
+    }
+  }
+
+
   async handleConnection(socket: Socket): Promise<void> {
     this.logger.log(`Socket connected: ${socket.id}`)
   }

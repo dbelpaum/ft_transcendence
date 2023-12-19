@@ -98,7 +98,7 @@ const CreateChannel: React.FC<CreateChannelsProps> = ({ channelUtility }) => {
 		return () => {
 		  clearTimeout(timeoutId);
 		};
-	  }, [channelName, setChannelName, channelUtility.recharger]);
+	  }, [channelName, setChannelName, channelUtility.forceReload]);
 	  
 
 	  return (

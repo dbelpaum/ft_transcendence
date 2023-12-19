@@ -211,6 +211,16 @@ body {
   .create-channel-button:hover, .channel-form button:hover {
 	background-color: darkblue;
   }
+
+  .modify-channel-container{
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+  }
+
+  .modify-channel-container select{
+	min-width: 250px;
+  }
   
   .create-form-container{
 	text-align: center;

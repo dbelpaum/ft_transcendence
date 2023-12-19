@@ -14,6 +14,7 @@ export interface ServerToClientEvents {
 export interface ClientToServerEvents {
     chat: (e: Message) => void;
 	join_channel: (e: ChannelCreate) => void
+	modify_channel: (e: ChannelCreate) => void
 	invite: (e: InviteToChannel) => void
 	add_admin: (e: addAdminInfo) => void
 	remove_admin: (e: addAdminInfo) => void
@@ -49,8 +50,8 @@ export interface ChannelUtility {
 	channels: Channel[];
 	setChannels: Dispatch<SetStateAction<Channel[]>>;
 	message: Message[],
-	recharger: () => void
-
+	recharger: () => void,
+	forceReload: number
   }
 
 export interface ChannelCreate {
