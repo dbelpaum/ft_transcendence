@@ -50,6 +50,8 @@ export interface ChannelUtility {
 	channels: Channel[];
 	setChannels: Dispatch<SetStateAction<Channel[]>>;
 	message: Message[],
+	setMessages: Dispatch<SetStateAction<Message[]>>;
+
 	recharger: () => void,
 	forceReload: number
   }

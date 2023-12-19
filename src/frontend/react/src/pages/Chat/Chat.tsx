@@ -94,6 +94,7 @@ function Chat(){
 		channels: channels,
 		setChannels: setChannels,
 		message: messages,
+		setMessages: setMessages,
 		recharger: recharger,
 		forceReload: forceReload
 	  };
