@@ -25,7 +25,7 @@ const UserList: React.FC = () => {
             {users.map(user => (
                 <div key={user.id42} className="user-item">
                     <img src={user.imageURL} alt="Profile" className="profile-pic" />
-                    <h3><a href={`/user/${user.id42}`}>{user.pseudo}</a></h3>  {/* Remplacer par composant react */}
+                    <h3><a href={`/users/${user.pseudo}`}>{user.pseudo}</a></h3>  {/* Remplacer par composant react */}
                     <p>{user.email}</p>
                     
                     {/* Autres détails de l'utilisateur */}

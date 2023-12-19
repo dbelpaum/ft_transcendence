@@ -34,7 +34,7 @@ function App() {
 							<Route path="/chat" element={<ProtectedChat><Chat /></ProtectedChat>} />
 							<Route path="/profil" element={<ProtectedChat><Profil /></ProtectedChat>} />
 							<Route path="/userlist" element={<ProtectedChat><UserList /></ProtectedChat>} />
-							<Route path='/user/:id' element={<ProtectedChat><UserProfile /></ProtectedChat>} />
+							<Route path='/users/:pseudo' element={<ProtectedChat><UserProfile /></ProtectedChat>} />
 						</Routes>
 					</div>
 				</Router>

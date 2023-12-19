@@ -11,6 +11,20 @@ export class UserController {
     }
 
     /* ----------------------------GET---------------------------- */
+
+    /* GET depuis un pseudo */
+    @Get('by-pseudo/:pseudo')
+    async getUserByPseudo(@Param('pseudo') pseudo: string) {
+        return await this.prisma.user.findUnique({
+            where: { pseudo },
+        });
+    }
+
+
+
+
+
+
     @Get(':id')
     async getUserById(@Param('id') id: string) {
         return await this.prisma.user.findUnique({

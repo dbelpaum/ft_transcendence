@@ -1358,6 +1358,11 @@ let UserController = class UserController {
     async getAllUsers() {
         return await this.prisma.user.findMany();
     }
+    async getUserByPseudo(pseudo) {
+        return await this.prisma.user.findUnique({
+            where: { pseudo },
+        });
+    }
     async getUserById(id) {
         return await this.prisma.user.findUnique({
             where: { id42: Number(id) },
@@ -1430,6 +1435,13 @@ __decorate([
     __metadata("design:paramtypes", []),
     __metadata("design:returntype", Promise)
 ], UserController.prototype, "getAllUsers", null);
+__decorate([
+    (0, common_1.Get)('by-pseudo/:pseudo'),
+    __param(0, (0, common_1.Param)('pseudo')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", Promise)
+], UserController.prototype, "getUserByPseudo", null);
 __decorate([
     (0, common_1.Get)(':id'),
     __param(0, (0, common_1.Param)('id')),
