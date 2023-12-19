@@ -48,11 +48,10 @@ const ChannelWrite: React.FC<ChannelWriteProps> = ({ channelUtility }) => {
 				type: channelInfo.type,
 				mdp: password,
 			}
-
+			channelUtility.socket.emit("join_channel", channelJoin);
 			const savedChannels: ChannelCreate[] = JSON.parse(sessionStorage.getItem('channels') || '[]');
 			const newChannels: ChannelCreate[]  = [...savedChannels, channelJoin];
 			sessionStorage.setItem('channels', JSON.stringify(newChannels));
-			window.location.reload();
 			
 			};
 		}

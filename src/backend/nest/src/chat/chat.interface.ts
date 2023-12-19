@@ -1,6 +1,6 @@
 export interface User {
     id: number;
-    login: string;
+    pseudo: string;
     email?: string;
 	socketId: string
 }
@@ -29,6 +29,8 @@ export interface Channel {
 	type: string
 	mdp: string
 	invited: string[]
+	ban: string[]
+	mute: string[]
 }
 
 export interface ChannelCreate {
@@ -53,6 +55,6 @@ export interface InviteToChannel
 export interface addAdminInfo
 {
 	channel: string
-	new_admin_name: string
+	new_name: string
 	user: User
 }

@@ -17,6 +17,9 @@ export interface ClientToServerEvents {
 	invite: (e: InviteToChannel) => void
 	add_admin: (e: addAdminInfo) => void
 	remove_admin: (e: addAdminInfo) => void
+	kick: (e: addAdminInfo) => void
+	ban: (e: addAdminInfo) => void
+	mute: (e: addAdminInfo) => void
 }
 
 export interface Channel {
@@ -27,6 +30,9 @@ export interface Channel {
 	type: string
 	mdp: string
 	invited: User[]
+	ban: string[]
+	mute: string[]
+
 }
 
 export interface Message {
@@ -64,6 +70,6 @@ export interface InviteToChannel
 export interface addAdminInfo
 {
 	channel: string
-	new_admin_name: string
+	new_name: string
 	user: User
 }
