@@ -7,7 +7,12 @@ interface UserInfo {
     pseudo: string;
     email: string;
     isFriend: boolean;
-    
+    imageURL: string;
+    firstname: string;
+    lastname: string;
+    bio: string;
+    createdAt: string;
+
    
 }
 
@@ -44,18 +49,28 @@ const UserProfile: React.FC = () => {
     }
 
     return (
-          <main className="user-profile-container">
-          <br /><br /><br /><br />
-          <h1>Profil de {userInfo.pseudo}</h1>
-          <p>Email: {userInfo.email}</p>
-          
-          {isFriend ? (
-            <p>Vous êtes déjà amis.</p>
-          ) : (
-            <button>Ajouter comme ami</button>
-          )}
-        </main>
-    );
+      <main className="user-profile-container">
+          <div className="profile-header">
+              <img src={userInfo.imageURL} alt={userInfo.pseudo} className="profile-pic"/>
+              <h1>{userInfo.firstname} {userInfo.lastname}</h1>
+              <p className="user-email">{userInfo.email}</p>
+              <p className="user-bio">{userInfo.bio}</p>
+          </div>
+          <div className="profile-details">
+              <h2>À propos de moi</h2>
+              <p>Pseudo: {userInfo.pseudo}</p>
+              <p>Membre depuis: {new Date(userInfo.createdAt).toLocaleDateString()}</p>
+              {/* Autres détails ici */}
+          </div>
+          <div className="friend-action">
+              {userInfo.isFriend ? (
+                  <p>Vous êtes déjà amis.</p>
+              ) : (
+                  <button>Ajouter comme ami</button>
+              )}
+          </div>
+      </main>
+  );
 };
 
 export default UserProfile;
