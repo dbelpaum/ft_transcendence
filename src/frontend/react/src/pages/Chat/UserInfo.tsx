@@ -133,11 +133,13 @@ const UserInfo: React.FC<userInfoProps> = ({ channelUtility, userAndAdmin, chann
         <div className='userChannel'>
 			
 			<span><img src={crownIconPath} alt="Couronne" className={`crownIcon ${userAndAdmin.isAdmin ? 'appear' : ''}`} /></span>
-          	<span 
-				title={userAndAdmin.isOwner ? "owner" : ""}
-				className={userAndAdmin.isOwner ? "owner" : ""}>
-				{userAndAdmin.user.pseudo}
-			</span>
+			<a href={`http://localhost:3000/users/${userAndAdmin.user.pseudo}`} target="_blank" rel="noopener noreferrer">
+				<span 
+					title={userAndAdmin.isOwner ? "owner" : ""}
+					className={userAndAdmin.isOwner ? "profil owner" : "profil"}>
+					{userAndAdmin.user.pseudo}
+				</span>
+			</a>
 			<div className="container_button">
 			{(iAmAdmin && (channelUtility.me.pseudo !== userAndAdmin.user.pseudo)) && (
 				<button className="action-button" onClick={toggleModal}>Actions</button>

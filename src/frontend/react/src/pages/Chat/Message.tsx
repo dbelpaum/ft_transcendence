@@ -24,7 +24,7 @@ const MessageComponent: React.FC<MessageProps> = ({ channelUtility, message, cha
     !isUserMessage ? 
       (
         <div className='messages'>
-          <span>{message.user.pseudo} : {message.message}</span>
+          <span><a href={`http://localhost:3000/users/${message.user.pseudo}`} target="_blank" rel="noopener noreferrer">{message.user.pseudo}</a> : {message.message}</span>
         </div>
       ) 
       : 
@@ -33,8 +33,6 @@ const MessageComponent: React.FC<MessageProps> = ({ channelUtility, message, cha
           <span>{message.message}</span>
         </div>
       )
-    
-    
   );
 };
 
