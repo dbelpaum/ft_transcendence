@@ -6,6 +6,7 @@ import { useLocation } from 'react-router-dom';
 import UserInfo from './UserInfo';
 import { User } from '../../context/AuthInteface';
 import InviteChannel from './InviteChannel';
+import ModifyChannel from './ModifyChannel';
 
 
 interface ChannelWriteProps {
@@ -74,6 +75,7 @@ const ChannelInfo: React.FC<ChannelWriteProps> = ({ channelUtility }) => {
 			</>
 			) : null}
 			<InviteChannel channelUrl={channelUrl} channelUtility={channelUtility} currentChannel={currentChannel}/>
+			<ModifyChannel channelUrl={channelUrl} channelUtility={channelUtility} currentChannel={currentChannel}/>
 		</div>
 	)
 };

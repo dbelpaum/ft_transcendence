@@ -61,14 +61,14 @@ const MessageInput: React.FC<MessageInputProps> = ({ setMessages, messages, sock
   return (
     <div className='input-box'>
 
-		<form onSubmit={handleMessageSubmit}>
-		<input
-			type="text"
-			value={inputValue}
-			onChange={handleInputChange}
-			placeholder="Type your message..."
-			/>
-		<button type="submit">Send</button>
+		<form onSubmit={handleMessageSubmit} className="input-chat-form">
+			<input
+				type="text"
+				value={inputValue}
+				onChange={handleInputChange}
+				placeholder="Type your message..."
+				/>
+		<button type="submit">Envoyer</button>
 		</form>
      </div>
   );

@@ -4,6 +4,9 @@ body {
 	padding: 0;
 	font-family: Arial, sans-serif;
   }
+input{
+	outline: none;
+}
 
   .leave_icon
   {
@@ -13,7 +16,9 @@ body {
 
 .chat-title
 {
-	text-align: center;;
+	text-align: center;
+	color: white;
+
 }
   
   .container {
@@ -29,7 +34,7 @@ body {
 
   .write-chat {
 	width: 50%;
-	background-color: ghostwhite;
+	background-color: white;
 	padding: 20px;
   }
 
@@ -56,10 +61,11 @@ body {
   }
   
   .chat-box {
+	display: flex;
+	flex-direction: column;
 	flex: 1;
 	overflow-y: auto;
 	padding: 20px;
-	background-color: #ffffff;
   }
   
   .messages {
@@ -210,6 +216,16 @@ body {
   
   .create-channel-button:hover, .channel-form button:hover {
 	background-color: darkblue;
+  }
+
+  .modify-channel-container{
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+  }
+
+  .modify-channel-container select{
+	min-width: 250px;
   }
   
   .create-form-container{
@@ -391,4 +407,55 @@ body {
 	display: flex;
 	justify-content: end;
 	margin-right: 16px;
+}
+
+.messages {
+	display: inline-block;
+	max-width: 60%;
+	margin-bottom: 10px;
+	padding: 18px;
+	border-radius: 20px;
+	color: white;
+	width: fit-content;
+  }
+  
+.messages.right {
+	background-color: #9CF854; /* Couleur verte claire pour les messages envoyés */
+	margin-left: auto;
+	color: black;
+}
+
+.messages:not(.right) {
+	background-color: #35BFDF;;
+}
+  
+.input-chat-form
+{
+	display: flex;
+	width: 50%;
+	margin: 0 auto;
+	box-sizing: border-box;
+  	padding: 0 8px;
+	position: relative;
+	left: 15px;
+}
+
+.input-chat-form input
+{
+	flex-grow: 1;
+	padding: 10px 15px;
+	border: none;
+	border-radius: 20px;
+	margin-right: 10px;
+	font-size: 16px;
+}
+
+.input-chat-form button
+{
+	padding: 10px 15px;
+	background-color: #007bff;
+	color: white;
+	border: none;
+	border-radius: 20px;
+	cursor: pointer;
 }

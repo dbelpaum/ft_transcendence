@@ -6,7 +6,7 @@ import { useLocation } from 'react-router-dom';
 import MessageComponent from './Message';
 import { ChannelCreate } from './chat.interface';
 import { Channel } from './chat.interface';
-
+import MessageInput from './MessageInput';
 
 interface ChannelWriteProps {
 	channelUtility: ChannelUtility;
@@ -52,7 +52,7 @@ const ChannelWrite: React.FC<ChannelWriteProps> = ({ channelUtility }) => {
 			const savedChannels: ChannelCreate[] = JSON.parse(sessionStorage.getItem('channels') || '[]');
 			const newChannels: ChannelCreate[]  = [...savedChannels, channelJoin];
 			sessionStorage.setItem('channels', JSON.stringify(newChannels));
-			
+			channelUtility.recharger()
 			};
 		}
 		

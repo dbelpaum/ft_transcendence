@@ -554,6 +554,15 @@ let ChannelService = class ChannelService {
             return;
         return this.channels[channelIndex].mute.some(muted => muted === message.user.pseudo);
     }
+    async modifyChannel(channelCreate) {
+        const channelIndex = await this.getChannelByName(channelCreate.name);
+        if (channelIndex === -1)
+            return;
+        if (channelCreate.user.pseudo !== this.channels[channelIndex].owner.pseudo)
+            return;
+        this.channels[channelIndex].type = channelCreate.type;
+        this.channels[channelIndex].mdp = channelCreate.mdp;
+    }
     async addUserToChannel(channelCreate) {
         const channelIndex = await this.getChannelByName(channelCreate.name);
         if (channelIndex !== -1) {
@@ -655,7 +664,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 var __param = (this && this.__param) || function (paramIndex, decorator) {
     return function (target, key) { decorator(target, key, paramIndex); }
 };
-var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m, _o, _p, _q, _r, _s, _t;
+var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m, _o, _p, _q, _r, _s, _t, _u, _v;
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.ChatGateway = void 0;
 const websockets_1 = __webpack_require__(/*! @nestjs/websockets */ "@nestjs/websockets");
@@ -733,6 +742,19 @@ let ChatGateway = class ChatGateway {
             return response;
         }
     }
+    async handleModifyChannelEvent(payload) {
+        if (payload.user.socketId) {
+            this.logger.log(`${payload.user.socketId} modified the settings of ${payload.name}`);
+            await this.server.in(payload.user.socketId).socketsJoin(payload.name);
+            await this.channelService.modifyChannel(payload);
+            this.server.to(payload.name).emit('chat', {
+                user: payload.user,
+                timeSent: null,
+                message: `${payload.user.pseudo} modified the settings of ${payload.name}`,
+                channelName: payload.name,
+            });
+        }
+    }
     async handleConnection(socket) {
         this.logger.log(`Socket connected: ${socket.id}`);
     }
@@ -802,6 +824,13 @@ __decorate([
     __metadata("design:paramtypes", [typeof (_s = typeof chat_interface_1.ChannelCreate !== "undefined" && chat_interface_1.ChannelCreate) === "function" ? _s : Object]),
     __metadata("design:returntype", typeof (_t = typeof Promise !== "undefined" && Promise) === "function" ? _t : Object)
 ], ChatGateway.prototype, "handleSetClientDataEvent", null);
+__decorate([
+    (0, websockets_1.SubscribeMessage)('modify_channel'),
+    __param(0, (0, websockets_1.MessageBody)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [typeof (_u = typeof chat_interface_1.ChannelCreate !== "undefined" && chat_interface_1.ChannelCreate) === "function" ? _u : Object]),
+    __metadata("design:returntype", typeof (_v = typeof Promise !== "undefined" && Promise) === "function" ? _v : Object)
+], ChatGateway.prototype, "handleModifyChannelEvent", null);
 exports.ChatGateway = ChatGateway = __decorate([
     (0, websockets_1.WebSocketGateway)({
         cors: {
@@ -1748,9 +1777,9 @@ let UserController = class UserController {
     async getImage(id) {
         const user = await this.prisma.user.findUnique({
             where: { id42: Number(id) },
-            select: { image: true },
+            select: { imageUrl: true },
         });
-        return user ? user.image : null;
+        return user ? user.imageUrl : null;
     }
     async updatePseudo(id, pseudo) {
         return await this.prisma.user.update({

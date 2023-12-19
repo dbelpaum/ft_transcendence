@@ -26,7 +26,8 @@ const ChannelItem: React.FC<ChannelsItemsProps> = ({ channelUtility, channel }) 
 		const savedChannels: ChannelCreate[] = JSON.parse(sessionStorage.getItem('channels') || '[]');
 		const updatedChannels = savedChannels.filter(the_channel => the_channel.name !== channel.name);
 		sessionStorage.setItem('channels', JSON.stringify(updatedChannels));
-		window.location.reload();
+		channelUtility.socket.disconnect()
+		channelUtility.socket.connect()
 	}
 
 

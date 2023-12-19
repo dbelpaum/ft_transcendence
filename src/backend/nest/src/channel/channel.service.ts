@@ -192,6 +192,19 @@ export class ChannelService {
 		// On return true si l'utilisateur est dans la liste des muted
 		return this.channels[channelIndex].mute.some(muted => muted === message.user.pseudo)
 	  }
+
+	async modifyChannel(channelCreate: ChannelCreate): Promise<void> {
+		// Si le channel existe pas, on ne fait rien
+		const channelIndex = await this.getChannelByName(channelCreate.name)
+		if (channelIndex === -1) return;
+
+		// Si l'utilisateur n'est pas owner, on ne fait rien
+		if (channelCreate.user.pseudo !== this.channels[channelIndex].owner.pseudo) return
+		
+		// Sinon, on peut modifier les informations du channel
+		this.channels[channelIndex].type = channelCreate.type
+		this.channels[channelIndex].mdp = channelCreate.mdp
+	}
 	  
 
 	async addUserToChannel(channelCreate: ChannelCreate): Promise<joinResponse> {
@@ -283,7 +296,6 @@ export class ChannelService {
 		  if (this.channels[channel].users.length === 0) {
 			await this.removeChannel(channelName)
 		  }
-
 	  }
 	}
 
