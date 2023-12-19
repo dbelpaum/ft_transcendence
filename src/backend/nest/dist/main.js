@@ -1805,6 +1805,12 @@ let UserController = class UserController {
             data: { lastname },
         });
     }
+    async updateBio(id, bio) {
+        return await this.prisma.user.update({
+            where: { id42: Number(id) },
+            data: { bio },
+        });
+    }
 };
 exports.UserController = UserController;
 __decorate([
@@ -1894,6 +1900,14 @@ __decorate([
     __metadata("design:paramtypes", [String, String]),
     __metadata("design:returntype", Promise)
 ], UserController.prototype, "updateLastName", null);
+__decorate([
+    (0, common_1.Patch)(':id/bio'),
+    __param(0, (0, common_1.Param)('id')),
+    __param(1, (0, common_1.Body)('bio')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, String]),
+    __metadata("design:returntype", Promise)
+], UserController.prototype, "updateBio", null);
 exports.UserController = UserController = __decorate([
     (0, common_1.Controller)('user'),
     __metadata("design:paramtypes", [typeof (_a = typeof prisma_service_1.PrismaService !== "undefined" && prisma_service_1.PrismaService) === "function" ? _a : Object])

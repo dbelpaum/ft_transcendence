@@ -112,6 +112,14 @@ export class UserController {
         });
     }
 
+    @Patch(':id/bio')
+    async updateBio(@Param('id') id : string, @Body('bio') bio: string) {
+        return await this.prisma.user.update({
+            where: { id42: Number(id) },
+            data: { bio },
+        });
+    }
+
     
 
 }

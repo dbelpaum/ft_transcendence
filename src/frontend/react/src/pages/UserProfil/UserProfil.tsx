@@ -60,7 +60,6 @@ const UserProfile: React.FC = () => {
               <h2>À propos de moi</h2>
               <p>Pseudo: {userInfo.pseudo}</p>
               <p>Membre depuis: {new Date(userInfo.createdAt).toLocaleDateString()}</p>
-             
           </div>
           <div className="friend-action">
               {userInfo.isFriend ? (

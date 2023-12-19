@@ -12,6 +12,7 @@ interface UserInfo {
   lastname: string;
   firstname: string;
   imageURL: string;
+  bio: string;
 }
 
 function Profil() {
@@ -89,6 +90,12 @@ function Profil() {
               onSave={(value) => saveField('lastname', value)}
             />
             
+            <EditableTextField
+              label="Bio"
+              value={userInfo.bio}
+              onSave={(value) => saveField('bio', value)}
+            />
+
           </>
         )}
 
