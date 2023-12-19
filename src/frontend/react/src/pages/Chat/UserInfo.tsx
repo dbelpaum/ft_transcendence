@@ -52,7 +52,7 @@ const UserInfo: React.FC<userInfoProps> = ({ channelUtility, userAndAdmin, chann
 			const adminInfo : addAdminInfo =
 			{
 				channel: channelUrl,
-				new_admin_name: userAndAdmin.user.pseudo,
+				new_name: userAndAdmin.user.pseudo,
 				user: channelUtility.me,
 			}
 			channelUtility.socket.emit('add_admin', adminInfo);
@@ -68,10 +68,58 @@ const UserInfo: React.FC<userInfoProps> = ({ channelUtility, userAndAdmin, chann
 			const adminInfo : addAdminInfo =
 			{
 				channel: channelUrl,
-				new_admin_name: userAndAdmin.user.pseudo,
+				new_name: userAndAdmin.user.pseudo,
 				user: channelUtility.me,
 			}
 			channelUtility.socket.emit('remove_admin', adminInfo);
+            setShowModal(false);
+			channelUtility.recharger()
+
+		}
+	}
+
+	const handleKickClick = () => {
+		if (channelUrl && channelUtility && channelUtility.me)
+		{
+			const kickInfo : addAdminInfo =
+			{
+				channel: channelUrl,
+				new_name: userAndAdmin.user.pseudo,
+				user: channelUtility.me,
+			}
+			channelUtility.socket.emit('kick', kickInfo);
+            setShowModal(false);
+			channelUtility.recharger()
+
+		}
+	}
+
+	const handleBanClick = () => {
+		if (channelUrl && channelUtility && channelUtility.me)
+		{
+			const banInfo : addAdminInfo =
+			{
+				channel: channelUrl,
+				new_name: userAndAdmin.user.pseudo,
+				user: channelUtility.me,
+			}
+			channelUtility.socket.emit('ban', banInfo);
+            setShowModal(false);
+			channelUtility.recharger()
+
+		}
+	}
+
+	const handleMuteClick = () => {
+		if (channelUrl && channelUtility && channelUtility.me)
+		{
+			const muteInfo : addAdminInfo =
+			{
+				channel: channelUrl,
+				new_name: userAndAdmin.user.pseudo,
+				user: channelUtility.me,
+			}
+			channelUtility.socket.emit('mute', muteInfo);
             setShowModal(false);
 			channelUtility.recharger()
 
@@ -96,9 +144,9 @@ const UserInfo: React.FC<userInfoProps> = ({ channelUtility, userAndAdmin, chann
 			)}
 				{showModal && (
 					<div className="modal" ref={modalRef}>
-						<span>Kick</span>
-						<span>Ban</span>
-						<span>Mute</span>
+						<span onClick={handleKickClick}>Kick</span>
+						<span onClick={handleBanClick}>Ban</span>
+						<span onClick={handleMuteClick}>Mute</span>
 						{
 							!userAndAdmin.isAdmin ? 
 							(<span onClick={handleAdminClick}>Make Admin</span>) : 

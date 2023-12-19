@@ -3,6 +3,7 @@ import {
 	Channel,
 	ChannelCreate,
 	InviteToChannel,
+	Message,
 	User, 
 	addAdminInfo, 
 	joinResponse} from "../chat/chat.interface"
@@ -26,7 +27,9 @@ export class ChannelService {
 				users: [channelCreate.user],
 				type: channelCreate.type,
 				mdp: channelCreate.mdp,
-				invited: [channelCreate.user.pseudo]
+				invited: [channelCreate.user.pseudo],
+				ban: [],
+				mute: []
 			})
 	  }
 	}
@@ -88,7 +91,7 @@ export class ChannelService {
 		if (!this.userIsHost(adminInfo.user.pseudo,this.channels[channelIndex])) return
 
 		// Sinon, on ajoute le nom a la liste des admins
-		this.channels[channelIndex].host.push(adminInfo.new_admin_name)
+		this.channels[channelIndex].host.push(adminInfo.new_name)
 
 	}
 
@@ -103,18 +106,94 @@ export class ChannelService {
 		if (!this.userIsHost(adminInfo.user.pseudo,this.channels[channelIndex])) return
 
 		// Si l'utilisateur a supprimer des admins est nous meme, on ne fait rien
-		if (adminInfo.new_admin_name === adminInfo.user.pseudo) return
+		if (adminInfo.new_name === adminInfo.user.pseudo) return
+
+		// Si l'utilisateur a ban est le channel owener, on ne fait rien
+		if (adminInfo.new_name === this.channels[channelIndex].owner.pseudo) return 
 
 		// Sinon, on ajoute le nom a la liste des admins
 
-		const adminIndex = this.channels[channelIndex].host.indexOf(adminInfo.new_admin_name);
+		const adminIndex = this.channels[channelIndex].host.indexOf(adminInfo.new_name);
 		if (adminIndex !== -1) {
 			this.channels[channelIndex].host.splice(adminIndex, 1);
 		}
+	}
 
+	async kick(adminInfo: addAdminInfo) : Promise<void>
+	{
+		// Si le channel existe pas, on ne fait rien
+		const channelIndex = await this.getChannelByName(adminInfo.channel)
+		if (channelIndex === -1) return;
 
+		// Si l'utilisateur n'est pas administrateur, on ne fait rien
+		if (!this.userIsHost(adminInfo.user.pseudo,this.channels[channelIndex])) return
+
+		// Si l'utilisateur a kick est nous meme, on ne fait rien
+		if (adminInfo.new_name === adminInfo.user.pseudo) return
+
+		// Si l'utilisateur a ban est le channel owener, on ne fait rien
+		if (adminInfo.new_name === this.channels[channelIndex].owner.pseudo) return 
+
+		// Sinon, on supprime la personne de la liste des users
+		this.channels[channelIndex].users = this.channels[channelIndex].users.filter(user => user.pseudo !== adminInfo.new_name);
 	}
   
+	async ban(adminInfo: addAdminInfo) : Promise<void>
+	{
+		// Si le channel existe pas, on ne fait rien
+		const channelIndex = await this.getChannelByName(adminInfo.channel)
+		if (channelIndex === -1) return;
+
+
+		// Si l'utilisateur n'est pas administrateur, on ne fait rien
+		if (!this.userIsHost(adminInfo.user.pseudo,this.channels[channelIndex])) return
+
+		// Si l'utilisateur a ban est nous meme, on ne fait rien
+		if (adminInfo.new_name === adminInfo.user.pseudo) return
+
+		// Si l'utilisateur a ban est le channel owener, on ne fait rien
+		if (adminInfo.new_name === this.channels[channelIndex].owner.pseudo) return 
+
+		// Sinon, on ajoute la personne de la liste des bannis
+		this.channels[channelIndex].ban.push(adminInfo.new_name)
+
+		// puis on supprime la personne de la liste des users
+		this.channels[channelIndex].users = this.channels[channelIndex].users.filter(user => user.pseudo !== adminInfo.new_name);
+	}
+
+	async mute(adminInfo: addAdminInfo): Promise<void> {
+		// Si le channel existe pas, on ne fait rien
+		const channelIndex = await this.getChannelByName(adminInfo.channel)
+		if (channelIndex === -1) return;
+
+
+		// Si l'utilisateur n'est pas administrateur, on ne fait rien
+		if (!this.userIsHost(adminInfo.user.pseudo,this.channels[channelIndex])) return
+
+		// Si l'utilisateur a ban est nous meme, on ne fait rien
+		if (adminInfo.new_name === adminInfo.user.pseudo) return
+
+		// Si l'utilisateur a ban est le channel owener, on ne fait rien
+		if (adminInfo.new_name === this.channels[channelIndex].owner.pseudo) return 
+
+		this.channels[channelIndex].mute.push(adminInfo.new_name);
+	
+		// Minuterie pour démuter automatiquement après 120 secondes
+		setTimeout(() => {
+			this.channels[channelIndex].mute = this.channels[channelIndex].mute.filter(m => m !== adminInfo.new_name);
+		}, 120000);
+	  }
+
+	  async isMuted(message: Message): Promise<boolean> {
+		// Si le channel existe pas, on ne fait rien
+		const channelIndex = await this.getChannelByName(message.channelName)
+		if (channelIndex === -1) return;
+
+		// On return true si l'utilisateur est dans la liste des muted
+		return this.channels[channelIndex].mute.some(muted => muted === message.user.pseudo)
+	  }
+	  
+
 	async addUserToChannel(channelCreate: ChannelCreate): Promise<joinResponse> {
 
 		// Si le channel existe
@@ -128,6 +207,16 @@ export class ChannelService {
 					text: "L'utilisateur " + channelCreate.user.pseudo + " essaie de rejoindre un channel alors qu'il est deja dedans : " + this.channels[channelIndex].name
 				};
 			}
+
+			// Si l'utilisateur est ban, qu'il le reste
+			if (this.channels[channelIndex].ban.some(name => name === channelCreate.user.pseudo))
+			{
+				return {
+					errorNumber: 26,
+					text: "L'utilisateur " + channelCreate.user.pseudo + " essaie de rejoindre un channel alors qu'il a été ban : " + this.channels[channelIndex].name
+				};
+			}
+
 
 			// Si le channel est private et qu'on est pas dans les invité, on ne rentre pas
 			if (this.channels[channelIndex].type === "private")

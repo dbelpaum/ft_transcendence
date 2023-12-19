@@ -42,6 +42,63 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	await this.channelService.removeAdminToChannel(payload)
   }
 
+  @SubscribeMessage('kick')
+  async kick(
+    @MessageBody()
+    payload: addAdminInfo,
+  ): Promise<void> {
+    this.logger.log(payload);
+
+	//this.server.to(payload.name).emit('chat', payload)
+
+	await this.channelService.kick(payload)
+	this.server.to(payload.channel).emit('chat', 
+	{
+		user: payload.user,
+		timeSent: null,
+		message: `${payload.new_name} was kicked from ${payload.channel} by ${payload.user.pseudo}`,
+		channelName: payload.channel,
+	}) 
+  }
+
+  @SubscribeMessage('ban')
+  async ban(
+    @MessageBody()
+    payload: addAdminInfo,
+  ): Promise<void> {
+    this.logger.log(payload);
+
+	//this.server.to(payload.name).emit('chat', payload)
+
+	await this.channelService.ban(payload)
+	this.server.to(payload.channel).emit('chat', 
+	{
+		user: payload.user,
+		timeSent: null,
+		message: `${payload.new_name} was ban from ${payload.channel}  by ${payload.user.pseudo}`,
+		channelName: payload.channel,
+	}) 
+  }
+
+  @SubscribeMessage('mute')
+  async mute(
+    @MessageBody()
+    payload: addAdminInfo,
+  ): Promise<void> {
+    this.logger.log(payload);
+
+	//this.server.to(payload.name).emit('chat', payload)
+
+	await this.channelService.mute(payload)
+	this.server.to(payload.channel).emit('chat', 
+	{
+		user: payload.user,
+		timeSent: null,
+		message: `${payload.new_name} was mute from ${payload.channel}  by ${payload.user.pseudo} for 2 minutes`,
+		channelName: payload.channel,
+	}) 
+  }
+
   @SubscribeMessage('add_admin')
   async addAdmin(
     @MessageBody()
@@ -69,7 +126,10 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     @MessageBody()
     payload: Message,
   ): Promise<Message> {
-    this.logger.log(payload);
+    //this.logger.log(payload);
+	// Si la personne est mute, on envoie rien
+	if (await this.channelService.isMuted(payload)) return payload
+
 	this.server.to(payload.channelName).emit('chat', payload) 
     return payload;
   }
