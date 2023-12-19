@@ -72,9 +72,9 @@ export class UserController {
     async getImage(@Param('id') id: string) {
         const user = await this.prisma.user.findUnique({
             where: { id42: Number(id) },
-            select: { image: true },
+            select: { imageUrl: true },
         });
-        return user ? user.image : null;
+        return user ? user.imageUrl : null;
     }
 
     /* -------------------------PATCH------------------------------ */

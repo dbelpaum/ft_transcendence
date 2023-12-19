@@ -52,7 +52,7 @@ const ChannelWrite: React.FC<ChannelWriteProps> = ({ channelUtility }) => {
 			const savedChannels: ChannelCreate[] = JSON.parse(sessionStorage.getItem('channels') || '[]');
 			const newChannels: ChannelCreate[]  = [...savedChannels, channelJoin];
 			sessionStorage.setItem('channels', JSON.stringify(newChannels));
-			
+			channelUtility.recharger()
 			};
 		}
 		

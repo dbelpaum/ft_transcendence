@@ -1777,9 +1777,9 @@ let UserController = class UserController {
     async getImage(id) {
         const user = await this.prisma.user.findUnique({
             where: { id42: Number(id) },
-            select: { image: true },
+            select: { imageUrl: true },
         });
-        return user ? user.image : null;
+        return user ? user.imageUrl : null;
     }
     async updatePseudo(id, pseudo) {
         return await this.prisma.user.update({
