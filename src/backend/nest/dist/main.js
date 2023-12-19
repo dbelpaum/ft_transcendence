@@ -176,7 +176,7 @@ let AuthentificationController = class AuthentificationController {
         if (checkUserid == null) {
             var newUser = {
                 id42: userData.id,
-                pseudo: userData.pseudo,
+                pseudo: userData.login,
                 email: userData.email,
                 firstname: userData.first_name,
                 lastname: userData.last_name,
