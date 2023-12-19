@@ -22,6 +22,8 @@ const ChannelWrite: React.FC<ChannelWriteProps> = ({ channelUtility }) => {
 	const query = useQuery();
 	const channelUrl = query.get('channel'); 
 
+	
+
 	// Fonction pour vérifier si l'utilisateur est dans le channel
 	const isUserInChannel = channelUtility.channels.some(channel => 
 		channel.name === channelUrl && channel.users.some(user => user.socketId === channelUtility.me?.socketId));
