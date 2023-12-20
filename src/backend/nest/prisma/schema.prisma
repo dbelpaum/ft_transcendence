@@ -19,9 +19,24 @@ model User {
   email     String   @unique
   bio       String?
   imageURL  String?
+  friendshipsAsRequester  Friendship[] @relation("RequesterRelation")
+  friendshipsAsAddressee  Friendship[] @relation("AddresseeRelation")
+
   createdAt DateTime @default(now())
 
   @@map("users")
+}
+
+model Friendship {
+  id         Int      @id @default(autoincrement())
+  createdAt  DateTime @default(now())
+  status     String
+  requester  User     @relation("RequesterRelation", fields: [requesterId], references: [id])
+  requesterId Int
+  addressee  User     @relation("AddresseeRelation", fields: [addresseeId], references: [id])
+  addresseeId Int
+
+  @@unique([requesterId, addresseeId])
 }
 
 
