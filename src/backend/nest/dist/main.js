@@ -74,6 +74,7 @@ const schedule_1 = __webpack_require__(/*! @nestjs/schedule */ "@nestjs/schedule
 const user_controller_1 = __webpack_require__(/*! ./user/user.controller */ "./src/user/user.controller.ts");
 const session = __webpack_require__(/*! express-session */ "express-session");
 const game_module_1 = __webpack_require__(/*! ./game/game.module */ "./src/game/game.module.ts");
+const friendship_controller_1 = __webpack_require__(/*! ./friendship/friendship.controller */ "./src/friendship/friendship.controller.ts");
 let AppModule = class AppModule {
     configure(consumer) {
         consumer
@@ -90,7 +91,7 @@ exports.AppModule = AppModule;
 exports.AppModule = AppModule = __decorate([
     (0, common_1.Module)({
         imports: [authentification_module_1.AuthentificationModule, chat_module_1.ChatModule, channel_module_1.ChannelModule, schedule_1.ScheduleModule.forRoot(), game_module_1.GameModule],
-        controllers: [app_controller_1.AppController, sam_test_controller_1.SamTestController, logout_controller_1.LogoutController, user_controller_1.UserController],
+        controllers: [app_controller_1.AppController, sam_test_controller_1.SamTestController, logout_controller_1.LogoutController, user_controller_1.UserController, friendship_controller_1.FriendshipController],
         providers: [app_service_1.AppService, prisma_service_1.PrismaService],
     })
 ], AppModule);
@@ -882,6 +883,124 @@ exports.ChatModule = ChatModule = __decorate([
         providers: [chat_gateway_1.ChatGateway],
     })
 ], ChatModule);
+
+
+/***/ }),
+
+/***/ "./src/friendship/friendship.controller.ts":
+/*!*************************************************!*\
+  !*** ./src/friendship/friendship.controller.ts ***!
+  \*************************************************/
+/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
+
+
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+var __param = (this && this.__param) || function (paramIndex, decorator) {
+    return function (target, key) { decorator(target, key, paramIndex); }
+};
+var _a;
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.FriendshipController = void 0;
+const common_1 = __webpack_require__(/*! @nestjs/common */ "@nestjs/common");
+const prisma_service_1 = __webpack_require__(/*! src/prisma.service */ "./src/prisma.service.ts");
+let FriendshipController = class FriendshipController {
+    constructor(prisma) {
+        this.prisma = prisma;
+    }
+    async addFriend(requesterId, addresseeId) {
+        if (requesterId === addresseeId) {
+            throw new Error('You cannot add yourself as a friend');
+        }
+        const requester = await this.prisma.user.findUnique({
+            where: { id42: Number(requesterId) },
+        });
+        if (!requester) {
+            throw new Error('Requester not found');
+        }
+        const addressee = await this.prisma.user.findUnique({
+            where: { id42: Number(addresseeId) },
+        });
+        if (!addressee) {
+            throw new Error('Addressee not found');
+        }
+        const existingFriendship = await this.prisma.friendship.findFirst({
+            where: {
+                OR: [
+                    { requesterId: Number(requesterId), addresseeId: Number(addresseeId) },
+                    { requesterId: Number(addresseeId), addresseeId: Number(requesterId) }
+                ],
+            },
+        });
+        const friendship = await this.prisma.friendship.create({
+            data: {
+                requesterId: Number(requesterId),
+                addresseeId: Number(addresseeId),
+                status: 'pending',
+            },
+        });
+        return friendship;
+    }
+    async acceptFriend(requesterId, addresseeId) {
+        const requester = await this.prisma.user.findUnique({
+            where: { id42: Number(requesterId) },
+        });
+        if (!requester) {
+            throw new Error('Requester not found');
+        }
+        const addressee = await this.prisma.user.findUnique({
+            where: { id42: Number(addresseeId) },
+        });
+        if (!addressee) {
+            throw new Error('Addressee not found');
+        }
+        const friendship = await this.prisma.friendship.findFirst({
+            where: {
+                OR: [
+                    { requesterId: Number(requesterId), addresseeId: Number(addresseeId) },
+                    { requesterId: Number(addresseeId), addresseeId: Number(requesterId) }
+                ],
+                status: 'pending',
+            },
+        });
+        if (!friendship) {
+            throw new Error('Friendship not found');
+        }
+        const updatedFriendship = await this.prisma.friendship.update({
+            where: { id: friendship.id },
+            data: { status: 'accepted' },
+        });
+        return updatedFriendship;
+    }
+};
+exports.FriendshipController = FriendshipController;
+__decorate([
+    (0, common_1.Post)(':requesterId/add-friend/:addresseeId'),
+    __param(0, (0, common_1.Param)('requesterId')),
+    __param(1, (0, common_1.Param)('addresseeId')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, String]),
+    __metadata("design:returntype", Promise)
+], FriendshipController.prototype, "addFriend", null);
+__decorate([
+    (0, common_1.Post)(':requesterId/accept-friend/:addresseeId'),
+    __param(0, (0, common_1.Param)('requesterId')),
+    __param(1, (0, common_1.Param)('addresseeId')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, String]),
+    __metadata("design:returntype", Promise)
+], FriendshipController.prototype, "acceptFriend", null);
+exports.FriendshipController = FriendshipController = __decorate([
+    (0, common_1.Controller)('friendship'),
+    __metadata("design:paramtypes", [typeof (_a = typeof prisma_service_1.PrismaService !== "undefined" && prisma_service_1.PrismaService) === "function" ? _a : Object])
+], FriendshipController);
 
 
 /***/ }),
@@ -1777,7 +1896,7 @@ let UserController = class UserController {
     async getImage(id) {
         const user = await this.prisma.user.findUnique({
             where: { id42: Number(id) },
-            select: { imageUrl: true },
+            select: { imageURL: true },
         });
         return user ? user.imageUrl : null;
     }

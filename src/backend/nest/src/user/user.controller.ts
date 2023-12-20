@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Patch } from '@nestjs/common';
+import { Body, Controller, Get, Param, Patch, Post } from '@nestjs/common';
 import { PrismaService } from 'src/prisma.service';
 
 @Controller('user')
@@ -72,7 +72,7 @@ export class UserController {
     async getImage(@Param('id') id: string) {
         const user = await this.prisma.user.findUnique({
             where: { id42: Number(id) },
-            select: { imageUrl: true },
+            select: { imageURL: true },
         });
         return user ? user.imageUrl : null;
     }
@@ -120,6 +120,5 @@ export class UserController {
         });
     }
 
-    
-
 }
+
