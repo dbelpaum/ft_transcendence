@@ -7,7 +7,10 @@ import { ClientMovementDto } from "../dtos";
 import { Ball, Paddle } from "./types";
 
 const TICK_RATE = 1000 / 60; // 60 updates per second
-const PADDLE_SPEED = 3.5;
+const PADDLE_SPEED = 3.75;
+const BALL_SPEED_INCREMENT = 0.0003;
+const WIDTH = 600;
+const HEIGHT = 800;
 
 export class Instance {
 	public hasStarted: boolean = false;
@@ -18,7 +21,7 @@ export class Instance {
 	private ball: Ball;
 	private paddleHost: Paddle;
 	private paddleGuest: Paddle;
-	private gameTick = 0;
+	private gameTick: number;
 	private updateInterval: NodeJS.Timeout | null = null;
 	constructor(private readonly lobby: Lobby) {
 		this.ball = {
@@ -31,14 +34,14 @@ export class Instance {
 			width: 80,
 			height: 10,
 			depth: 15,
-			position: { x: 0, y: 0, z: 0 },
+			position: { x: 0, y: WIDTH / 2.7, z: 0 },
 			movement: 0,
 		};
 		this.paddleHost = {
 			width: 80,
 			height: 10,
 			depth: 15,
-			position: { x: 0, y: 0, z: 0 },
+			position: { x: 0, y: -WIDTH / 2.7, z: 0 },
 			movement: 0,
 		};
 	}
@@ -49,6 +52,8 @@ export class Instance {
 		}
 
 		this.hasStarted = true;
+		this.scores[this.lobby.hostSocketId] = 0;
+		this.scores[this.lobby.guestSocketId] = 0;
 		this.lobby.dispatchToLobby(ServerEvents.GameStart, {});
 		this.newRound();
 		this.startGameRuntime();
@@ -79,6 +84,7 @@ export class Instance {
 	}
 
 	private newRound(): void {
+		this.gameTick = 0;
 		this.ball.position = { x: 0, y: 0, z: 0 };
 		this.ball.speedModifier = 1;
 		this.paddleGuest.position.x = 0;
@@ -90,43 +96,60 @@ export class Instance {
 	}
 
 	private makePaddleMove(): void {
-		if (this.paddleHost.position.x + this.paddleHost.movement * PADDLE_SPEED >= -300 + this.paddleHost.width / 2
-			&& this.paddleHost.position.x + this.paddleHost.movement * PADDLE_SPEED <= 300 - this.paddleHost.width / 2)
+		if (this.paddleHost.position.x + this.paddleHost.movement * PADDLE_SPEED >= - WIDTH / 2 + this.paddleHost.width / 2
+			&& this.paddleHost.position.x + this.paddleHost.movement * PADDLE_SPEED <= WIDTH / 2 - this.paddleHost.width / 2)
 			this.paddleHost.position.x -= -this.paddleHost.movement * PADDLE_SPEED;
-		if (this.paddleGuest.position.x + this.paddleGuest.movement * PADDLE_SPEED <= 300 - this.paddleGuest.width / 2
-			&& this.paddleGuest.position.x + this.paddleGuest.movement * PADDLE_SPEED >= -300 + this.paddleGuest.width / 2)
-			this.paddleGuest.position.x += this.paddleGuest.movement * PADDLE_SPEED;
+		if (this.paddleGuest.position.x - this.paddleGuest.movement * PADDLE_SPEED >= - WIDTH / 2 + this.paddleGuest.width / 2
+			&& this.paddleGuest.position.x - this.paddleGuest.movement * PADDLE_SPEED <= WIDTH / 2 - this.paddleGuest.width / 2)
+			this.paddleGuest.position.x -= this.paddleGuest.movement * PADDLE_SPEED;
 	}
 
 	private checkCollisions(): void {
-		if (this.ball.position.x >= this.paddleHost.position.x + this.paddleHost.width / 2
+		// Check collisions des joueurs avec la balle
+		if (
+			this.ball.position.x >= this.paddleHost.position.x - this.paddleHost.width / 2
 			&& this.ball.position.x <= this.paddleHost.position.x + this.paddleHost.width / 2
 			&& this.ball.position.y >= this.paddleHost.position.y - this.paddleHost.height / 2 - this.ball.radius
-			&& this.ball.position.y <= this.paddleHost.position.y + this.paddleHost.height / 2 + this.ball.radius) {
-			this.ball.velocity.x = -this.ball.velocity.x;
-			this.ball.velocity.y = -this.ball.velocity.y;
+			&& this.ball.position.y <= this.paddleHost.position.y + this.paddleHost.height / 2 + this.ball.radius
+		) {
+			const hitIndex = (this.ball.position.x - this.paddleHost.position.x) / (this.paddleHost.width / 2);
+			const maxReflectionAngle = Math.PI / 3;
+			const reflectionAngle = hitIndex * maxReflectionAngle;
+			this.ball.velocity.x = Math.sin(reflectionAngle);
+			this.ball.velocity.y = Math.cos(reflectionAngle);
+			this.ball.speedModifier = Math.exp(this.gameTick * BALL_SPEED_INCREMENT);
 		}
-		else if (this.ball.position.x >= this.paddleGuest.position.x - this.paddleGuest.width / 2
+		else if (
+			this.ball.position.x >= this.paddleGuest.position.x - this.paddleGuest.width / 2
 			&& this.ball.position.x <= this.paddleGuest.position.x + this.paddleGuest.width / 2
 			&& this.ball.position.y >= this.paddleGuest.position.y - this.paddleGuest.height / 2 - this.ball.radius
-			&& this.ball.position.y <= this.paddleGuest.position.y + this.paddleGuest.height / 2 + this.ball.radius) {
-			this.ball.velocity.x = -this.ball.velocity.x;
-			this.ball.velocity.y = -this.ball.velocity.y;
+			&& this.ball.position.y <= this.paddleGuest.position.y + this.paddleGuest.height / 2 + this.ball.radius
+		) {
+			const hitIndex = (this.ball.position.x - this.paddleGuest.position.x) / (this.paddleGuest.width / 2);
+			const maxReflectionAngle = Math.PI / 3;
+			const reflectionAngle = hitIndex * maxReflectionAngle;
+			this.ball.velocity.x = Math.sin(reflectionAngle);
+			this.ball.velocity.y = - Math.cos(reflectionAngle);
+			this.ball.speedModifier = Math.exp(this.gameTick * BALL_SPEED_INCREMENT);
 		}
-		// else if (this.ball.position.x >= 100 - this.ball.radius) {
-		// 	this.scores[this.lobby.hostSocketId]++;
-		// 	this.newRound();
-		// }
-		// else if (this.ball.position.x <= -100 + this.ball.radius) {
-		// 	this.scores[this.lobby.guestSocketId]++;
-		// 	this.newRound();
-		// }
-		// else if (this.ball.position.y >= 100 - this.ball.radius) {
-		// 	this.ball.velocity.y = -this.ball.velocity.y;
-		// }
-		// else if (this.ball.position.y <= -100 + this.ball.radius) {
-		// 	this.ball.velocity.y = -this.ball.velocity.y;
-		// }
+
+		//Check collisions de la balle avec les murs
+		if (Math.abs(this.ball.position.x) >= WIDTH / 2) {
+			this.ball.velocity.x = -this.ball.velocity.x;
+		}
+
+		//Check si la balle est sortie du terrain
+		if (this.ball.position.y > HEIGHT / 2) {
+			this.scores[this.lobby.hostSocketId]++;
+			this.newRound();
+		}
+		else if (this.ball.position.y < -HEIGHT / 2) {
+			this.scores[this.lobby.guestSocketId]++;
+			this.newRound();
+		}
+
+		// console.log("Scores: " + this.scores[this.lobby.hostSocketId] + " h-g " + this.scores[this.lobby.guestSocketId])
+		// console.log(this.ball.speedModifier);
 	}
 
 	private gameRuntime(): void {
@@ -138,10 +161,12 @@ export class Instance {
 		this.ball.position.y += this.ball.velocity.y * this.ball.speedModifier;
 
 		// Check for collisions
+		this.checkCollisions();
 
 
 		// Make player move
-		this.makePaddleMove();
+		if (this.paddleHost.movement != 0 || this.paddleGuest.movement != 0)
+			this.makePaddleMove();
 
 		// Send updates to clients
 		this.sendGameState();
@@ -183,12 +208,12 @@ export class Instance {
 			},
 			ballSpeedModifier: this.ball.speedModifier,
 			paddleOpponent: {
-				x: this.paddleHost.position.x,
+				x: - this.paddleHost.position.x,
 				y: this.paddleHost.position.y,
 				z: this.paddleHost.position.z
 			},
 			paddlePlayer: {
-				x: this.paddleGuest.position.x,
+				x: - this.paddleGuest.position.x,
 				y: this.paddleGuest.position.y,
 				z: this.paddleGuest.position.z
 			},
