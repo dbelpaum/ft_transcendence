@@ -26,7 +26,7 @@ export class Lobby {
 	constructor(
 		private readonly server: Server,
 		public readonly mode: string
-	) {}
+	) { }
 
 	public addClient(client: AuthenticatedSocket): void {
 		this.clients.set(client.id, client);

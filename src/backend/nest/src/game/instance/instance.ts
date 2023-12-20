@@ -104,6 +104,18 @@ export class Instance {
 			this.paddleGuest.position.x -= this.paddleGuest.movement * PADDLE_SPEED;
 	}
 
+	private checkGoal(): void {
+		//Check si la balle est sortie du terrain
+		if (this.ball.position.y > HEIGHT / 2) {
+			this.scores[this.lobby.hostSocketId]++;
+			this.newRound();
+		}
+		else if (this.ball.position.y < -HEIGHT / 2) {
+			this.scores[this.lobby.guestSocketId]++;
+			this.newRound();
+		}
+	}
+
 	private checkCollisions(): void {
 		// Check collisions des joueurs avec la balle
 		if (
@@ -138,27 +150,17 @@ export class Instance {
 			this.ball.velocity.x = -this.ball.velocity.x;
 		}
 
-		//Check si la balle est sortie du terrain
-		if (this.ball.position.y > HEIGHT / 2) {
-			this.scores[this.lobby.hostSocketId]++;
-			this.newRound();
-		}
-		else if (this.ball.position.y < -HEIGHT / 2) {
-			this.scores[this.lobby.guestSocketId]++;
-			this.newRound();
-		}
-
 		// console.log("Scores: " + this.scores[this.lobby.hostSocketId] + " h-g " + this.scores[this.lobby.guestSocketId])
 		// console.log(this.ball.speedModifier);
 	}
 
 	private gameRuntime(): void {
-		// Perform game logic here
-		this.gameTick++;
-
 		// Update ball position
 		this.ball.position.x += this.ball.velocity.x * this.ball.speedModifier;
 		this.ball.position.y += this.ball.velocity.y * this.ball.speedModifier;
+
+		// Check for goals
+		this.checkGoal();
 
 		// Check for collisions
 		this.checkCollisions();
@@ -170,6 +172,8 @@ export class Instance {
 
 		// Send updates to clients
 		this.sendGameState();
+
+		this.gameTick++;
 
 		// Check for game end conditions and stop the game if necessary
 		if (this.hasFinished) {

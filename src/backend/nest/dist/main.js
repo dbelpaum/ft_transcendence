@@ -1218,6 +1218,16 @@ class Instance {
             && this.paddleGuest.position.x - this.paddleGuest.movement * PADDLE_SPEED <= WIDTH / 2 - this.paddleGuest.width / 2)
             this.paddleGuest.position.x -= this.paddleGuest.movement * PADDLE_SPEED;
     }
+    checkGoal() {
+        if (this.ball.position.y > HEIGHT / 2) {
+            this.scores[this.lobby.hostSocketId]++;
+            this.newRound();
+        }
+        else if (this.ball.position.y < -HEIGHT / 2) {
+            this.scores[this.lobby.guestSocketId]++;
+            this.newRound();
+        }
+    }
     checkCollisions() {
         if (this.ball.position.x >= this.paddleHost.position.x - this.paddleHost.width / 2
             && this.ball.position.x <= this.paddleHost.position.x + this.paddleHost.width / 2
@@ -1244,23 +1254,16 @@ class Instance {
         if (Math.abs(this.ball.position.x) >= WIDTH / 2) {
             this.ball.velocity.x = -this.ball.velocity.x;
         }
-        if (this.ball.position.y > HEIGHT / 2) {
-            this.scores[this.lobby.hostSocketId]++;
-            this.newRound();
-        }
-        else if (this.ball.position.y < -HEIGHT / 2) {
-            this.scores[this.lobby.guestSocketId]++;
-            this.newRound();
-        }
     }
     gameRuntime() {
-        this.gameTick++;
         this.ball.position.x += this.ball.velocity.x * this.ball.speedModifier;
         this.ball.position.y += this.ball.velocity.y * this.ball.speedModifier;
+        this.checkGoal();
         this.checkCollisions();
         if (this.paddleHost.movement != 0 || this.paddleGuest.movement != 0)
             this.makePaddleMove();
         this.sendGameState();
+        this.gameTick++;
         if (this.hasFinished) {
             this.stopGameRuntime();
         }
