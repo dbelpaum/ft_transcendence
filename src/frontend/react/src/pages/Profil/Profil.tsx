@@ -4,6 +4,7 @@ import LogoutButton from '../../components/LogoutButton/LogoutButton';
 import EditableTextField from '../../components/EditableTextField/EditableTextField';
 import { useAuth } from '../../context/AuthContexte';
 import UserList from '../UserList/UserList';
+import { useLocation } from 'react-router-dom';
 
 interface UserInfo {
   pseudo: string;
@@ -15,9 +16,20 @@ interface UserInfo {
 }
 
 function Profil() {
-  const { user } = useAuth();
+  const { user, login} = useAuth();
   const userId = user?.id42;
   const [userInfo, setUserInfo] = useState<UserInfo | null>(null);
+
+  const useQuery = () => {
+	  return new URLSearchParams(useLocation().search);
+  };
+  const query = useQuery();
+  const token = query.get('token'); 
+  if (token)
+  {
+	login(token)
+	console.log("j'enregistre le token")
+  }
 
   useEffect(() => {
 	console.log("le user id")

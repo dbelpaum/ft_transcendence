@@ -11,6 +11,9 @@ type AuthContextType = {
     setUser: React.Dispatch<React.SetStateAction<User | null>>;
     isLoading: boolean;
     logout: () => void;
+    login: (token:string) => void;
+	authToken: string | null;
+	setAuthToken: React.Dispatch<React.SetStateAction<string | null>>;
   };
 
 type AuthProviderProps = {
@@ -21,12 +24,32 @@ const AuthContext = createContext<AuthContextType | null>(null);
 
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 	const [user, setUser] = useState<User | null>(null);
-  const { setErrorMessage } = useErrorMessage();
   const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [authToken, setAuthToken] = useState<string | null>(null);
+
+  // Chargez le token JWT depuis sessionStorage lors du démarrage
+  useEffect(() => {
+    const token = sessionStorage.getItem('token');
+    if (token) {
+      setAuthToken(token);
+    }
+  }, []);
+
+  const login = (token:string) => {
+    sessionStorage.setItem('token', token);
+    setAuthToken(token);
+  };
+
 
 
   const logout = () => {
-    fetch(process.env.REACT_APP_URL_SERVER + 'logout', { credentials: 'include' })
+    fetch(process.env.REACT_APP_URL_SERVER + 'logout', 
+		{ 
+			credentials: 'include',
+			headers: {
+				'Authorization': `Bearer ${authToken}`
+	  		}
+		})
         .then(response => {
             if (response.ok) {
               sessionStorage.clear();
@@ -39,16 +62,23 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         .catch(error => {
             console.error('Erreur de réseau lors de la tentative de déconnexion', error);
         });
+	sessionStorage.removeItem('token');
+	setAuthToken(null);
 };
 
 
   useEffect(() => {
-    const verifyUser = async () => {
+    const verifyUser = async (authToken:string) => {
       try {
         setIsLoading(true);
-        const response = await fetch(process.env.REACT_APP_URL_SERVER + 'authentification/42/profil', {
-        credentials: 'include'
-      });
+		console.log("token " + authToken)
+        const response = await fetch(process.env.REACT_APP_URL_SERVER + 'authentification/42/profil', 
+		{
+        	credentials: 'include',
+			headers: {
+				'Authorization': `Bearer ${authToken}`
+	  		}
+      	});
         const userData = await response.json();
         if (Object.keys(userData).length != 0) {
 			setUser(userData); // Utilisateur connecté
@@ -62,13 +92,16 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         setIsLoading(false);
       }
     };
-
-    verifyUser();
-  }, []);
+	console.log(authToken)
+	if (authToken)
+	{
+		verifyUser(authToken);
+	}
+  }, [authToken]);
 
 
 return (
-    <AuthContext.Provider value={{ user, setUser, isLoading , logout}}>
+    <AuthContext.Provider value={{ user, setUser, isLoading, login, logout, authToken, setAuthToken}}>
       {children}
     </AuthContext.Provider>
   );

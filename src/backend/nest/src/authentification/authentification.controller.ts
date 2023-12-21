@@ -3,10 +3,14 @@ import { Controller, Get, Req, Res, Session, UseGuards, Query } from '@nestjs/co
 import { AuthGuard } from '@nestjs/passport';
 import { Request, Response } from 'express';
 import { PrismaService } from '../prisma.service';
+import { JwtStrategy } from './jwt.strategy';
+import { JwtService } from '@nestjs/jwt';
 
 @Controller('authentification')
 export class AuthentificationController {
-  constructor (private prisma: PrismaService){}
+  constructor (
+	private prisma: PrismaService,
+	private jwtService: JwtService,){}
 
   @Get('42')
   @UseGuards(AuthGuard('42'))
@@ -62,7 +66,9 @@ export class AuthentificationController {
 		session.user = checkUserid
         console.log("L'utilisateur existe deja dans la bdd");
       }
-      res.redirect('http://localhost:3000/profil');
+	  const payload = { username: userData.login, sub: userData.id };
+	  const token = this.jwtService.sign(payload);
+      res.redirect(`http://localhost:3000/profil?token=${token}`);
   }
 
     // Un nouveau controlleur 42/profil
@@ -71,6 +77,7 @@ export class AuthentificationController {
     // Et que je reviens dans 42/profil, j'ai toutes les infos
     // Le front pourra toujours faire un appel en appel a cet url pour avoir les infos
   @Get('42/profil')
+  @UseGuards(AuthGuard('jwt'))
   async profilSession42(@Req() req, @Session() session: Record<string, any>) {
     // Gérer le callback après l'authentification
     if (session.user)

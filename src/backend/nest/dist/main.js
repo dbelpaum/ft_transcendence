@@ -146,16 +146,18 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 var __param = (this && this.__param) || function (paramIndex, decorator) {
     return function (target, key) { decorator(target, key, paramIndex); }
 };
-var _a, _b, _c, _d;
+var _a, _b, _c, _d, _e;
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.AuthentificationController = void 0;
 const common_1 = __webpack_require__(/*! @nestjs/common */ "@nestjs/common");
 const passport_1 = __webpack_require__(/*! @nestjs/passport */ "@nestjs/passport");
 const express_1 = __webpack_require__(/*! express */ "express");
 const prisma_service_1 = __webpack_require__(/*! ../prisma.service */ "./src/prisma.service.ts");
+const jwt_1 = __webpack_require__(/*! @nestjs/jwt */ "@nestjs/jwt");
 let AuthentificationController = class AuthentificationController {
-    constructor(prisma) {
+    constructor(prisma, jwtService) {
         this.prisma = prisma;
+        this.jwtService = jwtService;
     }
     async login42(req) {
     }
@@ -192,7 +194,9 @@ let AuthentificationController = class AuthentificationController {
             session.user = checkUserid;
             console.log("L'utilisateur existe deja dans la bdd");
         }
-        res.redirect('http://localhost:3000/profil');
+        const payload = { username: userData.login, sub: userData.id };
+        const token = this.jwtService.sign(payload);
+        res.redirect(`http://localhost:3000/profil?token=${token}`);
     }
     async profilSession42(req, session) {
         if (session.user) {
@@ -229,20 +233,21 @@ __decorate([
     __param(1, (0, common_1.Res)()),
     __param(2, (0, common_1.Session)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Object, typeof (_b = typeof express_1.Response !== "undefined" && express_1.Response) === "function" ? _b : Object, typeof (_c = typeof Record !== "undefined" && Record) === "function" ? _c : Object]),
+    __metadata("design:paramtypes", [Object, typeof (_c = typeof express_1.Response !== "undefined" && express_1.Response) === "function" ? _c : Object, typeof (_d = typeof Record !== "undefined" && Record) === "function" ? _d : Object]),
     __metadata("design:returntype", Promise)
 ], AuthentificationController.prototype, "callback42", null);
 __decorate([
     (0, common_1.Get)('42/profil'),
+    (0, common_1.UseGuards)((0, passport_1.AuthGuard)('jwt')),
     __param(0, (0, common_1.Req)()),
     __param(1, (0, common_1.Session)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Object, typeof (_d = typeof Record !== "undefined" && Record) === "function" ? _d : Object]),
+    __metadata("design:paramtypes", [Object, typeof (_e = typeof Record !== "undefined" && Record) === "function" ? _e : Object]),
     __metadata("design:returntype", Promise)
 ], AuthentificationController.prototype, "profilSession42", null);
 exports.AuthentificationController = AuthentificationController = __decorate([
     (0, common_1.Controller)('authentification'),
-    __metadata("design:paramtypes", [typeof (_a = typeof prisma_service_1.PrismaService !== "undefined" && prisma_service_1.PrismaService) === "function" ? _a : Object])
+    __metadata("design:paramtypes", [typeof (_a = typeof prisma_service_1.PrismaService !== "undefined" && prisma_service_1.PrismaService) === "function" ? _a : Object, typeof (_b = typeof jwt_1.JwtService !== "undefined" && jwt_1.JwtService) === "function" ? _b : Object])
 ], AuthentificationController);
 
 
@@ -264,16 +269,26 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.AuthentificationModule = void 0;
 const common_1 = __webpack_require__(/*! @nestjs/common */ "@nestjs/common");
+const passport_1 = __webpack_require__(/*! @nestjs/passport */ "@nestjs/passport");
 const authentification_controller_1 = __webpack_require__(/*! ./authentification.controller */ "./src/authentification/authentification.controller.ts");
 const fortytwo_service_1 = __webpack_require__(/*! ./fortytwo/fortytwo.service */ "./src/authentification/fortytwo/fortytwo.service.ts");
 const prisma_service_1 = __webpack_require__(/*! src/prisma.service */ "./src/prisma.service.ts");
+const jwt_1 = __webpack_require__(/*! @nestjs/jwt */ "@nestjs/jwt");
+const jwt_strategy_1 = __webpack_require__(/*! ./jwt.strategy */ "./src/authentification/jwt.strategy.ts");
 let AuthentificationModule = class AuthentificationModule {
 };
 exports.AuthentificationModule = AuthentificationModule;
 exports.AuthentificationModule = AuthentificationModule = __decorate([
     (0, common_1.Module)({
+        imports: [
+            passport_1.PassportModule,
+            jwt_1.JwtModule.register({
+                secret: 'votre_secret_jwt',
+                signOptions: { expiresIn: '60m' },
+            }),
+        ],
         controllers: [authentification_controller_1.AuthentificationController],
-        providers: [fortytwo_service_1.FortyTwoService, prisma_service_1.PrismaService],
+        providers: [fortytwo_service_1.FortyTwoService, prisma_service_1.PrismaService, jwt_strategy_1.JwtStrategy],
     })
 ], AuthentificationModule);
 
@@ -322,6 +337,48 @@ exports.FortyTwoService = FortyTwoService = __decorate([
     (0, common_1.Injectable)(),
     __metadata("design:paramtypes", [])
 ], FortyTwoService);
+
+
+/***/ }),
+
+/***/ "./src/authentification/jwt.strategy.ts":
+/*!**********************************************!*\
+  !*** ./src/authentification/jwt.strategy.ts ***!
+  \**********************************************/
+/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
+
+
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.JwtStrategy = void 0;
+const common_1 = __webpack_require__(/*! @nestjs/common */ "@nestjs/common");
+const passport_1 = __webpack_require__(/*! @nestjs/passport */ "@nestjs/passport");
+const passport_jwt_1 = __webpack_require__(/*! passport-jwt */ "passport-jwt");
+let JwtStrategy = class JwtStrategy extends (0, passport_1.PassportStrategy)(passport_jwt_1.Strategy) {
+    constructor() {
+        super({
+            jwtFromRequest: passport_jwt_1.ExtractJwt.fromAuthHeaderAsBearerToken(),
+            ignoreExpiration: false,
+            secretOrKey: 'votre_secret_jwt',
+        });
+    }
+    async validate(payload) {
+        return { userId: payload.sub, username: payload.username };
+    }
+};
+exports.JwtStrategy = JwtStrategy;
+exports.JwtStrategy = JwtStrategy = __decorate([
+    (0, common_1.Injectable)(),
+    __metadata("design:paramtypes", [])
+], JwtStrategy);
 
 
 /***/ }),
@@ -1777,9 +1834,9 @@ let UserController = class UserController {
     async getImage(id) {
         const user = await this.prisma.user.findUnique({
             where: { id42: Number(id) },
-            select: { imageUrl: true },
+            select: { imageURL: true },
         });
-        return user ? user.imageUrl : null;
+        return user ? user.imageURL : null;
     }
     async updatePseudo(id, pseudo) {
         return await this.prisma.user.update({
@@ -1922,6 +1979,16 @@ module.exports = require("@nestjs/core");
 
 /***/ }),
 
+/***/ "@nestjs/jwt":
+/*!******************************!*\
+  !*** external "@nestjs/jwt" ***!
+  \******************************/
+/***/ ((module) => {
+
+module.exports = require("@nestjs/jwt");
+
+/***/ }),
+
 /***/ "@nestjs/passport":
 /*!***********************************!*\
   !*** external "@nestjs/passport" ***!
@@ -2009,6 +2076,16 @@ module.exports = require("express-session");
 /***/ ((module) => {
 
 module.exports = require("passport-42");
+
+/***/ }),
+
+/***/ "passport-jwt":
+/*!*******************************!*\
+  !*** external "passport-jwt" ***!
+  \*******************************/
+/***/ ((module) => {
+
+module.exports = require("passport-jwt");
 
 /***/ }),
 
