@@ -1207,7 +1207,11 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.Instance = void 0;
 const ServerEvents_1 = __webpack_require__(/*! ../shared/server/ServerEvents */ "./src/game/shared/server/ServerEvents.ts");
 const TICK_RATE = 1000 / 60;
-const PADDLE_SPEED = 3.5;
+const PADDLE_SPEED = 3.75;
+const BALL_SPEED_INCREMENT = 0.0003;
+const BALL_DEFAULT_SPEED = 2;
+const WIDTH = 600;
+const HEIGHT = 800;
 class Instance {
     constructor(lobby) {
         this.lobby = lobby;
@@ -1215,11 +1219,10 @@ class Instance {
         this.hasFinished = false;
         this.isSuspended = false;
         this.scores = {};
-        this.gameTick = 0;
         this.updateInterval = null;
         this.ball = {
             radius: 5,
-            speedModifier: 1,
+            speedModifier: BALL_DEFAULT_SPEED,
             velocity: { x: 0, y: 0, z: 0 },
             position: { x: 0, y: 0, z: 0 },
         };
@@ -1227,14 +1230,14 @@ class Instance {
             width: 80,
             height: 10,
             depth: 15,
-            position: { x: 0, y: 0, z: 0 },
+            position: { x: 0, y: WIDTH / 2.7, z: 0 },
             movement: 0,
         };
         this.paddleHost = {
             width: 80,
             height: 10,
             depth: 15,
-            position: { x: 0, y: 0, z: 0 },
+            position: { x: 0, y: -WIDTH / 2.7, z: 0 },
             movement: 0,
         };
     }
@@ -1243,6 +1246,8 @@ class Instance {
             return;
         }
         this.hasStarted = true;
+        this.scores[this.lobby.hostSocketId] = 0;
+        this.scores[this.lobby.guestSocketId] = 0;
         this.lobby.dispatchToLobby(ServerEvents_1.ServerEvents.GameStart, {});
         this.newRound();
         this.startGameRuntime();
@@ -1269,8 +1274,9 @@ class Instance {
         }
     }
     newRound() {
+        this.gameTick = 0;
         this.ball.position = { x: 0, y: 0, z: 0 };
-        this.ball.speedModifier = 1;
+        this.ball.speedModifier = BALL_DEFAULT_SPEED;
         this.paddleGuest.position.x = 0;
         this.paddleHost.position.x = 0;
         const randomAngle = (Math.PI / 3) * (Math.random() * 2 - 1);
@@ -1278,38 +1284,64 @@ class Instance {
         this.ball.velocity.y = -Math.cos(randomAngle);
     }
     makePaddleMove() {
-        if (this.paddleHost.position.x + this.paddleHost.movement * PADDLE_SPEED >= -300 + this.paddleHost.width / 2
-            && this.paddleHost.position.x + this.paddleHost.movement * PADDLE_SPEED <= 300 - this.paddleHost.width / 2)
+        if (this.paddleHost.position.x + this.paddleHost.movement * PADDLE_SPEED >= -WIDTH / 2 + this.paddleHost.width / 2
+            && this.paddleHost.position.x + this.paddleHost.movement * PADDLE_SPEED <= WIDTH / 2 - this.paddleHost.width / 2)
             this.paddleHost.position.x -= -this.paddleHost.movement * PADDLE_SPEED;
-        if (this.paddleGuest.position.x + this.paddleGuest.movement * PADDLE_SPEED <= 300 - this.paddleGuest.width / 2
-            && this.paddleGuest.position.x + this.paddleGuest.movement * PADDLE_SPEED >= -300 + this.paddleGuest.width / 2)
-            this.paddleGuest.position.x += this.paddleGuest.movement * PADDLE_SPEED;
+        if (this.paddleGuest.position.x - this.paddleGuest.movement * PADDLE_SPEED >= -WIDTH / 2 + this.paddleGuest.width / 2
+            && this.paddleGuest.position.x - this.paddleGuest.movement * PADDLE_SPEED <= WIDTH / 2 - this.paddleGuest.width / 2)
+            this.paddleGuest.position.x -= this.paddleGuest.movement * PADDLE_SPEED;
+    }
+    checkGoal() {
+        if (this.ball.position.y > 270) {
+            this.scores[this.lobby.hostSocketId]++;
+            this.newRound();
+        }
+        else if (this.ball.position.y < -270) {
+            this.scores[this.lobby.guestSocketId]++;
+            this.newRound();
+        }
     }
     checkCollisions() {
-        if (this.ball.position.x >= this.paddleHost.position.x + this.paddleHost.width / 2
+        if (this.ball.position.x >= this.paddleHost.position.x - this.paddleHost.width / 2
             && this.ball.position.x <= this.paddleHost.position.x + this.paddleHost.width / 2
             && this.ball.position.y >= this.paddleHost.position.y - this.paddleHost.height / 2 - this.ball.radius
             && this.ball.position.y <= this.paddleHost.position.y + this.paddleHost.height / 2 + this.ball.radius) {
-            this.ball.velocity.x = -this.ball.velocity.x;
-            this.ball.velocity.y = -this.ball.velocity.y;
+            const hitIndex = (this.ball.position.x - this.paddleHost.position.x) / (this.paddleHost.width / 2);
+            const maxReflectionAngle = Math.PI / 3;
+            const reflectionAngle = hitIndex * maxReflectionAngle;
+            this.ball.velocity.x = Math.sin(reflectionAngle);
+            this.ball.velocity.y = Math.cos(reflectionAngle);
+            this.ball.speedModifier = Math.exp(this.gameTick * BALL_SPEED_INCREMENT) * BALL_DEFAULT_SPEED;
         }
         else if (this.ball.position.x >= this.paddleGuest.position.x - this.paddleGuest.width / 2
             && this.ball.position.x <= this.paddleGuest.position.x + this.paddleGuest.width / 2
             && this.ball.position.y >= this.paddleGuest.position.y - this.paddleGuest.height / 2 - this.ball.radius
             && this.ball.position.y <= this.paddleGuest.position.y + this.paddleGuest.height / 2 + this.ball.radius) {
+            const hitIndex = (this.ball.position.x - this.paddleGuest.position.x) / (this.paddleGuest.width / 2);
+            const maxReflectionAngle = Math.PI / 3;
+            const reflectionAngle = hitIndex * maxReflectionAngle;
+            this.ball.velocity.x = Math.sin(reflectionAngle);
+            this.ball.velocity.y = -Math.cos(reflectionAngle);
+            this.ball.speedModifier = Math.exp(this.gameTick * BALL_SPEED_INCREMENT) * BALL_DEFAULT_SPEED;
+        }
+        if (Math.abs(this.ball.position.x) >= WIDTH / 2) {
             this.ball.velocity.x = -this.ball.velocity.x;
-            this.ball.velocity.y = -this.ball.velocity.y;
         }
     }
     gameRuntime() {
-        this.gameTick++;
         this.ball.position.x += this.ball.velocity.x * this.ball.speedModifier;
         this.ball.position.y += this.ball.velocity.y * this.ball.speedModifier;
-        this.makePaddleMove();
+        this.checkGoal();
+        this.checkCollisions();
+        if (this.paddleHost.movement != 0 || this.paddleGuest.movement != 0)
+            this.makePaddleMove();
         this.sendGameState();
-        if (this.hasFinished) {
+        if (this.scores[this.lobby.hostSocketId] >= 5 || this.scores[this.lobby.guestSocketId] >= 5) {
+            this.hasFinished = true;
             this.stopGameRuntime();
+            return;
         }
+        this.gameTick++;
     }
     sendGameState() {
         this.lobby.sendToUser(this.lobby.hostSocketId, ServerEvents_1.ServerEvents.GameState, {
@@ -1342,12 +1374,12 @@ class Instance {
             },
             ballSpeedModifier: this.ball.speedModifier,
             paddleOpponent: {
-                x: this.paddleHost.position.x,
+                x: -this.paddleHost.position.x,
                 y: this.paddleHost.position.y,
                 z: this.paddleHost.position.z
             },
             paddlePlayer: {
-                x: this.paddleGuest.position.x,
+                x: -this.paddleGuest.position.x,
                 y: this.paddleGuest.position.y,
                 z: this.paddleGuest.position.z
             },
@@ -1412,7 +1444,7 @@ class LobbyManager {
         lobby.addClient(client);
     }
     lobbiesCleaner() {
-        console.log("Remaining lobbies : " + this.lobbies);
+        console.log("Remaining lobbies : " + this.lobbies.size);
         console.log("Checking for empty lobbies...");
         for (const [lobbyId, lobby] of this.lobbies) {
             if (lobby.clients.size === 0) {

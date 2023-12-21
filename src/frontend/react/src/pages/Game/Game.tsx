@@ -120,25 +120,26 @@ const Game: React.FC = () => {
 					</>
 				)}
 				{gameStarted && (
-					<OnlineGameScene
-						width={800}
-						height={600}
-						isHost={lobbyData.hostId === socket.id}
-					/>
+					<div>
+						<div className="gameScore" id="gameScore"></div>
+						<OnlineGameScene
+							width={800}
+							height={600}
+							isHost={lobbyData.hostId === socket.id}
+						/>
+					</div>
 				)}
 
 				{/* Bouton pour ouvrir/fermer la superposition du classement */}
 				<button onClick={toggleScoreRanking}>Voir le classement</button>
 				{/* Superposition modale du classement des scores */}
 				<div
-					className={`scoreRankingOverlay ${
-						showScoreRanking ? "active" : ""
-					}`}
+					className={`scoreRankingOverlay ${showScoreRanking ? "active" : ""
+						}`}
 				>
 					<div
-						className={`scoreRankingModal ${
-							showScoreRanking ? "active" : ""
-						}`}
+						className={`scoreRankingModal ${showScoreRanking ? "active" : ""
+							}`}
 					>
 						<button onClick={toggleScoreRanking}>Fermer</button>
 						{/* Affichage du classement des scores */}
