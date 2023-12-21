@@ -44,59 +44,46 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
 	// Récupérez votre token JWT
 	const token = sessionStorage.getItem('token');
-	const socket: Socket<ServerToClientEvents, ClientToServerEvents> = io("http://localhost:4000",
-	{ 
-		autoConnect: false,
-		auth: {
-			token: token // Envoyez le token JWT ici
-		}
-	});
+
 
   // Chargez le token JWT depuis sessionStorage lors du démarrage
   useEffect(() => {
 	const getUserData = async (authToken:string) => {
-		try {
-		  setIsLoading(true);
-		  console.log("token " + authToken)
-		  const response = await fetch(process.env.REACT_APP_URL_SERVER + 'authentification/42/profil', 
-		  {
-			  credentials: 'include',
-			  headers: {
-				  'Authorization': `Bearer ${authToken}`
-				}
-			});
-		  const userData = await response.json();
-		  if (Object.keys(userData).length != 0) {
-			  setUser(userData); // Utilisateur connecté
-			  console.log("the user data")
+	  try {
+		setIsLoading(true);
+		console.log("token " + authToken);
+		const response = await fetch(process.env.REACT_APP_URL_SERVER + 'authentification/42/profil', {
+		  credentials: 'include',
+		  headers: {
+			'Authorization': `Bearer ${authToken}`
 		  }
-		  else
-			setUser(null)
-		} catch (error) {
-		  console.error('Erreur lors de la vérification de l’utilisateur', error);
-		} finally {
-		  setIsLoading(false);
+		});
+		const userData = await response.json();
+		if (Object.keys(userData).length !== 0) {
+		  setUser(userData); // Utilisateur connecté
+		  console.log("the user data");
+		} else {
+		  setUser(null);
 		}
-	  };
-	if (tokenUrl)
-	{
-		login(tokenUrl)
-		getUserData(tokenUrl);
+	  } catch (error) {
+		console.error('Erreur lors de la vérification de l’utilisateur', error);
+	  } finally {
 		setIsLoading(false);
-		return ;
-	}
+	  }
+	};
+  
+	const authentificate = async () => {
+	  const tokenSession = tokenUrl || sessionStorage.getItem('token');
+	  if (tokenSession) {
+		await login(tokenSession);
+		await getUserData(tokenSession);
+	  }
+	  setIsLoading(false);
+	};
+  
+	authentificate();
+  }, [authToken]);
 
-	const tokenSession = sessionStorage.getItem('token');
-	if (tokenSession) {
-		login(tokenSession)
-		getUserData(tokenSession);
-		setIsLoading(false);
-		return ;
-	}
-	setIsLoading(false);
-
-
-  }, []);
 
   const login = async (token:string) => {
     sessionStorage.setItem('token', token);

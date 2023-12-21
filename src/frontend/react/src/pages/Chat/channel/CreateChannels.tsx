@@ -1,5 +1,5 @@
 import React, { useState, useEffect, ChangeEvent, FormEvent  } from 'react';
-import { Channel, ChannelCreate, ChannelUtility } from './chat.interface';
+import { Channel, ChannelCreate, ChannelUtility } from '../chat.interface';
 import { useLocation } from 'react-router-dom';
 
 

@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import {
 	ChannelUtility
-  } from './chat.interface';
+  } from '../chat.interface';
 import { useLocation } from 'react-router-dom';
 import MessageComponent from './Message';
-import { ChannelCreate } from './chat.interface';
-import { Channel } from './chat.interface';
+import { ChannelCreate } from '../chat.interface';
+import { Channel } from '../chat.interface';
 import MessageInput from './MessageInput';
 
 interface ChannelWriteProps {

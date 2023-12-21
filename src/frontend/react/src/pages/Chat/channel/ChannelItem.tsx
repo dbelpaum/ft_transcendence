@@ -3,9 +3,9 @@ import {
 	Channel,
 	ChannelCreate,
 	ChannelUtility
-  } from './chat.interface';
+  } from '../chat.interface';
 import CreateChannel from './CreateChannels';
-import { ReactComponent as LeaveIcon } from './leave.svg';
+import { ReactComponent as LeaveIcon } from '../assets/leave.svg';
 import { useNavigate } from 'react-router-dom';
 
 

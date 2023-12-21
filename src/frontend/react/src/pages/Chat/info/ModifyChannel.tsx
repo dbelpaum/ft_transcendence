@@ -3,10 +3,10 @@ import {
 	Channel,
 	ChannelCreate,
 	ChannelUtility
-  } from './chat.interface';
+  } from '../chat.interface';
 import { useLocation } from 'react-router-dom';
 import UserInfo from './UserInfo';
-import { User } from '../../context/AuthInteface';
+import { User } from '../../../context/AuthInteface';
 
 
 interface ModifyChannelProps {

@@ -2,7 +2,7 @@ import React from 'react';
 import {
   ChannelUtility,
 	Message,
-  } from './chat.interface';
+  } from '../chat.interface';
 
 interface MessageProps {
   channelUtility: ChannelUtility;
