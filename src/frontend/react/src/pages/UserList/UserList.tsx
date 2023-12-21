@@ -1,21 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import './UserList.css';
 import UserProfile from '../UserProfil/UserProfil';
+import { User } from '../../context/AuthInteface';
 
-interface User {
-    id42: number;
-    pseudo: string;
-    email: string;
-    imageURL: string;
-}
+
 
 const UserList: React.FC = () => {
-    const [users, setUsers] = useState<User[]>([]);
+    const [users, setUsersList] = useState<User[]>([]);
 
     useEffect(() => {
         fetch('http://localhost:4000/user/GetAllUsers') 
             .then(response => response.json())
-            .then((data: User[]) => setUsers(data))
+            .then((data: User[]) => setUsersList(data))
             .catch(error => console.error(error));
     }, []);
 

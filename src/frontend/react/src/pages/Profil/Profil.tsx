@@ -4,21 +4,13 @@ import LogoutButton from '../../components/LogoutButton/LogoutButton';
 import EditableTextField from '../../components/EditableTextField/EditableTextField';
 import { useAuth } from '../../context/AuthContexte';
 import UserList from '../UserList/UserList';
-import { useLocation } from 'react-router-dom';
-
-interface UserInfo {
-  pseudo: string;
-  email: string;
-  id: number;
-  lastname: string;
-  firstname: string;
-  imageURL: string;
-}
+import { Link } from 'react-router-dom';
+import { User } from '../../context/AuthInteface';
 
 function Profil() {
   const { user, login} = useAuth();
   const userId = user?.id42;
-  const [userInfo, setUserInfo] = useState<UserInfo | null>(null);
+  const [userInfo, setUserInfo] = useState<User | null>(null);
 
 
   useEffect(() => {
@@ -32,7 +24,7 @@ function Profil() {
     }
   }, [userId]);
 
-  const saveField = (field: keyof UserInfo, value: string) => {
+  const saveField = (field: keyof User, value: string) => {
     if (userId && userInfo) {
       const updatedUserInfo = { ...userInfo, [field]: value };
       setUserInfo(updatedUserInfo);
@@ -95,7 +87,7 @@ function Profil() {
         )}
 
 
-          <a href="/UserList"> Liste des joueurs</a>
+	<Link to="/UserList">Liste des joueurs</Link>
 
       </div>
     </main>

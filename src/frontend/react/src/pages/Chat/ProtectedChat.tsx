@@ -31,6 +31,7 @@ export const ProtectedChat: React.FC<ProtectedChatProps> = ({ children }) => {
 	}
 	
 	if (!user) {
+		console.log("je passe par la")
 		return <Navigate to="/" />;
 	}
 	return children
