@@ -9,6 +9,7 @@ import { Ball, Paddle } from "./types";
 const TICK_RATE = 1000 / 60; // 60 updates per second
 const PADDLE_SPEED = 3.75;
 const BALL_SPEED_INCREMENT = 0.0003;
+const BALL_DEFAULT_SPEED = 2;
 const WIDTH = 600;
 const HEIGHT = 800;
 
@@ -26,7 +27,7 @@ export class Instance {
 	constructor(private readonly lobby: Lobby) {
 		this.ball = {
 			radius: 5,
-			speedModifier: 1,
+			speedModifier: BALL_DEFAULT_SPEED,
 			velocity: { x: 0, y: 0, z: 0 },
 			position: { x: 0, y: 0, z: 0 },
 		};
@@ -86,7 +87,7 @@ export class Instance {
 	private newRound(): void {
 		this.gameTick = 0;
 		this.ball.position = { x: 0, y: 0, z: 0 };
-		this.ball.speedModifier = 1;
+		this.ball.speedModifier = BALL_DEFAULT_SPEED;
 		this.paddleGuest.position.x = 0;
 		this.paddleHost.position.x = 0;
 
@@ -106,11 +107,11 @@ export class Instance {
 
 	private checkGoal(): void {
 		//Check si la balle est sortie du terrain
-		if (this.ball.position.y > HEIGHT / 2) {
+		if (this.ball.position.y > 270) {
 			this.scores[this.lobby.hostSocketId]++;
 			this.newRound();
 		}
-		else if (this.ball.position.y < -HEIGHT / 2) {
+		else if (this.ball.position.y < -270) {
 			this.scores[this.lobby.guestSocketId]++;
 			this.newRound();
 		}
@@ -129,7 +130,7 @@ export class Instance {
 			const reflectionAngle = hitIndex * maxReflectionAngle;
 			this.ball.velocity.x = Math.sin(reflectionAngle);
 			this.ball.velocity.y = Math.cos(reflectionAngle);
-			this.ball.speedModifier = Math.exp(this.gameTick * BALL_SPEED_INCREMENT);
+			this.ball.speedModifier = Math.exp(this.gameTick * BALL_SPEED_INCREMENT) * BALL_DEFAULT_SPEED;
 		}
 		else if (
 			this.ball.position.x >= this.paddleGuest.position.x - this.paddleGuest.width / 2
@@ -142,7 +143,7 @@ export class Instance {
 			const reflectionAngle = hitIndex * maxReflectionAngle;
 			this.ball.velocity.x = Math.sin(reflectionAngle);
 			this.ball.velocity.y = - Math.cos(reflectionAngle);
-			this.ball.speedModifier = Math.exp(this.gameTick * BALL_SPEED_INCREMENT);
+			this.ball.speedModifier = Math.exp(this.gameTick * BALL_SPEED_INCREMENT) * BALL_DEFAULT_SPEED;
 		}
 
 		//Check collisions de la balle avec les murs
@@ -173,12 +174,14 @@ export class Instance {
 		// Send updates to clients
 		this.sendGameState();
 
-		this.gameTick++;
-
 		// Check for game end conditions and stop the game if necessary
-		if (this.hasFinished) {
+		if (this.scores[this.lobby.hostSocketId] >= 5 || this.scores[this.lobby.guestSocketId] >= 5) {
+			this.hasFinished = true;
 			this.stopGameRuntime();
+			return;
 		}
+
+		this.gameTick++;
 	}
 
 	private sendGameState(): void {
