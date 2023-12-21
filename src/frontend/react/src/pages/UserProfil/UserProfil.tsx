@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useParams } from 'react-router-dom';
 import "./UserProfil.css";
 import { Link } from "react-router-dom";
+import FriendshipButton from "../../components/FriendshipButton/FriendshipButton";
 
 interface UserInfo {
     pseudo: string;
@@ -62,12 +63,11 @@ const UserProfile: React.FC = () => {
               <p>Membre depuis: {new Date(userInfo.createdAt).toLocaleDateString()}</p>
           </div>
           <div className="friend-action">
-              {userInfo.isFriend ? (
-                  <p>Vous êtes déjà amis.</p>
-              ) : (
-                  <button>Ajouter comme ami</button>
-              )}
-          </div>
+          </div><FriendshipButton
+                status="addFriend"
+                onButtonClick={console.log("click")}
+                color="green"
+            />
       </main>
   );
 };
