@@ -1,5 +1,5 @@
 import { SubscribeMessage, WebSocketGateway, MessageBody,  WebSocketServer, OnGatewayConnection, OnGatewayDisconnect,
-  } from '@nestjs/websockets';
+	ConnectedSocket} from '@nestjs/websockets';
 import { Logger } from '@nestjs/common';
 import {
   ServerToClientEvents,
@@ -33,9 +33,11 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
   @SubscribeMessage('remove_admin')
   async delete_admin(
-    @MessageBody()
-    payload: addAdminInfo,
+    @MessageBody() payload: addAdminInfo,
+	@ConnectedSocket() client: Socket
   ): Promise<void> {
+	if (client.user.id !== payload.user.id ) return ; // Securité
+
     this.logger.log(payload);
 
 	//this.server.to(payload.name).emit('chat', payload)
@@ -44,9 +46,11 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
   @SubscribeMessage('kick')
   async kick(
-    @MessageBody()
-    payload: addAdminInfo,
+    @MessageBody() payload: addAdminInfo,
+	@ConnectedSocket() client: Socket
   ): Promise<void> {
+	if (client.user.id !== payload.user.id ) return ; // Securité
+
     this.logger.log(payload);
 
 	//this.server.to(payload.name).emit('chat', payload)
@@ -63,9 +67,11 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
   @SubscribeMessage('ban')
   async ban(
-    @MessageBody()
-    payload: addAdminInfo,
-  ): Promise<void> {
+    @MessageBody() payload: addAdminInfo,
+  	@ConnectedSocket() client: Socket
+	): Promise<void> {
+	if (client.user.id !== payload.user.id ) return ; // Securité
+
     this.logger.log(payload);
 
 	//this.server.to(payload.name).emit('chat', payload)
@@ -82,9 +88,11 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
   @SubscribeMessage('mute')
   async mute(
-    @MessageBody()
-    payload: addAdminInfo,
-  ): Promise<void> {
+    @MessageBody() payload: addAdminInfo,
+  	@ConnectedSocket() client: Socket
+	): Promise<void> {
+	if (client.user.id !== payload.user.id ) return ; // Securité
+
     this.logger.log(payload);
 
 	//this.server.to(payload.name).emit('chat', payload)
@@ -101,9 +109,11 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
   @SubscribeMessage('add_admin')
   async addAdmin(
-    @MessageBody()
-    payload: addAdminInfo,
-  ): Promise<void> {
+    @MessageBody() payload: addAdminInfo,
+  	@ConnectedSocket() client: Socket
+	): Promise<void> {
+	if (client.user.id !== payload.user.id ) return ; // Securité
+
     this.logger.log(payload);
 
 	//this.server.to(payload.name).emit('chat', payload)
@@ -112,9 +122,11 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
   @SubscribeMessage('invite')
   async handleInvite(
-    @MessageBody()
-    payload: InviteToChannel,
-  ): Promise<void> {
+    @MessageBody() payload: InviteToChannel,
+  	@ConnectedSocket() client: Socket
+	): Promise<void> {
+	if (client.user.id !== payload.user.id ) return ; // Securité
+
     this.logger.log(payload);
 
 	//this.server.to(payload.name).emit('chat', payload)
@@ -123,9 +135,11 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
   @SubscribeMessage('chat')
   async handleEvent(
-    @MessageBody()
-    payload: Message,
-  ): Promise<Message> {
+    @MessageBody() payload: Message,
+  	@ConnectedSocket() client: Socket
+	): Promise<Message> {
+	if (client.user.id !== payload.user.id ) return ; // Securité
+
     //this.logger.log(payload);
 	// Si la personne est mute, on envoie rien
 	if (await this.channelService.isMuted(payload)) return payload
@@ -136,33 +150,36 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
   @SubscribeMessage('join_channel')
   async handleSetClientDataEvent(
-    @MessageBody()
-    payload: ChannelCreate
+    @MessageBody() payload: ChannelCreate,
+	@ConnectedSocket() client: Socket
   ): Promise<joinResponse> {
-	  if (payload.user.socketId) {
-		this.logger.log(`${payload.user.socketId} is joining ${payload.name}`)
-		await this.server.in(payload.user.socketId).socketsJoin(payload.name)
+	if (client.user.id !== payload.user.id ) return ; // Securité
+	if (payload.user.socketId) {
+	this.logger.log(`${payload.user.socketId} is joining ${payload.name}`)
+	await this.server.in(payload.user.socketId).socketsJoin(payload.name)
 
-		const response =  await this.channelService.addUserToChannel(payload)
-		if (response.errorNumber === 0)
+	const response =  await this.channelService.addUserToChannel(payload)
+	if (response.errorNumber === 0)
+	{
+		this.server.to(payload.name).emit('chat', 
 		{
-			this.server.to(payload.name).emit('chat', 
-			{
-				user: payload.user,
-				timeSent: null,
-				message: `${payload.user.pseudo} jump in ${payload.name}`,
-				channelName: payload.name,
-			}) 
-		}
-		return response
-    }
+			user: payload.user,
+			timeSent: null,
+			message: `${payload.user.pseudo} jump in ${payload.name}`,
+			channelName: payload.name,
+		}) 
+	}
+	return response
+}
   }
 
   @SubscribeMessage('modify_channel')
   async handleModifyChannelEvent(
-    @MessageBody()
-    payload: ChannelCreate
-  ): Promise<void> {
+    @MessageBody() payload: ChannelCreate,
+  	@ConnectedSocket() client: Socket
+	): Promise<void> {
+	if (client.user.id !== payload.user.id ) return ; // Securité
+
 	  if (payload.user.socketId) {
 		this.logger.log(`${payload.user.socketId} modified the settings of ${payload.name}`)
 		await this.server.in(payload.user.socketId).socketsJoin(payload.name)
@@ -184,8 +201,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		  const token = client.handshake.auth.token;
 		  // Validez le token ici
 		  const payload = jwt.verify(token, 'votre_secret_jwt');
-		  console.log(payload)
-		  
+		  client.user = payload;
 		  // Si la vérification échoue, une exception sera lancée
 		} catch (e) {
 		  console.log("je suis sans coeur, je te deco ")
