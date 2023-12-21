@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { io, Socket } from 'socket.io-client';
-import './Chat.css'; // Importation de styles spécifiques à la page d'accueil
+import './assets/Chat.css'; // Importation de styles spécifiques à la page d'accueil
 import Title from '../../components/Title/Title';
 // import chat from './chat.png';
-import ChatContainer from './ChatContainer';
-import Channels from './Channels';
+import ChatContainer from './write/ChatContainer';
+import Channels from './channel/Channels';
 import {
 	Message,
 	ServerToClientEvents,
@@ -15,8 +15,8 @@ import {
   } from './chat.interface';
   import { User } from '../../context/AuthInteface';
 import { useAuth } from '../../context/AuthContexte'; 
-import ChannelWrite from './ChannelWrite';
-import ChannelInfo from './ChannelInfo';
+import ChannelWrite from './write/ChannelWrite';
+import ChannelInfo from './info/ChannelInfo';
 
 
 /*

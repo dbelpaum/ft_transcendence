@@ -12,7 +12,7 @@ import UserProfile from './pages/UserProfil/UserProfil';
 import { Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContexte'; 
 import { ErrorMessageProvider, useErrorMessage } from './context/ErrorContexte';
-import { ProtectedChat } from './pages/Chat/ProtectedChat';
+import { ProtextedElement } from './components/Protection/ProtectedElement';
 import { ReactNotifications, Store } from 'react-notifications-component'
 import 'react-notifications-component/dist/theme.css'
 
@@ -31,10 +31,10 @@ function App() {
 						<Routes>
 							<Route path="/" element={<Home />} />
 							<Route path="/game" element={<Game />} />
-							<Route path="/chat" element={<ProtectedChat><Chat /></ProtectedChat>} />
-							<Route path="/profil" element={<ProtectedChat><Profil /></ProtectedChat>} />
-							<Route path="/userlist" element={<ProtectedChat><UserList /></ProtectedChat>} />
-							<Route path='/users/:pseudo' element={<ProtectedChat><UserProfile /></ProtectedChat>} />
+							<Route path="/chat" element={<ProtextedElement><Chat /></ProtextedElement>} />
+							<Route path="/profil" element={<ProtextedElement><Profil /></ProtextedElement>} />
+							<Route path="/userlist" element={<ProtextedElement><UserList /></ProtextedElement>} />
+							<Route path='/users/:pseudo' element={<ProtextedElement><UserProfile /></ProtextedElement>} />
 						</Routes>
 					</div>
 				</AuthProvider >

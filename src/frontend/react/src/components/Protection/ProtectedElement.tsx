@@ -7,11 +7,11 @@ import { useAuth } from '../../context/AuthContexte';
 import { useErrorMessage } from '../../context/ErrorContexte';
 
 
-type ProtectedChatProps = {
+type ProtextedElementProps = {
 	children: ReactElement;
   };
 
-export const ProtectedChat: React.FC<ProtectedChatProps> = ({ children }) => {
+export const ProtextedElement: React.FC<ProtextedElementProps> = ({ children }) => {
 
 	const { user, isLoading } = useAuth(); 
 	const { setErrorMessage } = useErrorMessage();

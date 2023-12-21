@@ -4,9 +4,9 @@ import {
   ChannelUtility,
 	Message,
 	addAdminInfo,
-  } from './chat.interface';
-import { User } from '../../context/AuthInteface';
-import crownIconPath from './couronne.svg';
+  } from '../chat.interface';
+import { User } from '../../../context/AuthInteface';
+import crownIconPath from '../assets/couronne.svg';
 
 interface UserAndAdmin {
 	user: User;

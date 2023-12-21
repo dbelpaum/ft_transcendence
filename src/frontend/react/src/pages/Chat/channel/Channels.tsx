@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 
 import {
 	ChannelUtility
-  } from './chat.interface';
+  } from '../chat.interface';
 import CreateChannel from './CreateChannels';
 import ChannelItem from './ChannelItem';
 
