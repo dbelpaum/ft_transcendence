@@ -21,6 +21,11 @@ import * as jwt from 'jsonwebtoken';
     origin: '*',
   },
 })
+declare module 'socket.io' {
+	export interface Socket {
+	  user: any; // Définissez le type approprié pour 'user'
+	}
+  }
 
 export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	constructor(private channelService: ChannelService) {}
