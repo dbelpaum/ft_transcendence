@@ -7,11 +7,11 @@ import { useAuth } from '../../context/AuthContexte';
 import { useErrorMessage } from '../../context/ErrorContexte';
 
 
-type ProtextedElementProps = {
+type ProtectedElementProps = {
 	children: ReactElement;
   };
 
-export const ProtextedElement: React.FC<ProtextedElementProps> = ({ children }) => {
+export const ProtectedElement: React.FC<ProtectedElementProps> = ({ children }) => {
 
 	const { user, isLoading } = useAuth(); 
 	const { setErrorMessage } = useErrorMessage();

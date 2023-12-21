@@ -12,7 +12,7 @@ import UserProfile from './pages/UserProfil/UserProfil';
 import { Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContexte'; 
 import { ErrorMessageProvider, useErrorMessage } from './context/ErrorContexte';
-import { ProtextedElement } from './components/Protection/ProtectedElement';
+import { ProtectedElement } from './components/Protection/ProtectedElement';
 import { ReactNotifications, Store } from 'react-notifications-component'
 import 'react-notifications-component/dist/theme.css'
 
@@ -30,11 +30,11 @@ function App() {
 						<NavBar />
 						<Routes>
 							<Route path="/" element={<Home />} />
-							<Route path="/game" element={<Game />} />
-							<Route path="/chat" element={<ProtextedElement><Chat /></ProtextedElement>} />
-							<Route path="/profil" element={<ProtextedElement><Profil /></ProtextedElement>} />
-							<Route path="/userlist" element={<ProtextedElement><UserList /></ProtextedElement>} />
-							<Route path='/users/:pseudo' element={<ProtextedElement><UserProfile /></ProtextedElement>} />
+							<Route path="/game" element={<ProtectedElement><Game /></ProtectedElement>} />
+							<Route path="/chat" element={<ProtectedElement><Chat /></ProtectedElement>} />
+							<Route path="/profil" element={<ProtectedElement><Profil /></ProtectedElement>} />
+							<Route path="/userlist" element={<ProtectedElement><UserList /></ProtectedElement>} />
+							<Route path='/users/:pseudo' element={<ProtectedElement><UserProfile /></ProtectedElement>} />
 						</Routes>
 					</div>
 				</AuthProvider >
