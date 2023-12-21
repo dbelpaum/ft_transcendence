@@ -20,16 +20,6 @@ function Profil() {
   const userId = user?.id42;
   const [userInfo, setUserInfo] = useState<UserInfo | null>(null);
 
-  const useQuery = () => {
-	  return new URLSearchParams(useLocation().search);
-  };
-  const query = useQuery();
-  const token = query.get('token'); 
-  if (token)
-  {
-	login(token)
-	console.log("j'enregistre le token")
-  }
 
   useEffect(() => {
 	console.log("le user id")

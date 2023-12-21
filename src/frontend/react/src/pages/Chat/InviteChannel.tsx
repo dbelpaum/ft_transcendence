@@ -34,7 +34,7 @@ const InviteChannel: React.FC<ChannelInviteProps> = ({ channelUtility, channelUr
 	const handleInvite = (e: React.FormEvent) => {
 		e.preventDefault();
 		// Logique pour envoyer l'invitation ici
-		if (!channelUtility || !channelUtility.me)
+		if (!channelUtility || !channelUtility.me || !channelUtility.socket)
 			return
 		const inviteToChannel : InviteToChannel = 
 		{

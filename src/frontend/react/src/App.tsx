@@ -22,9 +22,9 @@ function App() {
 	return (
 		<ErrorMessageProvider>
 			<ReactNotifications />
-			<AuthProvider>
 			
 			<Router>
+				<AuthProvider>
 
 					<div>
 						<NavBar />
@@ -37,8 +37,9 @@ function App() {
 							<Route path='/users/:pseudo' element={<ProtectedChat><UserProfile /></ProtectedChat>} />
 						</Routes>
 					</div>
-				</Router>
-			</AuthProvider >
+				</AuthProvider >
+			</Router>
+			
 		</ErrorMessageProvider>
 	);
 }

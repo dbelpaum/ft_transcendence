@@ -1,5 +1,5 @@
 // auth.controller.ts
-import { Controller, Get, Req, Res, Session, UseGuards, Query } from '@nestjs/common';
+import { Controller, Get, Req, Res, UseGuards, Query } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { Request, Response } from 'express';
 import { PrismaService } from '../prisma.service';
@@ -20,7 +20,7 @@ export class AuthentificationController {
 
   @Get('42/callback')
   @UseGuards(AuthGuard('42'))
-  async callback42(@Req() req, @Res() res: Response, @Session() session: Record<string, any>) {
+  async callback42(@Req() req, @Res() res: Response) {
     // Gérer le callback après l'authentification
     // En fait on est la quand la personne a reussis a etre identifié
 
@@ -40,34 +40,40 @@ export class AuthentificationController {
       // Ici j'ai enregistrer dans la session les infos que j'ai reçu
       // Tu peux aussi enregistrer celles qui t'interessent dans la bdd avec prisma, en une ligne ou 2
     //   session.user = { id: userData.id, login: userData.login, email: userData.email, imageUrl: userData.image.link, firstname: userData.first_name, lastname: userData.last_name};
-      const checkUserid = await this.prisma.user.findUnique({
+      const findUser = await this.prisma.user.findUnique({
         where: {
           id42: userData.id,
         },
       });
 
-      if (checkUserid == null){
-		var newUser = {
-			id42: userData.id,
-            pseudo: userData.login,
-            email: userData.email,
-            firstname: userData.first_name,
-            lastname: userData.last_name,
-            imageURL: userData.image.link,
-		}
-        newUser = await this.prisma.user.create({
-          data: newUser,
-        });
-		session.user = newUser
-        console.log("L'utilisateur n'existe pas dans la bdd");
+		var dataToken;
+      	if (!findUser){
+			const newUser = {
+				id42: userData.id,
+				pseudo: userData.login,
+				email: userData.email,
+				firstname: userData.first_name,
+				lastname: userData.last_name,
+				imageURL: userData.image.link,
+			}
+			const UserBdd = await this.prisma.user.create({
+			data: newUser,
+			});
+			dataToken = {
+				id: UserBdd.id,
+				id42: UserBdd.id42
+			}
+			console.log("L'utilisateur n'existe pas dans la bdd");
         
       }
       else{
-		session.user = checkUserid
+			dataToken = {
+				id: findUser.id,
+				id42: findUser.id42
+			}
         console.log("L'utilisateur existe deja dans la bdd");
       }
-	  const payload = { username: userData.login, sub: userData.id };
-	  const token = this.jwtService.sign(payload);
+	  const token = this.jwtService.sign(dataToken);
       res.redirect(`http://localhost:3000/profil?token=${token}`);
   }
 
@@ -78,25 +84,22 @@ export class AuthentificationController {
     // Le front pourra toujours faire un appel en appel a cet url pour avoir les infos
   @Get('42/profil')
   @UseGuards(AuthGuard('jwt'))
-  async profilSession42(@Req() req, @Session() session: Record<string, any>) {
+  async profilSession42(@Req() req, ) {
     // Gérer le callback après l'authentification
-    if (session.user)
+    if (req.user)
     {
       console.log("Il y a un utilisateur connecté")
 	  const userBdd = await this.prisma.user.findUnique({
         where: {
-          id42: session.user.id42,
+          id42: req.user.id42,
         },
       });
 	  if (userBdd)
-	  {
-		session.user = userBdd
-	  }
-	  return session.user
+		return userBdd
     }
     else
     {
-      console.log("Aucun utilisateur connecté")
+      console.log("Utilisateur non trouvé en bdd")
       return {undefined}
     }
 }

@@ -17,17 +17,21 @@ interface ChannelsItemsProps {
 const ChannelItem: React.FC<ChannelsItemsProps> = ({ channelUtility, channel }) => {
 
 	const navigate = useNavigate();
-
+	
 	const handleChannelClick = () => {
-	  navigate(`/chat?channel=${channel.name}`);
+		navigate(`/chat?channel=${channel.name}`);
 	};
-
+	
 	const handleSubmitLeaveChannel = () => {
-		const savedChannels: ChannelCreate[] = JSON.parse(sessionStorage.getItem('channels') || '[]');
-		const updatedChannels = savedChannels.filter(the_channel => the_channel.name !== channel.name);
-		sessionStorage.setItem('channels', JSON.stringify(updatedChannels));
-		channelUtility.socket.disconnect()
-		channelUtility.socket.connect()
+		if (channelUtility.socket)
+		{
+			const savedChannels: ChannelCreate[] = JSON.parse(sessionStorage.getItem('channels') || '[]');
+			const updatedChannels = savedChannels.filter(the_channel => the_channel.name !== channel.name);
+			sessionStorage.setItem('channels', JSON.stringify(updatedChannels));
+			channelUtility.socket.disconnect()
+			channelUtility.socket.connect()
+
+		}
 	}
 
 

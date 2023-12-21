@@ -146,7 +146,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 var __param = (this && this.__param) || function (paramIndex, decorator) {
     return function (target, key) { decorator(target, key, paramIndex); }
 };
-var _a, _b, _c, _d, _e;
+var _a, _b, _c;
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.AuthentificationController = void 0;
 const common_1 = __webpack_require__(/*! @nestjs/common */ "@nestjs/common");
@@ -161,7 +161,7 @@ let AuthentificationController = class AuthentificationController {
     }
     async login42(req) {
     }
-    async callback42(req, res, session) {
+    async callback42(req, res) {
         const apiResponse = await fetch('https://api.intra.42.fr/v2/me', {
             method: 'GET',
             headers: {
@@ -170,13 +170,14 @@ let AuthentificationController = class AuthentificationController {
             }
         });
         const userData = await apiResponse.json();
-        const checkUserid = await this.prisma.user.findUnique({
+        const findUser = await this.prisma.user.findUnique({
             where: {
                 id42: userData.id,
             },
         });
-        if (checkUserid == null) {
-            var newUser = {
+        var dataToken;
+        if (!findUser) {
+            const newUser = {
                 id42: userData.id,
                 pseudo: userData.login,
                 email: userData.email,
@@ -184,35 +185,38 @@ let AuthentificationController = class AuthentificationController {
                 lastname: userData.last_name,
                 imageURL: userData.image.link,
             };
-            newUser = await this.prisma.user.create({
+            const UserBdd = await this.prisma.user.create({
                 data: newUser,
             });
-            session.user = newUser;
+            dataToken = {
+                id: UserBdd.id,
+                id42: UserBdd.id42
+            };
             console.log("L'utilisateur n'existe pas dans la bdd");
         }
         else {
-            session.user = checkUserid;
+            dataToken = {
+                id: findUser.id,
+                id42: findUser.id42
+            };
             console.log("L'utilisateur existe deja dans la bdd");
         }
-        const payload = { username: userData.login, sub: userData.id };
-        const token = this.jwtService.sign(payload);
+        const token = this.jwtService.sign(dataToken);
         res.redirect(`http://localhost:3000/profil?token=${token}`);
     }
-    async profilSession42(req, session) {
-        if (session.user) {
+    async profilSession42(req) {
+        if (req.user) {
             console.log("Il y a un utilisateur connecté");
             const userBdd = await this.prisma.user.findUnique({
                 where: {
-                    id42: session.user.id42,
+                    id42: req.user.id42,
                 },
             });
-            if (userBdd) {
-                session.user = userBdd;
-            }
-            return session.user;
+            if (userBdd)
+                return userBdd;
         }
         else {
-            console.log("Aucun utilisateur connecté");
+            console.log("Utilisateur non trouvé en bdd");
             return { undefined };
         }
     }
@@ -231,18 +235,16 @@ __decorate([
     (0, common_1.UseGuards)((0, passport_1.AuthGuard)('42')),
     __param(0, (0, common_1.Req)()),
     __param(1, (0, common_1.Res)()),
-    __param(2, (0, common_1.Session)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Object, typeof (_c = typeof express_1.Response !== "undefined" && express_1.Response) === "function" ? _c : Object, typeof (_d = typeof Record !== "undefined" && Record) === "function" ? _d : Object]),
+    __metadata("design:paramtypes", [Object, typeof (_c = typeof express_1.Response !== "undefined" && express_1.Response) === "function" ? _c : Object]),
     __metadata("design:returntype", Promise)
 ], AuthentificationController.prototype, "callback42", null);
 __decorate([
     (0, common_1.Get)('42/profil'),
     (0, common_1.UseGuards)((0, passport_1.AuthGuard)('jwt')),
     __param(0, (0, common_1.Req)()),
-    __param(1, (0, common_1.Session)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Object, typeof (_e = typeof Record !== "undefined" && Record) === "function" ? _e : Object]),
+    __metadata("design:paramtypes", [Object]),
     __metadata("design:returntype", Promise)
 ], AuthentificationController.prototype, "profilSession42", null);
 exports.AuthentificationController = AuthentificationController = __decorate([
@@ -371,7 +373,10 @@ let JwtStrategy = class JwtStrategy extends (0, passport_1.PassportStrategy)(pas
         });
     }
     async validate(payload) {
-        return { userId: payload.sub, username: payload.username };
+        return {
+            id: payload.id,
+            id42: payload.id42
+        };
     }
 };
 exports.JwtStrategy = JwtStrategy;
@@ -729,6 +734,7 @@ const common_1 = __webpack_require__(/*! @nestjs/common */ "@nestjs/common");
 const chat_interface_1 = __webpack_require__(/*! ./chat.interface */ "./src/chat/chat.interface.ts");
 const socket_io_1 = __webpack_require__(/*! socket.io */ "socket.io");
 const channel_service_1 = __webpack_require__(/*! src/channel/channel.service */ "./src/channel/channel.service.ts");
+const jwt = __webpack_require__(/*! jsonwebtoken */ "jsonwebtoken");
 let ChatGateway = class ChatGateway {
     constructor(channelService) {
         this.channelService = channelService;
@@ -812,8 +818,17 @@ let ChatGateway = class ChatGateway {
             });
         }
     }
-    async handleConnection(socket) {
-        this.logger.log(`Socket connected: ${socket.id}`);
+    async handleConnection(client) {
+        try {
+            const token = client.handshake.auth.token;
+            const payload = jwt.verify(token, 'votre_secret_jwt');
+            console.log(payload);
+        }
+        catch (e) {
+            console.log("je suis sans coeur, je te deco ");
+            client.disconnect();
+        }
+        this.logger.log(`Socket connected: ${client.id}`);
     }
     async handleDisconnect(socket) {
         await this.channelService.removeUserFromAllChannels(socket.id);
@@ -2066,6 +2081,16 @@ module.exports = require("express");
 /***/ ((module) => {
 
 module.exports = require("express-session");
+
+/***/ }),
+
+/***/ "jsonwebtoken":
+/*!*******************************!*\
+  !*** external "jsonwebtoken" ***!
+  \*******************************/
+/***/ ((module) => {
+
+module.exports = require("jsonwebtoken");
 
 /***/ }),
 

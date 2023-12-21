@@ -22,13 +22,14 @@ export const ProtectedChat: React.FC<ProtectedChatProps> = ({ children }) => {
 				message: 'Vous devez être connecté pour accéder à cette page.',
 				type: 'error'
 			});
+			console.log(user)
 		}
 	}, [user, isLoading, setErrorMessage]);
 	
 	if (isLoading) {
 		return <div>Chargement...</div>;
 	}
-
+	
 	if (!user) {
 		return <Navigate to="/" />;
 	}

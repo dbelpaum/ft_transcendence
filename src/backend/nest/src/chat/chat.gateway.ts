@@ -14,7 +14,7 @@ import {
 } from './chat.interface';
 import { Server, Socket } from 'socket.io';
 import { ChannelService } from 'src/channel/channel.service';
-
+import * as jwt from 'jsonwebtoken';
 
 @WebSocketGateway({
   cors: {
@@ -179,8 +179,19 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   }
 
 
-  async handleConnection(socket: Socket): Promise<void> {
-    this.logger.log(`Socket connected: ${socket.id}`)
+  async handleConnection(client: Socket): Promise<void> {
+	  try {
+		  const token = client.handshake.auth.token;
+		  // Validez le token ici
+		  const payload = jwt.verify(token, 'votre_secret_jwt');
+		  console.log(payload)
+		  
+		  // Si la vérification échoue, une exception sera lancée
+		} catch (e) {
+		  console.log("je suis sans coeur, je te deco ")
+		client.disconnect(); // Déconnectez le client en cas d'échec de la vérification
+	  }
+    this.logger.log(`Socket connected: ${client.id}`)
   }
 
   async handleDisconnect(socket: Socket): Promise<void> {
