@@ -47,7 +47,7 @@ const UserInfo: React.FC<userInfoProps> = ({ channelUtility, userAndAdmin, chann
     };
 
 	const handleAdminClick = () => {
-		if (channelUrl && channelUtility && channelUtility.me)
+		if (channelUrl && channelUtility && channelUtility.me && channelUtility.socket)
 		{
 			const adminInfo : addAdminInfo =
 			{
@@ -63,7 +63,7 @@ const UserInfo: React.FC<userInfoProps> = ({ channelUtility, userAndAdmin, chann
 	}
 
 	const handleRemoveAdminClick = () => {
-		if (channelUrl && channelUtility && channelUtility.me)
+		if (channelUrl && channelUtility && channelUtility.me && channelUtility.socket)
 		{
 			const adminInfo : addAdminInfo =
 			{
@@ -79,7 +79,7 @@ const UserInfo: React.FC<userInfoProps> = ({ channelUtility, userAndAdmin, chann
 	}
 
 	const handleKickClick = () => {
-		if (channelUrl && channelUtility && channelUtility.me)
+		if (channelUrl && channelUtility && channelUtility.me && channelUtility.socket)
 		{
 			const kickInfo : addAdminInfo =
 			{
@@ -95,7 +95,7 @@ const UserInfo: React.FC<userInfoProps> = ({ channelUtility, userAndAdmin, chann
 	}
 
 	const handleBanClick = () => {
-		if (channelUrl && channelUtility && channelUtility.me)
+		if (channelUrl && channelUtility && channelUtility.me && channelUtility.socket)
 		{
 			const banInfo : addAdminInfo =
 			{
@@ -111,7 +111,7 @@ const UserInfo: React.FC<userInfoProps> = ({ channelUtility, userAndAdmin, chann
 	}
 
 	const handleMuteClick = () => {
-		if (channelUrl && channelUtility && channelUtility.me)
+		if (channelUrl && channelUtility && channelUtility.me && channelUtility.socket)
 		{
 			const muteInfo : addAdminInfo =
 			{

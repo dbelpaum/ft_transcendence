@@ -46,12 +46,11 @@ export interface Message {
   
 export interface ChannelUtility {
 	me: User|null;
-	socket: Socket<ServerToClientEvents, ClientToServerEvents>;
+	socket: Socket<ServerToClientEvents, ClientToServerEvents> | null;
 	channels: Channel[];
 	setChannels: Dispatch<SetStateAction<Channel[]>>;
 	message: Message[],
 	setMessages: Dispatch<SetStateAction<Message[]>>;
-
 	recharger: () => void,
 	forceReload: number
   }

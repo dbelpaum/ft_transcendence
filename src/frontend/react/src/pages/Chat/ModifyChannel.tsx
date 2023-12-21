@@ -43,7 +43,7 @@ const ModifyChannel: React.FC<ModifyChannelProps> = ({ channelUtility, channelUr
 	const handleModifyChannel = (e: React.FormEvent) => {
 		e.preventDefault();
 		// Logique pour envoyer l'invitation ici
-		if (!channelUtility || !channelUtility.me)
+		if (!channelUtility || !channelUtility.me || !channelUtility.socket)
 			return
 		const modifiedChannel : ChannelCreate = {
 			name: currentChannel.name,

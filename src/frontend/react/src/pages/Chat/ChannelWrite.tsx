@@ -41,7 +41,7 @@ const ChannelWrite: React.FC<ChannelWriteProps> = ({ channelUtility }) => {
 		e.preventDefault();
 		channelInfo = channelUtility.channels.find(c => c.name === channelUrl);
 
-		if (channelUrl && channelUtility.me && channelInfo)
+		if (channelUrl && channelUtility.me && channelInfo && channelUtility.socket)
 		{
 
 			const channelJoin : ChannelCreate = {

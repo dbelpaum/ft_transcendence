@@ -25,7 +25,7 @@ const CreateChannel: React.FC<CreateChannelsProps> = ({ channelUtility }) => {
 	  const handleSubmitCreateChannel = (event: FormEvent<HTMLFormElement>) => {
 		  event.preventDefault();
 		  // Ici, vous pouvez ajouter la logique pour créer le channel
-		if (channelName.trim() !== '' && channelUtility.me ) 
+		if (channelName.trim() !== '' && channelUtility.me && channelUtility.socket) 
 		{
 			const newChannel : ChannelCreate = {
 				name: channelName,
@@ -59,9 +59,10 @@ const CreateChannel: React.FC<CreateChannelsProps> = ({ channelUtility }) => {
 
 	  useEffect(() => {
 		const fetchChannels = async () => {
+			if (!channelUtility.socket) return
 			if (channelUtility.me)
 			{
-
+				
 				try {
 					const response = await fetch('http://localhost:4000/channel/all/' + channelUtility.me.pseudo); // URL de votre API
 					if (!response.ok) {
@@ -69,6 +70,8 @@ const CreateChannel: React.FC<CreateChannelsProps> = ({ channelUtility }) => {
 					}
 					const data : Channel[]= await response.json();
 					channelUtility.setChannels(data); // Mise à jour de l'état avec les données de l'API
+					console.log("salut" + channelUtility.me.pseudo)
+					console.log(data)
 
 					if (channelUrl)
 					{

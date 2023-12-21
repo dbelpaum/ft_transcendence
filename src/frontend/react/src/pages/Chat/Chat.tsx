@@ -19,9 +19,6 @@ import ChannelWrite from './ChannelWrite';
 import ChannelInfo from './ChannelInfo';
 
 
-const socket: Socket<ServerToClientEvents, ClientToServerEvents> = io("http://localhost:4000", { autoConnect: false });
-
-
 /*
   Ce que je veux d'abord c'est que lorsque j'ajoute un channel
   Le channel apparaisse
@@ -33,10 +30,8 @@ const socket: Socket<ServerToClientEvents, ClientToServerEvents> = io("http://lo
 */
 
 function Chat(){
-	const [messages, setMessages] = useState<Message[]>([]);
 	const [inputValue, setInputValue] = useState<string>('');
-	const { user, setUser } = useAuth(); 
-	const [isConnected, setIsConnected] = useState(socket.connected);
+	const { user, setUser, chatSocket, messages, setMessages } = useAuth(); 
 	
 	const [channels, setChannels] = useState<Channel[]>([]);
 	const [forceReload, setForceReload] = useState<number>(0);
@@ -45,52 +40,11 @@ function Chat(){
 	const recharger = (): void => {
 		setForceReload(prev => prev + 1);
 	};
-	useEffect(() => {
-	
-		if (user)
-		{
-			socket.connect();
 
-			socket.on('connect', () => {
-				setIsConnected(true);
-				const updatedUser = { ...user, socketId: socket.id };
-				setUser(updatedUser); 
-				const savedChannels: ChannelCreate[] = JSON.parse(sessionStorage.getItem('channels') || '[]');
-				const updatedChannels = savedChannels.map(channel => {
-					return {
-						...channel, 
-						user: updatedUser
-					};
-				});
-				if (updatedChannels && updatedUser)
-				{
-					updatedChannels.forEach((channel) => {
-						socket.emit('join_channel', channel);
-					});
-				}
-
-			});
-		
-		}
-			socket.on('disconnect', () => {
-				setIsConnected(false);
-			});
-		
-			socket.on('chat', (e) => {
-				setMessages((messages) => [...messages, e]);
-				
-			});
-		
-			return () => {
-				socket.off('connect');
-				socket.off('disconnect');
-				socket.off('chat');
-			};
-	}, [user]);
 
 	const channelUtility: ChannelUtility = {
 		me: user,
-		socket: socket,
+		socket: chatSocket,
 		channels: channels,
 		setChannels: setChannels,
 		message: messages,
@@ -109,7 +63,7 @@ function Chat(){
 
 			</div>
 			<div className='chat'>
-				<ChatContainer username={user?.pseudo} messages={messages} setMessages={setMessages} socket={socket}/>
+				<ChatContainer username={user?.pseudo} messages={messages} setMessages={setMessages} socket={chatSocket}/>
 			</div>
 	  </div>
 	  )}
