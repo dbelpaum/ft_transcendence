@@ -89,13 +89,13 @@ const CreateChannel: React.FC<CreateChannelsProps> = ({ channelUtility }) => {
 		// Démarrer avec un délai initial
 		const timeoutId = setTimeout(() => {
 		  fetchChannels(); // Premier appel
-		  const intervalId = setInterval(fetchChannels, 20000); // Intervalle de 3 secondes
+		  const intervalId = setInterval(fetchChannels, 10000); // Intervalle de 3 secondes
 	  
 		  // Nettoyer l'intervalle lors du démontage du composant
 		  return () => {
 			clearInterval(intervalId);
 		  };
-		}, 300); // Délai initial de 2 secondes
+		}, 1000); // Délai initial de 2 secondes
 	  
 		// Nettoyer le timeout lors du démontage du composant
 		return () => {

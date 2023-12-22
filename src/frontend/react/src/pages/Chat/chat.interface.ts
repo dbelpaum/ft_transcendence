@@ -72,6 +72,6 @@ export interface InviteToChannel
 export interface addAdminInfo
 {
 	channel: string
-	new_name: string
+	user_to_modify: User
 	user: User
 }

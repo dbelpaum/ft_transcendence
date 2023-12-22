@@ -16,16 +16,17 @@ import { Server, Socket } from 'socket.io';
 import { ChannelService } from 'src/channel/channel.service';
 import * as jwt from 'jsonwebtoken';
 
-@WebSocketGateway({
-  cors: {
-    origin: '*',
-  },
-})
 declare module 'socket.io' {
 	export interface Socket {
 	  user: any; // Définissez le type approprié pour 'user'
 	}
   }
+
+@WebSocketGateway({
+  cors: {
+    origin: '*',
+  },
+})
 
 export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	constructor(private channelService: ChannelService) {}
@@ -60,12 +61,13 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
 	//this.server.to(payload.name).emit('chat', payload)
 
-	await this.channelService.kick(payload)
+	if (!await this.channelService.kick(payload)) return
+	await this.server.in(payload.user.socketId).socketsLeave(payload.user_to_modify.pseudo);
 	this.server.to(payload.channel).emit('chat', 
 	{
 		user: payload.user,
 		timeSent: null,
-		message: `${payload.new_name} was kicked from ${payload.channel} by ${payload.user.pseudo}`,
+		message: `${payload.user_to_modify.pseudo} was kicked from ${payload.channel} by ${payload.user.pseudo}`,
 		channelName: payload.channel,
 	}) 
   }
@@ -81,12 +83,13 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
 	//this.server.to(payload.name).emit('chat', payload)
 
-	await this.channelService.ban(payload)
+	if (!await this.channelService.ban(payload)) return
+	await this.server.in(payload.user.socketId).socketsLeave(payload.user_to_modify.pseudo);
 	this.server.to(payload.channel).emit('chat', 
 	{
 		user: payload.user,
 		timeSent: null,
-		message: `${payload.new_name} was ban from ${payload.channel}  by ${payload.user.pseudo}`,
+		message: `${payload.user_to_modify.pseudo} was ban from ${payload.channel}  by ${payload.user.pseudo}`,
 		channelName: payload.channel,
 	}) 
   }
@@ -102,12 +105,12 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
 	//this.server.to(payload.name).emit('chat', payload)
 
-	await this.channelService.mute(payload)
+	if (!await this.channelService.mute(payload)) return
 	this.server.to(payload.channel).emit('chat', 
 	{
 		user: payload.user,
 		timeSent: null,
-		message: `${payload.new_name} was mute from ${payload.channel}  by ${payload.user.pseudo} for 2 minutes`,
+		message: `${payload.user_to_modify.pseudo} was mute from ${payload.channel}  by ${payload.user.pseudo} for 2 minutes`,
 		channelName: payload.channel,
 	}) 
   }
@@ -161,11 +164,12 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	if (client.user.id !== payload.user.id ) return ; // Securité
 	if (payload.user.socketId) {
 	this.logger.log(`${payload.user.socketId} is joining ${payload.name}`)
-	await this.server.in(payload.user.socketId).socketsJoin(payload.name)
+	
 
 	const response =  await this.channelService.addUserToChannel(payload)
 	if (response.errorNumber === 0)
 	{
+		await this.server.in(payload.user.socketId).socketsJoin(payload.name)
 		this.server.to(payload.name).emit('chat', 
 		{
 			user: payload.user,
