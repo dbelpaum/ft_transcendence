@@ -11,10 +11,10 @@ export class FriendshipController {
         return friendships;
     }
 
-    @Get(':requesterId/relation/:addresseeId')
+    @Get(':requesterId42/relation/:addresseeId42')
     async getFriendship(
-        @Param('requesterId') requesterId: string,
-        @Param('addresseeId') addresseeId: string
+        @Param('requesterId42') requesterId: string,
+        @Param('addresseeId42') addresseeId: string
     ) {
         const friendship = await this.prisma.friendship.findFirst({
             where: {
@@ -29,11 +29,14 @@ export class FriendshipController {
     }
 
 
-    @Post(':requesterId/add-friend/:addresseeId')
+    @Post(':requesterId42/add-friend/:addresseeId42')
     async addFriend(
-        @Param('requesterId') requesterId: string,
-        @Param('addresseeId') addresseeId: string
+        @Param('requesterId42') requesterId: string,
+        @Param('addresseeId42') addresseeId: string
     ) {
+
+        console.log("requesterId : " + requesterId);
+        console.log("addresseeId : " + addresseeId);
         if (requesterId === addresseeId) {
             throw new Error('You cannot add yourself as a friend');
         }
@@ -75,7 +78,7 @@ export class FriendshipController {
             },
         });
 
-        return friendship;
+        return !!friendship;
     }
 
     @Post(':requesterId/accept-friend/:addresseeId')

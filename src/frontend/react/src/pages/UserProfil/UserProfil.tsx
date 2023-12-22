@@ -24,6 +24,7 @@ interface UserProfileProps {
 const UserProfile: React.FC = () => {
     const [userInfo, setUserInfo] = useState<UserInfo | null>(null);
     const [isFriend, setIsFriend] = useState<boolean | null>(null);
+    const [buttonStatus, setButtonStatus] = useState<"addFriend" | "removeFriend" | "block" | "cancelRequest">('addFriend');
     const { user } = useAuth();
     const { pseudo } = useParams<{ pseudo: string }>();
 
@@ -33,8 +34,7 @@ const UserProfile: React.FC = () => {
             return;
         }
 
-        // console.log(`Le pseudo de l'utilisateur cible est: ${pseudo}`);
-        // console.log(`L'utilisateur connecté est: ${user?.pseudo}`)
+        
 
         
         fetch(`http://localhost:4000/user/by-pseudo/${pseudo}`)
@@ -63,8 +63,31 @@ useEffect(() => {
     console.log(isFriend)
 
 
+    console.log(`L'utilisateur a ajouter est: ${userInfo?.pseudo}`);
+    console.log(`L'utilisateur connecté est: ${user?.pseudo}`)
+
     if (!userInfo) {
         return <div>Chargement...</div>;
+    }
+
+    const handleAddFriendClick = () => {
+        // Envoyer la requête d'ami
+        fetch(`http://localhost:4000/friendship/${user?.id42}/add-friend/${userInfo?.id42}`, {
+            method: 'POST',
+            // Ajoutez les informations nécessaires ici
+        })
+        .then(response => {
+            if (response.ok) {
+                setButtonStatus('cancelRequest');
+            } else {
+                throw new Error('Échec de la demande d\'ami');
+            }
+        })
+        .catch(error => {
+            console.error(error);
+            setButtonStatus('addFriend');
+        });
+
     }
 
     return (
@@ -84,15 +107,15 @@ useEffect(() => {
           {isFriend ===false && (
             <FriendshipButton
                 status="addFriend"
-                onButtonClick={() =>console.log("click")}
+                onButtonClick={buttonStatus === 'addFriend' ? handleAddFriendClick : () => console.log('Probleme avec la requete d\'ami')}
                 color="green"
             />
           )}
             {isFriend ===true && (
                 <FriendshipButton
-                    status="removeFriend"
-                    onButtonClick={() =>console.log("click")}
-                    color="red"
+                    status={buttonStatus}
+                    onButtonClick={buttonStatus === 'addFriend' ? handleAddFriendClick : () => console.log('Probleme avec la requete d\'ami')}
+                    color={buttonStatus === 'addFriend' ? 'green' : 'grey'}
                 />
             )}
           </div>
