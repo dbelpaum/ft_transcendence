@@ -40,6 +40,7 @@ a{
 	width: 50%;
 	background-color: white;
 	padding: 20px;
+	overflow-y: scroll;
   }
 
   .channel_item{
@@ -481,4 +482,19 @@ a{
 {
 	transform: scale(1.1);
 
+}
+
+.user-profile-container .channel_status
+{
+	position: relative;
+	left: 5px;
+	top: -3px;
+}
+
+.user-profile-container .channel_status .status_indicator{
+	background-color: #c22929;
+}
+
+.user-profile-container .channel_status .status_indicator.connected{
+	background-color: green;
 }

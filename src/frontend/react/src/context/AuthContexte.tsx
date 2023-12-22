@@ -99,7 +99,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
 
   const logout = () => {
-	sessionStorage.removeItem('token');
+	if (chatSocket)	chatSocket.disconnect()
+	sessionStorage.clear()
 	setAuthToken(null);
 	setUser(null)
 };

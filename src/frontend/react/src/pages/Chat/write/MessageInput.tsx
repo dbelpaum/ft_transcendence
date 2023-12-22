@@ -1,4 +1,4 @@
-import React, { useState, ChangeEvent, FormEvent, Dispatch, SetStateAction } from 'react';
+import React, { useState, ChangeEvent, FormEvent, Dispatch, SetStateAction, useRef, useEffect } from 'react';
 import {
 	Message,
 	ServerToClientEvents,
@@ -22,6 +22,10 @@ const MessageInput: React.FC<MessageInputProps> = ({ setMessages, messages, sock
   const [showErrorMessage, setShowErrorMessage] = useState<boolean>(false);
   const [showChat, setShowChat] = useState<boolean>(false);
   const { user, setUser } = useAuth(); 
+
+
+
+
 
   const useQuery = () => {
 	return new URLSearchParams(useLocation().search);
@@ -49,12 +53,17 @@ const MessageInput: React.FC<MessageInputProps> = ({ setMessages, messages, sock
 	  // Si l'input est vide, on affiche un message d'erreur
 	  setShowErrorMessage(true);
 	}
+	window.dispatchEvent(new CustomEvent('scrollToBottom'));
+
+	
 }
 };
 
   const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
     setInputValue(e.target.value);
   };
+
+
 
 
 

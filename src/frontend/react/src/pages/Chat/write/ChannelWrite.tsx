@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
 	ChannelUtility
   } from '../chat.interface';
@@ -15,6 +15,7 @@ interface ChannelWriteProps {
 const ChannelWrite: React.FC<ChannelWriteProps> = ({ channelUtility }) => {
 
 	const [password, setPassword] = useState('');
+	const bottomRef = useRef<HTMLDivElement>(null);
 
 	const useQuery = () => {
 		return new URLSearchParams(useLocation().search);
@@ -22,7 +23,25 @@ const ChannelWrite: React.FC<ChannelWriteProps> = ({ channelUtility }) => {
 	const query = useQuery();
 	const channelUrl = query.get('channel'); 
 
-	
+	useEffect(() => {
+		const handleScrollToBottom = () => {
+			setTimeout(() => {
+				if (bottomRef && bottomRef.current)
+				{
+					bottomRef.current.scrollTop = bottomRef.current.scrollHeight;
+					//bottomRef.current.scrollIntoView({ behavior: 'smooth' });
+				}
+			  }, 1000);
+		};
+	  
+		// Ajouter l'écouteur d'événements
+		window.addEventListener('scrollToBottom', handleScrollToBottom);
+	  
+		// Nettoyage
+		return () => {
+		  window.removeEventListener('scrollToBottom', handleScrollToBottom);
+		};
+	  }, []);
 
 	// Fonction pour vérifier si l'utilisateur est dans le channel
 	const isUserInChannel = channelUtility.channels.some(channel => 
@@ -67,8 +86,11 @@ const ChannelWrite: React.FC<ChannelWriteProps> = ({ channelUtility }) => {
 		)
 	}
 
+
+	  
+
 	return (
-		<div className='write-chat'>
+		<div className='write-chat' ref={bottomRef}>
 			<h2>{channelUrl}</h2>
 			<div className='chat-box'>
 			{isUserInChannel ? (

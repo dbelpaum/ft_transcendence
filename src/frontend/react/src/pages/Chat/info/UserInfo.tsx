@@ -52,7 +52,7 @@ const UserInfo: React.FC<userInfoProps> = ({ channelUtility, userAndAdmin, chann
 			const adminInfo : addAdminInfo =
 			{
 				channel: channelUrl,
-				new_name: userAndAdmin.user.pseudo,
+				user_to_modify: userAndAdmin.user,
 				user: channelUtility.me,
 			}
 			channelUtility.socket.emit('add_admin', adminInfo);
@@ -68,7 +68,7 @@ const UserInfo: React.FC<userInfoProps> = ({ channelUtility, userAndAdmin, chann
 			const adminInfo : addAdminInfo =
 			{
 				channel: channelUrl,
-				new_name: userAndAdmin.user.pseudo,
+				user_to_modify: userAndAdmin.user,
 				user: channelUtility.me,
 			}
 			channelUtility.socket.emit('remove_admin', adminInfo);
@@ -84,7 +84,7 @@ const UserInfo: React.FC<userInfoProps> = ({ channelUtility, userAndAdmin, chann
 			const kickInfo : addAdminInfo =
 			{
 				channel: channelUrl,
-				new_name: userAndAdmin.user.pseudo,
+				user_to_modify: userAndAdmin.user,
 				user: channelUtility.me,
 			}
 			channelUtility.socket.emit('kick', kickInfo);
@@ -100,7 +100,7 @@ const UserInfo: React.FC<userInfoProps> = ({ channelUtility, userAndAdmin, chann
 			const banInfo : addAdminInfo =
 			{
 				channel: channelUrl,
-				new_name: userAndAdmin.user.pseudo,
+				user_to_modify: userAndAdmin.user,
 				user: channelUtility.me,
 			}
 			channelUtility.socket.emit('ban', banInfo);
@@ -116,7 +116,7 @@ const UserInfo: React.FC<userInfoProps> = ({ channelUtility, userAndAdmin, chann
 			const muteInfo : addAdminInfo =
 			{
 				channel: channelUrl,
-				new_name: userAndAdmin.user.pseudo,
+				user_to_modify: userAndAdmin.user,
 				user: channelUtility.me,
 			}
 			channelUtility.socket.emit('mute', muteInfo);
@@ -141,7 +141,10 @@ const UserInfo: React.FC<userInfoProps> = ({ channelUtility, userAndAdmin, chann
 				</span>
 			</a>
 			<div className="container_button">
-			{(iAmAdmin && (channelUtility.me.pseudo !== userAndAdmin.user.pseudo)) && (
+			{(iAmAdmin 
+				&& (channelUtility.me.pseudo !== userAndAdmin.user.pseudo)) 
+				&& (!userAndAdmin.isOwner) 
+				&& (
 				<button className="action-button" onClick={toggleModal}>Actions</button>
 			)}
 				{showModal && (
@@ -150,7 +153,7 @@ const UserInfo: React.FC<userInfoProps> = ({ channelUtility, userAndAdmin, chann
 						<span onClick={handleBanClick}>Ban</span>
 						<span onClick={handleMuteClick}>Mute</span>
 						{
-							!userAndAdmin.isAdmin ? 
+							(!userAndAdmin.isAdmin) ? 
 							(<span onClick={handleAdminClick}>Make Admin</span>) : 
 							(<span onClick={handleRemoveAdminClick}>Remove Admin</span>)
 						}

@@ -1,7 +1,7 @@
 import React, { useState, useEffect, ChangeEvent, FormEvent  } from 'react';
 import { Channel, ChannelCreate, ChannelUtility } from '../chat.interface';
 import { useLocation } from 'react-router-dom';
-
+import { useAuth } from '../../../context/AuthContexte';
 
 interface CreateChannelsProps {
 	channelUtility: ChannelUtility;
@@ -12,6 +12,7 @@ const CreateChannel: React.FC<CreateChannelsProps> = ({ channelUtility }) => {
 	const [channelName, setChannelName] = useState<string>('');
 	const [channelType, setChannelType] = useState('public');
 	const [password, setPassword] = useState('');
+	const {authToken} = useAuth();
 	const useQuery = () => {
 		return new URLSearchParams(useLocation().search);
 	};
@@ -64,7 +65,12 @@ const CreateChannel: React.FC<CreateChannelsProps> = ({ channelUtility }) => {
 			{
 				
 				try {
-					const response = await fetch('http://localhost:4000/channel/all/' + channelUtility.me.pseudo); // URL de votre API
+					const response = await fetch('http://localhost:4000/channel/all/' + channelUtility.me.pseudo,
+					{headers: {
+						'Authorization': `Bearer ${authToken}`
+					  }
+					}
+					  ); // URL de votre API
 					if (!response.ok) {
 						throw new Error(`Erreur HTTP : ${response.status}`);
 					}
@@ -89,13 +95,13 @@ const CreateChannel: React.FC<CreateChannelsProps> = ({ channelUtility }) => {
 		// Démarrer avec un délai initial
 		const timeoutId = setTimeout(() => {
 		  fetchChannels(); // Premier appel
-		  const intervalId = setInterval(fetchChannels, 20000); // Intervalle de 3 secondes
+		  const intervalId = setInterval(fetchChannels, 10000); // Intervalle de 3 secondes
 	  
 		  // Nettoyer l'intervalle lors du démontage du composant
 		  return () => {
 			clearInterval(intervalId);
 		  };
-		}, 300); // Délai initial de 2 secondes
+		}, 1000); // Délai initial de 2 secondes
 	  
 		// Nettoyer le timeout lors du démontage du composant
 		return () => {
