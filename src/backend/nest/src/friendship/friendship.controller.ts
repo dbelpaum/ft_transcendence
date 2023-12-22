@@ -12,37 +12,28 @@ export class FriendshipController {
     }
 
 
-    @Get(':requesterId42/relation/:addresseeId42')
-    async getFriendship(
-        @Param('requesterId42') requesterId: string,
-        @Param('addresseeId42') addresseeId: string
+    @Get(':requesterId/relation/:addresseeId')
+    async getFriendshipStatus(
+        @Param('requesterId') requesterId: string,
+        @Param('addresseeId') addresseeId: string
     ) {
-
-        //verifier que les deux users existent
-        const requester = await this.prisma.user.findUnique({
-            where: { id42: Number(requesterId) },
-        });
-        if (!requester) {
-            throw new Error('Requester not found');
-        }
-        const addressee = await this.prisma.user.findUnique({
-            where: { id42: Number(requesterId) },
-        });
-        if (!addressee) {
-            throw new Error('Addressee not found');
-        }
-        
-
-        const friendship = await this.prisma.friendship.findFirst({
+        const status = await this.prisma.friendship.findUnique({
             where: {
-                OR: [
-                    { requesterId: Number(requesterId), addresseeId: Number(addresseeId) },
-                    { requesterId: Number(addresseeId), addresseeId: Number(requesterId) }
-                ],
+                requesterId_addresseeId: {
+                    requesterId: Number(requesterId),
+                    addresseeId: Number(addresseeId),
+                },
+            },
+            select: {
+                status: true,
             },
         });
 
-        return !!friendship;
+        if (!status) {
+            throw new Error('Friendship not found');
+        }
+
+        return status;
     }
 
 
@@ -60,7 +51,7 @@ export class FriendshipController {
 
         // On vérifie que le requester et l'addressee existent
         const requester = await this.prisma.user.findUnique({
-            where: { id42: Number(requesterId) },
+            where: { id: Number(requesterId) },
         });
 
         if (!requester) {
@@ -68,7 +59,7 @@ export class FriendshipController {
         }
 
         const addressee = await this.prisma.user.findUnique({
-            where: { id42: Number(addresseeId) },
+            where: { id: Number(addresseeId) },
         });
 
         if (!addressee) {
@@ -86,6 +77,9 @@ export class FriendshipController {
                 // status: { not: 'blocked' }, // On ne peut pas ajouter un ami si on est bloqué
             },
         });
+        if (existingFriendship) {
+            throw new Error('Users are already friends');
+        }
 
         const friendship = await this.prisma.friendship.create({
             data: {

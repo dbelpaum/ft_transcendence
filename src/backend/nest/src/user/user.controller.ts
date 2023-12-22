@@ -74,7 +74,7 @@ export class UserController {
             where: { id42: Number(id) },
             select: { imageURL: true },
         });
-        return user ? user.imageUrl : null;
+        return user ? user.imageURL : null;
     }
 
     /* -------------------------PATCH------------------------------ */

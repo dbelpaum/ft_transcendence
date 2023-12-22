@@ -6,6 +6,7 @@ import { Link } from "react-router-dom";
 import FriendshipButton from "../../components/FriendshipButton/FriendshipButton";
 
 interface UserInfo {
+    id: number;
     id42: number;
     pseudo: string;
     email: string;
@@ -72,7 +73,7 @@ useEffect(() => {
 
     const handleAddFriendClick = () => {
         // Envoyer la requête d'ami
-        fetch(`http://localhost:4000/friendship/${user?.id42}/add-friend/${userInfo?.id42}`, {
+        fetch(`http://localhost:4000/friendship/${user?.id}/add-friend/${userInfo?.id}`, {
             method: 'POST',
             credentials: 'include',
         })
@@ -111,6 +112,10 @@ useEffect(() => {
                 color="green"
             />
           )}
+
+            
+
+
             {isFriend ===true && (
                 <FriendshipButton
                     status={buttonStatus}
