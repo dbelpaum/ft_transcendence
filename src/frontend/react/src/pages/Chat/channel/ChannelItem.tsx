@@ -25,11 +25,18 @@ const ChannelItem: React.FC<ChannelsItemsProps> = ({ channelUtility, channel }) 
 	const handleSubmitLeaveChannel = () => {
 		if (channelUtility.socket)
 		{
-			const savedChannels: ChannelCreate[] = JSON.parse(sessionStorage.getItem('channels') || '[]');
-			const updatedChannels = savedChannels.filter(the_channel => the_channel.name !== channel.name);
-			sessionStorage.setItem('channels', JSON.stringify(updatedChannels));
-			channelUtility.socket.disconnect()
-			channelUtility.socket.connect()
+			try
+			{
+				const savedChannels: ChannelCreate[] = JSON.parse(sessionStorage.getItem('channels') || '[]');
+				const updatedChannels = savedChannels.filter(the_channel => the_channel.name !== channel.name);
+				sessionStorage.setItem('channels', JSON.stringify(updatedChannels));
+				channelUtility.socket.disconnect()
+				channelUtility.socket.connect()
+			}catch (error) {
+				console.error('Error parsing JSON from sessionStorage:', error);
+				console.error('Data that caused the error:', sessionStorage.getItem('channels'));
+				// Gérez l'erreur ou initialisez savedChannels à une valeur par défaut
+			}
 
 		}
 	}

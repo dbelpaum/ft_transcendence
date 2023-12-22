@@ -22,7 +22,6 @@ export const ProtectedElement: React.FC<ProtectedElementProps> = ({ children }) 
 				message: 'Vous devez être connecté pour accéder à cette page.',
 				type: 'error'
 			});
-			console.log(user)
 		}
 	}, [user, isLoading, setErrorMessage]);
 	
@@ -31,7 +30,6 @@ export const ProtectedElement: React.FC<ProtectedElementProps> = ({ children }) 
 	}
 	
 	if (!user) {
-		console.log("je passe par la")
 		return <Navigate to="/" />;
 	}
 	return children

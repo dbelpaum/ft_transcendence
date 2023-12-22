@@ -240,6 +240,9 @@ export class ChannelService {
 	  }
 
 	async modifyChannel(channelCreate: ChannelCreate): Promise<void> {
+		if (!this.typeIsValid(channelCreate.type)){
+			return 
+		}
 		// Si le channel existe pas, on ne fait rien
 		const channelIndex = await this.getChannelByName(channelCreate.name)
 		if (channelIndex === -1) return;
@@ -252,9 +255,22 @@ export class ChannelService {
 		this.channels[channelIndex].mdp = channelCreate.mdp
 	}
 	  
+	typeIsValid(type:string) : boolean
+	{
+		if (type == "private") return true
+		if (type == "public") return true
+		if (type == "protected") return true
+		return false
+	}
 
 	async addUserToChannel(channelCreate: ChannelCreate): Promise<joinResponse> {
 
+		if (!this.typeIsValid(channelCreate.type)){
+			return {
+				errorNumber: 10,
+				text: "Le type du channel n'est pas ok " + channelCreate.type
+			}
+		}
 		// Si le channel existe
 		const channelIndex = await this.getChannelByName(channelCreate.name)
 		if (channelIndex !== -1) {

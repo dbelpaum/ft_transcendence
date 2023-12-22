@@ -123,19 +123,26 @@ useEffect(() => {
 			setIsConnected(true);
 			const updatedUser = { ...user, socketId: chatSocket.id };
 			setUser(updatedUser); 
-			const savedChannels: ChannelCreate[] = JSON.parse(sessionStorage.getItem('channels') || '[]');
-			const updatedChannels = savedChannels.map(channel => {
-				return {
-					...channel, 
-					user: updatedUser
-				};
-			});
-			if (updatedChannels && updatedUser)
-			{
+			try{
+				const savedChannels: ChannelCreate[] = JSON.parse(sessionStorage.getItem('channels') || '[]');
+				const updatedChannels = savedChannels.map(channel => {
+					return {
+						...channel, 
+						user: updatedUser
+					};
+				});
+				if (updatedChannels && updatedUser)
+				{
 				updatedChannels.forEach((channel) => {
 					chatSocket.emit('join_channel', channel);
 				});
-			}
+				}
+			}catch (error) {
+				console.error('Error parsing JSON from sessionStorage:', error);
+				console.error('Data that caused the error:', sessionStorage.getItem('channels'));
+				// Gérez l'erreur ou initialisez savedChannels à une valeur par défaut
+			  }
+			
 
 		});
 	

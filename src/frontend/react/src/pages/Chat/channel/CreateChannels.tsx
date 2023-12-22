@@ -35,10 +35,18 @@ const CreateChannel: React.FC<CreateChannelsProps> = ({ channelUtility }) => {
 				mdp: password
 			}
 			channelUtility.socket.emit('join_channel', newChannel);
-			
-			const savedChannels: ChannelCreate[] = JSON.parse(sessionStorage.getItem('channels') || '[]');
-			const newChannels: ChannelCreate[]  = [...savedChannels, newChannel];
-			sessionStorage.setItem('channels', JSON.stringify(newChannels));
+			try
+			{
+
+				const savedChannels: ChannelCreate[] = JSON.parse(sessionStorage.getItem('channels') || '[]');
+				const newChannels: ChannelCreate[]  = [...savedChannels, newChannel];
+				sessionStorage.setItem('channels', JSON.stringify(newChannels));
+			}
+			catch (error) {
+				console.error('Error parsing JSON from sessionStorage:', error);
+				console.error('Data that caused the error:', sessionStorage.getItem('channels'));
+				// Gérez l'erreur ou initialisez savedChannels à une valeur par défaut
+			}
 		}
 		setChannelName("");
 		
