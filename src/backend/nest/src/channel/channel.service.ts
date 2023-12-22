@@ -18,6 +18,40 @@ export class ChannelService {
 	private channels: Channel[] = []
 	private connectedUsers: UserTokenInfo[] = []
   
+
+	addConnectedUser(user: UserTokenInfo): void {
+		const userExists = this.connectedUsers.some(u => u.id === user.id);
+		if (!userExists) {
+			this.connectedUsers.push(user);
+		}
+	}
+	  
+	removeConnectedUser(userId: number): void {
+		this.connectedUsers = this.connectedUsers.filter(u => u.id !== userId);
+	}
+
+	isUserConnected(userId: number): boolean {
+		return this.connectedUsers.some(u => u.id === userId);
+	}
+	  
+	getConnectedUserById(userId: number): UserTokenInfo | undefined {
+		return this.connectedUsers.find(u => u.id === userId);
+	}
+
+	getConnectedUserById42(userId42: number): UserTokenInfo | undefined {
+		return this.connectedUsers.find(u => u.id42 === userId42);
+	}
+
+	getConnectedUserByPseudo(pseudo: string): UserTokenInfo | undefined {
+		return this.connectedUsers.find(u => u.pseudo === pseudo);
+	}
+
+	getAllConnectedUsers(): UserTokenInfo[] {
+		return this.connectedUsers;
+	}
+	  
+	  
+
 	async addChannel(channelCreate: ChannelCreate): Promise<void> {
 	  const channel = await this.getChannelByName(channelCreate.name)
 	  if (channel === -1) {

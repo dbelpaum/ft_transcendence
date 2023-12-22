@@ -61,17 +61,18 @@ export class AuthentificationController {
 			});
 			dataToken = {
 				id: UserBdd.id,
-				id42: UserBdd.id42
+				id42: UserBdd.id42,
+				pseudo: UserBdd.pseudo
 			}
-			console.log("L'utilisateur n'existe pas dans la bdd");
         
       }
       else{
 			dataToken = {
 				id: findUser.id,
-				id42: findUser.id42
+				id42: findUser.id42,
+				pseudo: findUser.pseudo
+
 			}
-        console.log("L'utilisateur existe deja dans la bdd");
       }
 	  const token = this.jwtService.sign(dataToken);
       res.redirect(`http://localhost:3000/profil?token=${token}`);
@@ -88,7 +89,6 @@ export class AuthentificationController {
     // Gérer le callback après l'authentification
     if (req.user)
     {
-      console.log("Il y a un utilisateur connecté")
 	  const userBdd = await this.prisma.user.findUnique({
         where: {
           id42: req.user.id42,
@@ -99,7 +99,6 @@ export class AuthentificationController {
     }
     else
     {
-      console.log("Utilisateur non trouvé en bdd")
       return {undefined}
     }
 }

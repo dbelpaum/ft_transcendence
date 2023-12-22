@@ -211,17 +211,18 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		  // Validez le token ici
 		  const payload = jwt.verify(token, 'votre_secret_jwt');
 		  client.user = payload;
+		  this.channelService.addConnectedUser(payload)
 		  // Si la vérification échoue, une exception sera lancée
 		} catch (e) {
-		  console.log("je suis sans coeur, je te deco ")
 		client.disconnect(); // Déconnectez le client en cas d'échec de la vérification
 	  }
     this.logger.log(`Socket connected: ${client.id}`)
   }
 
-  async handleDisconnect(socket: Socket): Promise<void> {
-    await this.channelService.removeUserFromAllChannels(socket.id)
-    this.logger.log(`Socket disconnected: ${socket.id}`)
+  async handleDisconnect(client: Socket): Promise<void> {
+    await this.channelService.removeUserFromAllChannels(client.id)
+	this.channelService.removeConnectedUser(client.user.id)
+    this.logger.log(`Socket disconnected: ${client.id}`)
   }
 
 }

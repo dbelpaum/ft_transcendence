@@ -61,5 +61,6 @@ export interface addAdminInfo
 
 export interface UserTokenInfo{
 	id: number,
-	id42: number
+	id42: number,
+	pseudo: string
 }
