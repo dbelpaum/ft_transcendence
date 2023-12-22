@@ -3,12 +3,14 @@ import "./GameModeButtons.css";
 import { SocketContext } from "../../pages/Game/SocketContext";
 import { Socket } from "socket.io-client";
 import SoloGameScene from "../GameScene/SoloGameScene";
-import { showNotificationSuccess } from "../../pages/Game/Notification";
+import { showNotificationSuccess, showNotificationWarning } from "../../pages/Game/Notification";
+import { PulseLoader } from "react-spinners";
 
 const GameModeButtons: React.FC = () => {
 	const socket = useContext(SocketContext) as unknown as Socket;
 	const [roomCode, setRoomCode] = useState<string>("");
 	const [showSoloGame, setShowSoloGame] = React.useState<boolean>(false);
+	const [isMatchmaking, setIsMatchmaking] = useState<boolean>(false);
 
 	const handleSelectSoloMode = () => {
 		setShowSoloGame(true);
@@ -32,6 +34,22 @@ const GameModeButtons: React.FC = () => {
 				mode: "vanilla",
 				lobbyId: roomCode,
 			});
+		}
+	};
+
+	const handleMatchmaking = () => {
+		if (socket) {
+			setIsMatchmaking(!isMatchmaking);
+
+			// Emit matchmaking event
+			if (!isMatchmaking) {
+				socket.emit("client.matchmaking.enter", {});
+				showNotificationSuccess("Matchmaking", "Looking for opponent...");
+			}
+			else
+				showNotificationWarning("Matchmaking", "Left matchmaking")
+
+			// You might want to listen for a response from the server here, but for simplicity, it's omitted in this example.
 		}
 	};
 
@@ -93,7 +111,7 @@ const GameModeButtons: React.FC = () => {
 					</div>
 
 					<div>
-						<button className="buttonStyle">Matchmaking</button>
+						<button className="buttonStyle" onClick={handleMatchmaking}>Matchmaking {isMatchmaking && <PulseLoader size={10} color={"#ffffff"} />}</button>
 					</div>
 					<button onClick={handlePing}>Ping</button>
 				</>
