@@ -74,7 +74,7 @@ useEffect(() => {
         // Envoyer la requête d'ami
         fetch(`http://localhost:4000/friendship/${user?.id42}/add-friend/${userInfo?.id42}`, {
             method: 'POST',
-            // Ajoutez les informations nécessaires ici
+            credentials: 'include',
         })
         .then(response => {
             if (response.ok) {

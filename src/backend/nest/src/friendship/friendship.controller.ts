@@ -11,11 +11,28 @@ export class FriendshipController {
         return friendships;
     }
 
+
     @Get(':requesterId42/relation/:addresseeId42')
     async getFriendship(
         @Param('requesterId42') requesterId: string,
         @Param('addresseeId42') addresseeId: string
     ) {
+
+        //verifier que les deux users existent
+        const requester = await this.prisma.user.findUnique({
+            where: { id42: Number(requesterId) },
+        });
+        if (!requester) {
+            throw new Error('Requester not found');
+        }
+        const addressee = await this.prisma.user.findUnique({
+            where: { id42: Number(requesterId) },
+        });
+        if (!addressee) {
+            throw new Error('Addressee not found');
+        }
+        
+
         const friendship = await this.prisma.friendship.findFirst({
             where: {
                 OR: [
@@ -29,10 +46,10 @@ export class FriendshipController {
     }
 
 
-    @Post(':requesterId42/add-friend/:addresseeId42')
+    @Post(':requesterId/add-friend/:addresseeId')
     async addFriend(
-        @Param('requesterId42') requesterId: string,
-        @Param('addresseeId42') addresseeId: string
+        @Param('requesterId') requesterId: string,
+        @Param('addresseeId') addresseeId: string
     ) {
 
         console.log("requesterId : " + requesterId);
@@ -81,6 +98,11 @@ export class FriendshipController {
         return !!friendship;
     }
 
+
+
+
+
+    
     @Post(':requesterId/accept-friend/:addresseeId')
     async acceptFriend(
         @Param('requesterId') requesterId: string,

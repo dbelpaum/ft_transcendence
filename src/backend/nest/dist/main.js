@@ -920,6 +920,18 @@ let FriendshipController = class FriendshipController {
         return friendships;
     }
     async getFriendship(requesterId, addresseeId) {
+        const requester = await this.prisma.user.findUnique({
+            where: { id42: Number(requesterId) },
+        });
+        if (!requester) {
+            throw new Error('Requester not found');
+        }
+        const addressee = await this.prisma.user.findUnique({
+            where: { id42: Number(requesterId) },
+        });
+        if (!addressee) {
+            throw new Error('Addressee not found');
+        }
         const friendship = await this.prisma.friendship.findFirst({
             where: {
                 OR: [
@@ -1013,9 +1025,9 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], FriendshipController.prototype, "getFriendship", null);
 __decorate([
-    (0, common_1.Post)(':requesterId42/add-friend/:addresseeId42'),
-    __param(0, (0, common_1.Param)('requesterId42')),
-    __param(1, (0, common_1.Param)('addresseeId42')),
+    (0, common_1.Post)(':requesterId/add-friend/:addresseeId'),
+    __param(0, (0, common_1.Param)('requesterId')),
+    __param(1, (0, common_1.Param)('addresseeId')),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String, String]),
     __metadata("design:returntype", Promise)
