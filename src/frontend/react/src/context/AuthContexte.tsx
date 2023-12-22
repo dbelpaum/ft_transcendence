@@ -58,13 +58,21 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 			'Authorization': `Bearer ${authToken}`
 		  }
 		});
-		const userData = await response.json();
-		if (Object.keys(userData).length !== 0) {
-		  setUser(userData); // Utilisateur connecté
-		  console.log("the user data");
-		} else {
-		  setUser(null);
+		if (response.ok) {
+			const userData = await response.json();
+			if (Object.keys(userData).length !== 0) {
+			setUser(userData); // Utilisateur connecté
+			console.log("the user data");
+			} else {
+			setUser(null);
+			}
 		}
+		else
+		{
+			console.log("je passe la")
+			setUser(null)
+		}
+		
 	  } catch (error) {
 		console.error('Erreur lors de la vérification de l’utilisateur', error);
 	  } finally {
@@ -75,8 +83,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 	const authentificate = async () => {
 	  const tokenSession = tokenUrl || sessionStorage.getItem('token');
 	  if (tokenSession) {
+		  await getUserData(tokenSession);
 		await login(tokenSession);
-		await getUserData(tokenSession);
 	  }
 	  setIsLoading(false);
 	};
@@ -86,6 +94,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
 
   const login = async (token:string) => {
+	sessionStorage.removeItem('token');
     sessionStorage.setItem('token', token);
     setAuthToken(token);
 
