@@ -915,6 +915,21 @@ let FriendshipController = class FriendshipController {
     constructor(prisma) {
         this.prisma = prisma;
     }
+    async getAllFriendships() {
+        const friendships = await this.prisma.friendship.findMany();
+        return friendships;
+    }
+    async getFriendship(requesterId, addresseeId) {
+        const friendship = await this.prisma.friendship.findFirst({
+            where: {
+                OR: [
+                    { requesterId: Number(requesterId), addresseeId: Number(addresseeId) },
+                    { requesterId: Number(addresseeId), addresseeId: Number(requesterId) }
+                ],
+            },
+        });
+        return !!friendship;
+    }
     async addFriend(requesterId, addresseeId) {
         if (requesterId === addresseeId) {
             throw new Error('You cannot add yourself as a friend');
@@ -981,6 +996,20 @@ let FriendshipController = class FriendshipController {
     }
 };
 exports.FriendshipController = FriendshipController;
+__decorate([
+    (0, common_1.Get)(),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", []),
+    __metadata("design:returntype", Promise)
+], FriendshipController.prototype, "getAllFriendships", null);
+__decorate([
+    (0, common_1.Get)(':requesterId/relation/:addresseeId'),
+    __param(0, (0, common_1.Param)('requesterId')),
+    __param(1, (0, common_1.Param)('addresseeId')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, String]),
+    __metadata("design:returntype", Promise)
+], FriendshipController.prototype, "getFriendship", null);
 __decorate([
     (0, common_1.Post)(':requesterId/add-friend/:addresseeId'),
     __param(0, (0, common_1.Param)('requesterId')),

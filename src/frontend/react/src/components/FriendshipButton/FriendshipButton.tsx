@@ -1,5 +1,5 @@
 import React from "react"
-import "FriendshipButton.css"
+import './FriendshipButton.css'
 
 
 type FriendshipButtonProps = {

@@ -5,6 +5,29 @@ import { PrismaService } from 'src/prisma.service';
 export class FriendshipController {
     constructor(private prisma: PrismaService) {}
 
+    @Get()
+    async getAllFriendships() {
+        const friendships = await this.prisma.friendship.findMany();
+        return friendships;
+    }
+
+    @Get(':requesterId/relation/:addresseeId')
+    async getFriendship(
+        @Param('requesterId') requesterId: string,
+        @Param('addresseeId') addresseeId: string
+    ) {
+        const friendship = await this.prisma.friendship.findFirst({
+            where: {
+                OR: [
+                    { requesterId: Number(requesterId), addresseeId: Number(addresseeId) },
+                    { requesterId: Number(addresseeId), addresseeId: Number(requesterId) }
+                ],
+            },
+        });
+
+        return !!friendship;
+    }
+
 
     @Post(':requesterId/add-friend/:addresseeId')
     async addFriend(
