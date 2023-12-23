@@ -51,10 +51,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 	const tokenUrl = query.get('token'); 
 
 	// Récupérez votre token JWT
-	const token = sessionStorage.getItem('token');
+	const token = localStorage.getItem('token');
 
 
-  // Chargez le token JWT depuis sessionStorage lors du démarrage
+  // Chargez le token JWT depuis localStorage lors du démarrage
   useEffect(() => {
 	const getUserData = async (authToken:string) => {
 	  try {
@@ -89,7 +89,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 	};
   
 	const authentificate = async () => {
-	  const tokenSession = tokenUrl || sessionStorage.getItem('token');
+	  const tokenSession = tokenUrl || localStorage.getItem('token');
 	  if (tokenSession) {
 		  await getUserData(tokenSession);
 		await login(tokenSession);
@@ -102,8 +102,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
 
   const login = async (token:string) => {
-	sessionStorage.removeItem('token');
-    sessionStorage.setItem('token', token);
+	localStorage.removeItem('token');
+    localStorage.setItem('token', token);
     setAuthToken(token);
 
 	const newChatSocket = io("http://localhost:4000", {
@@ -117,7 +117,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const logout = () => {
 	if (chatSocket)	chatSocket.disconnect()
-	sessionStorage.clear()
+	localStorage.clear()
 	setAuthToken(null);
 	setUser(null)
 };
@@ -132,7 +132,7 @@ useEffect(() => {
 			const updatedUser = { ...user, socketId: chatSocket.id };
 			setUser(updatedUser); 
 			try{
-				const savedChannels: ChannelCreate[] = JSON.parse(sessionStorage.getItem('channels') || '[]');
+				const savedChannels: ChannelCreate[] = JSON.parse(localStorage.getItem('channels') || '[]');
 				const updatedChannels = savedChannels.map(channel => {
 					return {
 						...channel, 
@@ -146,8 +146,8 @@ useEffect(() => {
 				});
 				}
 			}catch (error) {
-				console.error('Error parsing JSON from sessionStorage:', error);
-				console.error('Data that caused the error:', sessionStorage.getItem('channels'));
+				console.error('Error parsing JSON from localStorage:', error);
+				console.error('Data that caused the error:', localStorage.getItem('channels'));
 				// Gérez l'erreur ou initialisez savedChannels à une valeur par défaut
 			  }
 			

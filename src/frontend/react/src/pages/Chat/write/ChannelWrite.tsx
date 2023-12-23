@@ -71,13 +71,13 @@ const ChannelWrite: React.FC<ChannelWriteProps> = ({ channelUtility }) => {
 			}
 			channelUtility.socket.emit("join_channel", channelJoin);
 			try{
-				const savedChannels: ChannelCreate[] = JSON.parse(sessionStorage.getItem('channels') || '[]');
+				const savedChannels: ChannelCreate[] = JSON.parse(localStorage.getItem('channels') || '[]');
 				const newChannels: ChannelCreate[]  = [...savedChannels, channelJoin];
-				sessionStorage.setItem('channels', JSON.stringify(newChannels));
+				localStorage.setItem('channels', JSON.stringify(newChannels));
 				channelUtility.recharger()
 			}catch (error) {
-				console.error('Error parsing JSON from sessionStorage:', error);
-				console.error('Data that caused the error:', sessionStorage.getItem('channels'));
+				console.error('Error parsing JSON from localStorage:', error);
+				console.error('Data that caused the error:', localStorage.getItem('channels'));
 				// Gérez l'erreur ou initialisez savedChannels à une valeur par défaut
 			}
 

@@ -40,17 +40,17 @@ const CreateChannel: React.FC<CreateChannelsProps> = ({ channelUtility }) => {
 			try
 			{
 
-				const savedChannels: ChannelCreate[] = JSON.parse(sessionStorage.getItem('channels') || '[]');
+				const savedChannels: ChannelCreate[] = JSON.parse(localStorage.getItem('channels') || '[]');
 				const channelExists = savedChannels.some(channel => channel.name === channelName);
 				if (!channelExists)
 				{
 					const newChannels: ChannelCreate[]  = [...savedChannels, newChannel];
-					sessionStorage.setItem('channels', JSON.stringify(newChannels));
+					localStorage.setItem('channels', JSON.stringify(newChannels));
 				}
 			}
 			catch (error) {
-				console.error('Error parsing JSON from sessionStorage:', error);
-				console.error('Data that caused the error:', sessionStorage.getItem('channels'));
+				console.error('Error parsing JSON from localStorage:', error);
+				console.error('Data that caused the error:', localStorage.getItem('channels'));
 				// Gérez l'erreur ou initialisez savedChannels à une valeur par défaut
 			}
 		}
