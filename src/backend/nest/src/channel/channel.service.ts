@@ -281,7 +281,7 @@ export class ChannelService {
 			{
 				return {
 					errorNumber: 25,
-					text: `Vous essayez de rejoindre un channel alors que vous etes deja dedans ${his.channels[channelIndex].name}`
+					text: `Vous essayez de creer ou rejoindre un channel alors que vous etes deja dedans ${this.channels[channelIndex].name}`
 				};
 			}
 

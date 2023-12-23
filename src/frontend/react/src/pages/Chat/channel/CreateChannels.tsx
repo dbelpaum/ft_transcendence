@@ -41,8 +41,12 @@ const CreateChannel: React.FC<CreateChannelsProps> = ({ channelUtility }) => {
 			{
 
 				const savedChannels: ChannelCreate[] = JSON.parse(sessionStorage.getItem('channels') || '[]');
-				const newChannels: ChannelCreate[]  = [...savedChannels, newChannel];
-				sessionStorage.setItem('channels', JSON.stringify(newChannels));
+				const channelExists = savedChannels.some(channel => channel.name === channelName);
+				if (!channelExists)
+				{
+					const newChannels: ChannelCreate[]  = [...savedChannels, newChannel];
+					sessionStorage.setItem('channels', JSON.stringify(newChannels));
+				}
 			}
 			catch (error) {
 				console.error('Error parsing JSON from sessionStorage:', error);
@@ -86,8 +90,7 @@ const CreateChannel: React.FC<CreateChannelsProps> = ({ channelUtility }) => {
 					}
 					const data : Channel[]= await response.json();
 					channelUtility.setChannels(data); // Mise à jour de l'état avec les données de l'API
-					console.log("salut" + channelUtility.me.pseudo)
-					console.log(data)
+
 
 					if (channelUrl)
 					{
