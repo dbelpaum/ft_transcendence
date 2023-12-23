@@ -5,6 +5,7 @@ import { User } from './AuthInteface';
 import { useLocation } from 'react-router-dom';
 import { ChannelCreate, ClientToServerEvents, Message, ServerToClientEvents } from '../pages/Chat/chat.interface';
 import { io, Socket } from 'socket.io-client';
+import { showNotification } from '../pages/Game/Notification';
 
 
 
@@ -19,7 +20,8 @@ type AuthContextType = {
 	chatSocket: Socket<ServerToClientEvents, ClientToServerEvents> | null;
 	messages: Message[];
 	setMessages: React.Dispatch<React.SetStateAction<Message[]>>;
-
+	recharger: () => void;
+	forceReload: number;
   };
 
 type AuthProviderProps = {
@@ -35,6 +37,12 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 	const [chatSocket, setChatSocket] = useState<Socket<ServerToClientEvents, ClientToServerEvents> | null>(null);
 	const [isConnected, setIsConnected] = useState(false);
 	const [messages, setMessages] = useState<Message[]>([]);
+	const [forceReload, setForceReload] = useState<number>(0);
+
+
+	const recharger = (): void => {
+		setForceReload(prev => prev + 1);
+	};
 
 	const useQuery = () => {
 		return new URLSearchParams(useLocation().search);
@@ -152,20 +160,37 @@ useEffect(() => {
 	
 		chatSocket.on('chat', (e) => {
 			setMessages((messages) => [...messages, e]);
-			
 		});
+
+		chatSocket.on('notif', (e) => {
+			showNotification("Chat", e.message, e.type)
+			recharger()
+		})
 	
 		return () => {
 			chatSocket.off('connect');
 			chatSocket.off('disconnect');
 			chatSocket.off('chat');
 		};
-}, [user, chatSocket]);
+}, [chatSocket]);
 
 
 
 return (
-    <AuthContext.Provider value={{ user, setUser, isLoading, login, logout, authToken, setAuthToken, chatSocket, messages, setMessages}}>
+    <AuthContext.Provider value={{ 
+		user, 
+		setUser, 
+		isLoading, 
+		login, 
+		logout, 
+		authToken, 
+		setAuthToken, 
+		chatSocket, 
+		messages, 
+		setMessages,
+		recharger,
+		forceReload
+		}}>
       {children}
     </AuthContext.Provider>
   );

@@ -127,11 +127,10 @@ const UserInfo: React.FC<userInfoProps> = ({ channelUtility, userAndAdmin, chann
 	}
 
 
-
+	
 
   return (
         <div className='userChannel'>
-			
 			<span><img src={crownIconPath} alt="Couronne" className={`crownIcon ${userAndAdmin.isAdmin ? 'appear' : ''}`} /></span>
 			<a href={`http://localhost:3000/users/${userAndAdmin.user.pseudo}`} target="_blank" rel="noopener noreferrer">
 				<span 
