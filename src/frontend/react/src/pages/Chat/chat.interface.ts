@@ -1,13 +1,11 @@
 import { io, Socket } from 'socket.io-client';
 import { Dispatch, SetStateAction } from 'react';
 import { User } from '../../context/AuthInteface';
-
-  
-
   
 // Interface for when server emits events to clients.
 export interface ServerToClientEvents {
     chat: (e: Message) => void;
+    notif: (e: Notif) => void;
 }
   
 // Interface for when clients emit events to the server.
@@ -75,3 +73,10 @@ export interface addAdminInfo
 	user_to_modify: User
 	user: User
 }
+
+export interface Notif {
+	message: string,
+	type: NotificationType
+}
+
+export type NotificationType = 'success' | 'danger' | 'info' | 'default' | 'warning';

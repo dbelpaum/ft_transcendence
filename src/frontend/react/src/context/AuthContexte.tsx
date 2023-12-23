@@ -5,6 +5,7 @@ import { User } from './AuthInteface';
 import { useLocation } from 'react-router-dom';
 import { ChannelCreate, ClientToServerEvents, Message, ServerToClientEvents } from '../pages/Chat/chat.interface';
 import { io, Socket } from 'socket.io-client';
+import { showNotification } from '../pages/Game/Notification';
 
 
 
@@ -19,7 +20,8 @@ type AuthContextType = {
 	chatSocket: Socket<ServerToClientEvents, ClientToServerEvents> | null;
 	messages: Message[];
 	setMessages: React.Dispatch<React.SetStateAction<Message[]>>;
-
+	recharger: () => void;
+	forceReload: number;
   };
 
 type AuthProviderProps = {
@@ -35,6 +37,12 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 	const [chatSocket, setChatSocket] = useState<Socket<ServerToClientEvents, ClientToServerEvents> | null>(null);
 	const [isConnected, setIsConnected] = useState(false);
 	const [messages, setMessages] = useState<Message[]>([]);
+	const [forceReload, setForceReload] = useState<number>(0);
+
+
+	const recharger = (): void => {
+		setForceReload(prev => prev + 1);
+	};
 
 	const useQuery = () => {
 		return new URLSearchParams(useLocation().search);
@@ -58,13 +66,21 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 			'Authorization': `Bearer ${authToken}`
 		  }
 		});
-		const userData = await response.json();
-		if (Object.keys(userData).length !== 0) {
-		  setUser(userData); // Utilisateur connecté
-		  console.log("the user data");
-		} else {
-		  setUser(null);
+		if (response.ok) {
+			const userData = await response.json();
+			if (Object.keys(userData).length !== 0) {
+			setUser(userData); // Utilisateur connecté
+			console.log("the user data");
+			} else {
+			setUser(null);
+			}
 		}
+		else
+		{
+			console.log("je passe la")
+			setUser(null)
+		}
+		
 	  } catch (error) {
 		console.error('Erreur lors de la vérification de l’utilisateur', error);
 	  } finally {
@@ -75,8 +91,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 	const authentificate = async () => {
 	  const tokenSession = tokenUrl || sessionStorage.getItem('token');
 	  if (tokenSession) {
+		  await getUserData(tokenSession);
 		await login(tokenSession);
-		await getUserData(tokenSession);
 	  }
 	  setIsLoading(false);
 	};
@@ -86,6 +102,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
 
   const login = async (token:string) => {
+	sessionStorage.removeItem('token');
     sessionStorage.setItem('token', token);
     setAuthToken(token);
 
@@ -114,19 +131,26 @@ useEffect(() => {
 			setIsConnected(true);
 			const updatedUser = { ...user, socketId: chatSocket.id };
 			setUser(updatedUser); 
-			const savedChannels: ChannelCreate[] = JSON.parse(sessionStorage.getItem('channels') || '[]');
-			const updatedChannels = savedChannels.map(channel => {
-				return {
-					...channel, 
-					user: updatedUser
-				};
-			});
-			if (updatedChannels && updatedUser)
-			{
+			try{
+				const savedChannels: ChannelCreate[] = JSON.parse(sessionStorage.getItem('channels') || '[]');
+				const updatedChannels = savedChannels.map(channel => {
+					return {
+						...channel, 
+						user: updatedUser
+					};
+				});
+				if (updatedChannels && updatedUser)
+				{
 				updatedChannels.forEach((channel) => {
 					chatSocket.emit('join_channel', channel);
 				});
-			}
+				}
+			}catch (error) {
+				console.error('Error parsing JSON from sessionStorage:', error);
+				console.error('Data that caused the error:', sessionStorage.getItem('channels'));
+				// Gérez l'erreur ou initialisez savedChannels à une valeur par défaut
+			  }
+			
 
 		});
 	
@@ -136,20 +160,37 @@ useEffect(() => {
 	
 		chatSocket.on('chat', (e) => {
 			setMessages((messages) => [...messages, e]);
-			
 		});
+
+		chatSocket.on('notif', (e) => {
+			showNotification("Chat", e.message, e.type)
+			recharger()
+		})
 	
 		return () => {
 			chatSocket.off('connect');
 			chatSocket.off('disconnect');
 			chatSocket.off('chat');
 		};
-}, [user, chatSocket]);
+}, [chatSocket]);
 
 
 
 return (
-    <AuthContext.Provider value={{ user, setUser, isLoading, login, logout, authToken, setAuthToken, chatSocket, messages, setMessages}}>
+    <AuthContext.Provider value={{ 
+		user, 
+		setUser, 
+		isLoading, 
+		login, 
+		logout, 
+		authToken, 
+		setAuthToken, 
+		chatSocket, 
+		messages, 
+		setMessages,
+		recharger,
+		forceReload
+		}}>
       {children}
     </AuthContext.Provider>
   );

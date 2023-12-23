@@ -2,6 +2,7 @@ import React, { useState, useEffect, ChangeEvent, FormEvent  } from 'react';
 import { Channel, ChannelCreate, ChannelUtility } from '../chat.interface';
 import { useLocation } from 'react-router-dom';
 import { useAuth } from '../../../context/AuthContexte';
+import { useNavigate } from 'react-router-dom';
 
 interface CreateChannelsProps {
 	channelUtility: ChannelUtility;
@@ -18,6 +19,7 @@ const CreateChannel: React.FC<CreateChannelsProps> = ({ channelUtility }) => {
 	};
 	const query = useQuery();
 	const channelUrl = query.get('channel'); 
+	const navigate = useNavigate();
 	
 	const handleCreateClick = () => {
 		setShowForm(true);
@@ -35,10 +37,18 @@ const CreateChannel: React.FC<CreateChannelsProps> = ({ channelUtility }) => {
 				mdp: password
 			}
 			channelUtility.socket.emit('join_channel', newChannel);
-			
-			const savedChannels: ChannelCreate[] = JSON.parse(sessionStorage.getItem('channels') || '[]');
-			const newChannels: ChannelCreate[]  = [...savedChannels, newChannel];
-			sessionStorage.setItem('channels', JSON.stringify(newChannels));
+			try
+			{
+
+				const savedChannels: ChannelCreate[] = JSON.parse(sessionStorage.getItem('channels') || '[]');
+				const newChannels: ChannelCreate[]  = [...savedChannels, newChannel];
+				sessionStorage.setItem('channels', JSON.stringify(newChannels));
+			}
+			catch (error) {
+				console.error('Error parsing JSON from sessionStorage:', error);
+				console.error('Data that caused the error:', sessionStorage.getItem('channels'));
+				// Gérez l'erreur ou initialisez savedChannels à une valeur par défaut
+			}
 		}
 		setChannelName("");
 		
@@ -82,7 +92,10 @@ const CreateChannel: React.FC<CreateChannelsProps> = ({ channelUtility }) => {
 					if (channelUrl)
 					{
 						if (!data.some(c => c.name === channelUrl))
-							window.location.href = 'http://localhost:3000/chat';
+						{
+							navigate('/chat');
+						}
+
 
 					}
 

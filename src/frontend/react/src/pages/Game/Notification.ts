@@ -1,5 +1,8 @@
 import { Store } from "react-notifications-component";
 
+type NotificationType = 'success' | 'danger' | 'info' | 'default' | 'warning';
+
+
 export const showNotificationSuccess = (title: string, message: string) => {
 	Store.addNotification({
 		title: title,
@@ -50,3 +53,21 @@ export const showNotificationWarning = (title: string, message: string) => {
 		},
 	});
 };
+
+export const showNotification = (title: string, message: string, type: NotificationType) => {
+	if (!type) return
+	Store.addNotification({
+		title: title,
+		message: message,
+		type: type,
+		insert: "top",
+		container: "top-right",
+		animationIn: ["animate__animated", "animate__fadeIn"],
+		animationOut: ["animate__animated", "animate__fadeOut"],
+		dismiss: {
+			duration: 5000,
+			onScreen: true,
+			showIcon: true,
+		},
+	});
+}

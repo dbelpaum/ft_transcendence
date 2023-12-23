@@ -62,5 +62,14 @@ export interface addAdminInfo
 export interface UserTokenInfo{
 	id: number,
 	id42: number,
-	pseudo: string
+	pseudo: string,
+	socketId: string
 }
+
+export interface Notif
+{
+	message: string,
+	type: NotificationType
+}
+
+export type NotificationType = 'success' | 'danger' | 'info' | 'default' | 'warning';

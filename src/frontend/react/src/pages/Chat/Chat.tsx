@@ -31,15 +31,10 @@ import ChannelInfo from './info/ChannelInfo';
 
 function Chat(){
 	const [inputValue, setInputValue] = useState<string>('');
-	const { user, setUser, chatSocket, messages, setMessages } = useAuth(); 
+	const { user, setUser, chatSocket, messages, setMessages, recharger, forceReload } = useAuth(); 
 	
 	const [channels, setChannels] = useState<Channel[]>([]);
-	const [forceReload, setForceReload] = useState<number>(0);
 
-
-	const recharger = (): void => {
-		setForceReload(prev => prev + 1);
-	};
 
 
 	const channelUtility: ChannelUtility = {

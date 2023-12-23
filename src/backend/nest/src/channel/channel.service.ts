@@ -174,7 +174,7 @@ export class ChannelService {
 
 		// Sinon, on supprime la personne de la liste des users
 		this.channels[channelIndex].users = this.channels[channelIndex].users.filter(user => user.pseudo !== adminInfo.user_to_modify.pseudo);
-		this.channels[channelIndex].host = this.channels[channelIndex].host.filter(pseudo => pseudo !== pseudo);
+		this.channels[channelIndex].host = this.channels[channelIndex].host.filter(pseudo => pseudo !== adminInfo.user_to_modify.pseudo);
 		return true
 	}
   
@@ -200,6 +200,8 @@ export class ChannelService {
 
 		// puis on supprime la personne de la liste des users
 		this.channels[channelIndex].users = this.channels[channelIndex].users.filter(user => user.pseudo !== adminInfo.user_to_modify.pseudo);
+		this.channels[channelIndex].host = this.channels[channelIndex].host.filter(pseudo => pseudo !== adminInfo.user_to_modify.pseudo);
+
 		
 		return true
 	}
@@ -240,6 +242,9 @@ export class ChannelService {
 	  }
 
 	async modifyChannel(channelCreate: ChannelCreate): Promise<void> {
+		if (!this.typeIsValid(channelCreate.type)){
+			return 
+		}
 		// Si le channel existe pas, on ne fait rien
 		const channelIndex = await this.getChannelByName(channelCreate.name)
 		if (channelIndex === -1) return;
@@ -252,9 +257,22 @@ export class ChannelService {
 		this.channels[channelIndex].mdp = channelCreate.mdp
 	}
 	  
+	typeIsValid(type:string) : boolean
+	{
+		if (type == "private") return true
+		if (type == "public") return true
+		if (type == "protected") return true
+		return false
+	}
 
 	async addUserToChannel(channelCreate: ChannelCreate): Promise<joinResponse> {
 
+		if (!this.typeIsValid(channelCreate.type)){
+			return {
+				errorNumber: 10,
+				text: "Le type du channel n'est pas ok " + channelCreate.type
+			}
+		}
 		// Si le channel existe
 		const channelIndex = await this.getChannelByName(channelCreate.name)
 		if (channelIndex !== -1) {
@@ -263,7 +281,7 @@ export class ChannelService {
 			{
 				return {
 					errorNumber: 25,
-					text: "L'utilisateur " + channelCreate.user.pseudo + " essaie de rejoindre un channel alors qu'il est deja dedans : " + this.channels[channelIndex].name
+					text: `Vous essayez de rejoindre un channel alors que vous etes deja dedans ${his.channels[channelIndex].name}`
 				};
 			}
 
@@ -272,7 +290,7 @@ export class ChannelService {
 			{
 				return {
 					errorNumber: 26,
-					text: "L'utilisateur " + channelCreate.user.pseudo + " essaie de rejoindre un channel alors qu'il a été ban : " + this.channels[channelIndex].name
+					text: "Vous essayez de rejoindre un channel alors que vous avez été ban : " + this.channels[channelIndex].name
 				};
 			}
 
@@ -284,7 +302,7 @@ export class ChannelService {
 				{
 					return {
 						errorNumber: 20,
-						text: "L'utilisateur " + channelCreate.user.pseudo + " essaie de rejoindre un channel privé sans avoir été invité : " + this.channels[channelIndex].name
+						text: "Vous essayez de rejoindre un channel privé sans avoir été invité : " + this.channels[channelIndex].name
 					};
 
 				}
@@ -296,16 +314,17 @@ export class ChannelService {
 				{
 					return {
 						errorNumber: 21,
-						text: "L'utilisateur " + channelCreate.user.pseudo + " essaie de rejoindre un channel privé avec le mauvais mdp: " + this.channels[channelIndex].name
+						text: "Vous essayez de rejoindre un channel privé avec le mauvais mdp: " + this.channels[channelIndex].name
 					};
 
 				}
 			}
 				// Dans tout les autres cas, on ajoute l'utilisateur
 			this.channels[channelIndex].users.push(channelCreate.user)
+			this.channels[channelIndex].invited.push(channelCreate.user.pseudo)
 			return {
 				errorNumber: 0,
-				text: "Utilisateur ajouté dans le channel"
+				text: `Vous avez rejoint le channel ${this.channels[channelIndex].name}`
 			};
 		}
 		// Si le channel existe pas, on le créé
