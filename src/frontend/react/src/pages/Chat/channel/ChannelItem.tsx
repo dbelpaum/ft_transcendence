@@ -16,7 +16,9 @@ interface ChannelsItemsProps {
   
 const ChannelItem: React.FC<ChannelsItemsProps> = ({ channelUtility, channel }) => {
 
+	
 	const navigate = useNavigate();
+	if (!channelUtility.me) return null
 	
 	const handleChannelClick = () => {
 		navigate(`/chat?channel=${channel.name}`);

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, ChangeEvent, FormEvent  } from 'react';
-import { Channel, ChannelCreate, ChannelUtility } from '../chat.interface';
+import { Channel, ChannelCreate, ChannelUtility, MpChannel } from '../chat.interface';
 import { useLocation } from 'react-router-dom';
 import { useAuth } from '../../../context/AuthContexte';
 import { useNavigate } from 'react-router-dom';
@@ -79,27 +79,37 @@ const CreateChannel: React.FC<CreateChannelsProps> = ({ channelUtility }) => {
 			{
 				
 				try {
-					const response = await fetch('http://localhost:4000/channel/all/' + channelUtility.me.pseudo,
+					const responseChannels = await fetch('http://localhost:4000/channel/all/',
 					{headers: {
 						'Authorization': `Bearer ${authToken}`
 					  }
 					}
 					  ); // URL de votre API
-					if (!response.ok) {
-						throw new Error(`Erreur HTTP : ${response.status}`);
+					if (!responseChannels.ok) {
+						throw new Error(`Erreur HTTP : ${responseChannels.status}`);
 					}
-					const data : Channel[]= await response.json();
-					channelUtility.setChannels(data); // Mise à jour de l'état avec les données de l'API
+					const dataChannels : Channel[]= await responseChannels.json();
+					channelUtility.setChannels(dataChannels); // Mise à jour de l'état avec les données de l'API
 
-
+					const responseMps = await fetch('http://localhost:4000/channel/mp',
+					{headers: {
+						'Authorization': `Bearer ${authToken}`
+					  }
+					}
+					  ); // URL de votre API
+					if (!responseMps.ok) {
+						throw new Error(`Erreur HTTP : ${responseMps.status}`);
+					}
+					const dataMps : MpChannel[]= await responseMps.json();
+					channelUtility.setMpChannels(dataMps)
+					console.log("les mp")
+					console.log(dataMps)
 					if (channelUrl)
 					{
-						if (!data.some(c => c.name === channelUrl))
+						if (!dataChannels.some(c => c.name === channelUrl))
 						{
 							navigate('/chat');
 						}
-
-
 					}
 
 		 		} catch (error) {

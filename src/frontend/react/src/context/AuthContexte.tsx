@@ -3,7 +3,7 @@ import React, { ReactNode, createContext, useContext, useState, useEffect } from
 import { useErrorMessage, ErrorMessageProvider } from './ErrorContexte';
 import { User } from './AuthInteface';
 import { useLocation } from 'react-router-dom';
-import { ChannelCreate, ClientToServerEvents, Message, ServerToClientEvents } from '../pages/Chat/chat.interface';
+import { ChannelCreate, ClientToServerEvents, Message, MpChannel, ServerToClientEvents } from '../pages/Chat/chat.interface';
 import { io, Socket } from 'socket.io-client';
 import { showNotification } from '../pages/Game/Notification';
 
@@ -144,12 +144,12 @@ useEffect(() => {
 				updatedChannels.forEach((channel) => {
 					chatSocket.emit('join_channel', channel);
 				});
-				}
+			}
 			}catch (error) {
 				console.error('Error parsing JSON from localStorage:', error);
 				console.error('Data that caused the error:', localStorage.getItem('channels'));
 				// Gérez l'erreur ou initialisez savedChannels à une valeur par défaut
-			  }
+			}
 			
 
 		});
@@ -161,12 +161,12 @@ useEffect(() => {
 		chatSocket.on('chat', (e) => {
 			setMessages((messages) => [...messages, e]);
 		});
-
+		
 		chatSocket.on('notif', (e) => {
 			showNotification("Chat", e.message, e.type)
 			recharger()
 		})
-	
+
 		return () => {
 			chatSocket.off('connect');
 			chatSocket.off('disconnect');

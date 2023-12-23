@@ -11,7 +11,8 @@ import {
 	ClientToServerEvents,
 	Channel,
 	ChannelUtility,
-	ChannelCreate
+	ChannelCreate,
+	MpChannel
   } from './chat.interface';
   import { User } from '../../context/AuthInteface';
 import { useAuth } from '../../context/AuthContexte'; 
@@ -34,6 +35,7 @@ function Chat(){
 	const { user, setUser, chatSocket, messages, setMessages, recharger, forceReload } = useAuth(); 
 	
 	const [channels, setChannels] = useState<Channel[]>([]);
+	const [mpChannels, setMpChannels] = useState<MpChannel[]>([]);
 
 
 
@@ -45,7 +47,10 @@ function Chat(){
 		message: messages,
 		setMessages: setMessages,
 		recharger: recharger,
-		forceReload: forceReload
+		forceReload: forceReload,
+		mpChannels: mpChannels,
+		setMpChannels: setMpChannels,
+
 	  };
 
 	return (

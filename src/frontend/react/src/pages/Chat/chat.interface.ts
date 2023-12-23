@@ -52,6 +52,8 @@ export interface ChannelUtility {
 	setMessages: Dispatch<SetStateAction<Message[]>>;
 	recharger: () => void,
 	forceReload: number
+	mpChannels: MpChannel[],
+	setMpChannels: Dispatch<SetStateAction<MpChannel[]>>,
   }
 
 export interface ChannelCreate {
