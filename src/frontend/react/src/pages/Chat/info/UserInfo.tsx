@@ -4,6 +4,7 @@ import {
   ChannelUtility,
 	Message,
 	addAdminInfo,
+	MpChannel,
   } from '../chat.interface';
 import { User } from '../../../context/AuthInteface';
 import crownIconPath from '../assets/couronne.svg';
@@ -126,6 +127,21 @@ const UserInfo: React.FC<userInfoProps> = ({ channelUtility, userAndAdmin, chann
 		}
 	}
 
+	const triggerMp = () => {
+		if (channelUrl && channelUtility && channelUtility.me && channelUtility.socket)
+		{
+			const mpCreateInfo : MpChannel =
+			{
+				user1: channelUtility.me,
+				user2: userAndAdmin.user,
+			}
+			channelUtility.socket.emit('mp_create', mpCreateInfo);
+            setShowModal(false);
+			channelUtility.recharger()
+
+		}
+	}
+
 
 	
 
@@ -158,6 +174,10 @@ const UserInfo: React.FC<userInfoProps> = ({ channelUtility, userAndAdmin, chann
 						}
 					</div>
 				)}
+			{(channelUtility.me.pseudo !== userAndAdmin.user.pseudo)
+				&& (
+				<button className="mp-button" onClick={triggerMp}>Mp</button>
+			)}
 			</div>
 			
         </div>

@@ -33,6 +33,12 @@ export interface Channel {
 	mute: string[]
 }
 
+export interface MpChannel
+{
+	user1: User,
+	user2: User
+}
+
 export interface ChannelCreate {
 	name: string
 	user: User

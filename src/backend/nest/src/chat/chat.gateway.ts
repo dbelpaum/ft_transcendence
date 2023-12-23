@@ -13,6 +13,8 @@ import {
   addAdminInfo,
   Notif,
   UserTokenInfo,
+  CreateMpInfo,
+  MpChannel,
 } from './chat.interface';
 import { Server, Socket } from 'socket.io';
 import { ChannelService } from 'src/channel/channel.service';
@@ -310,8 +312,38 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		message: `Vous avez modifé les settings de ${payload.name}`,
 		type: "success" 
 	}
-	this.server.to(client.id).emit('notif',  notif);
-    
+	this.server.to(client.id).emit('notif',  notif); 
+  }
+
+  @SubscribeMessage('mp_create')
+  async mp_create(
+    @MessageBody() payload: MpChannel,
+  	@ConnectedSocket() client: Socket
+	): Promise<void> {
+		if (client.user.id !== payload.user1.id ) return ; // Securité
+		if (!payload.user1.socketId) return 
+
+
+		this.logger.log(`${payload.user1.pseudo} created mp channel with ${payload.user1.pseudo}`)
+
+		const response = this.channelService.addMpChannel(payload)
+
+		if (response.errorNumber == 0)
+		{
+			const notif : Notif = 
+			{ 
+				message: `Nouveau channel de message privé créé avec  ${payload.user2}`,
+				type: "success" 
+			}
+			const notif2 : Notif = 
+			{ 
+				message: `${payload.user1} a créé un nouveau channel de messages privés avec vous`,
+				type: "success" 
+			}
+			this.server.to(payload.user1.socketId).emit('notif',  notif); 
+			this.server.to(payload.user2.socketId).emit('notif',  notif2); 
+		}
+		
   }
 
 

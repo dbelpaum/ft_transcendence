@@ -19,6 +19,7 @@ export interface ClientToServerEvents {
 	kick: (e: addAdminInfo) => void
 	ban: (e: addAdminInfo) => void
 	mute: (e: addAdminInfo) => void
+	mp_create: (e: MpChannel) => void
 }
 
 export interface Channel {
@@ -80,3 +81,9 @@ export interface Notif {
 }
 
 export type NotificationType = 'success' | 'danger' | 'info' | 'default' | 'warning';
+
+export interface MpChannel
+{
+	user1: User,
+	user2: User,
+}
