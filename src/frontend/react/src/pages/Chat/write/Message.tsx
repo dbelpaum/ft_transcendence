@@ -8,11 +8,12 @@ interface MessageProps {
   channelUtility: ChannelUtility;
 	message: Message;
 	channelUrl: string|null;
+	mpUrl: string|null
 }
 
-const MessageComponent: React.FC<MessageProps> = ({ channelUtility, message, channelUrl }) => {
+const MessageComponent: React.FC<MessageProps> = ({ channelUtility, message, channelUrl, mpUrl }) => {
 
-	if (message.channelName !== channelUrl) {
+	if (message.channelName !== channelUrl && message.channelName !== mpUrl) {
 		  return null; // Ne rien afficher si les channels ne correspondent pas
 	}
 

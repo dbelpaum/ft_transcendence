@@ -14,8 +14,6 @@ function Profil() {
 
 
   useEffect(() => {
-	console.log("le user id")
-	console.log(userId)
     if (userId) {
       fetch(`http://localhost:4000/user/${userId}`)
         .then(response => response.json())

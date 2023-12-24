@@ -31,32 +31,53 @@ const MessageInput: React.FC<MessageInputProps> = ({ setMessages, messages, sock
 	return new URLSearchParams(useLocation().search);
 };
 	const channelUrl = useQuery().get('channel'); 
+	const mpUrl = useQuery().get('mp');
+	
 
   const handleMessageSubmit = (e: React.FormEvent) => {
 	e.preventDefault();
 	if (inputValue.trim() !== '' && channelUrl) {
-	  // Si l'input n'est pas vide, on affiche le chat et ajoute le message
-	  setShowChat(true);
-	  setShowErrorMessage(false); // Cache le message d'erreur s'il était affiché
-	  const newMessage: Message = {
-		message: inputValue.trim(),
-		user: user as User,
-		id: uuidv4(),
-		timeSent: new Date(Date.now()).toLocaleString('en-US'),
-		channelName: channelUrl
-	};
+		// Si l'input n'est pas vide, on affiche le chat et ajoute le message
+		setShowChat(true);
+		setShowErrorMessage(false); // Cache le message d'erreur s'il était affiché
+		const newMessage: Message = {
+			message: inputValue.trim(),
+			user: user as User,
+			id: uuidv4(),
+			timeSent: new Date(Date.now()).toLocaleString('en-US'),
+			channelName: channelUrl,
+			type: "channel"
+		};
+		if (user && newMessage) {
+			const result = socket.emit('chat', newMessage);
+		}
+		else {
+			setShowErrorMessage(true);
+		}
+		window.dispatchEvent(new CustomEvent('scrollToBottom'));
+	}
+	else if (inputValue.trim() !== '' && mpUrl) {
+		// Si l'input n'est pas vide, on affiche le chat et ajoute le message
+		setShowChat(true);
+		setShowErrorMessage(false); // Cache le message d'erreur s'il était affiché
+		const newMessage: Message = {
+			message: inputValue.trim(),
+			user: user as User,
+			id: uuidv4(),
+			timeSent: new Date(Date.now()).toLocaleString('en-US'),
+			channelName: mpUrl,
+			type: "mp"
+		};
+		if (user && newMessage) {
+			const result = socket.emit('chat', newMessage);
+		}
+		else {
+			setShowErrorMessage(true);
+		}
+		window.dispatchEvent(new CustomEvent('scrollToBottom'));
+	}
 	setInputValue(''); // Efface l'input après l'envoi du message
-	if (user && newMessage) {
-		const result = socket.emit('chat', newMessage);
-	}
-	else {
-	  // Si l'input est vide, on affiche un message d'erreur
-	  setShowErrorMessage(true);
-	}
-	window.dispatchEvent(new CustomEvent('scrollToBottom'));
 
-	
-}
 };
 
   const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {

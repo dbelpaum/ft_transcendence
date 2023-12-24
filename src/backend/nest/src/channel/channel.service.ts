@@ -4,6 +4,7 @@ import {
 	ChannelCreate,
 	InviteToChannel,
 	Message,
+	MpChannel,
 	User, 
 	UserTokenInfo, 
 	addAdminInfo, 
@@ -17,8 +18,73 @@ import { Server, Socket } from 'socket.io';
 export class ChannelService {
 	private channels: Channel[] = []
 	private connectedUsers: UserTokenInfo[] = []
+	private mpChannel : MpChannel[] = []
   
+	getUserByPseudo(pseudo: string): User | undefined {
+		const user = this.connectedUsers.find(u => u.pseudo === pseudo);
+		return user ? user : undefined;
+	}
 
+	getUserPseudoByID(userID: number): string | undefined {
+		const user = this.connectedUsers.find(u => u.id === userID);
+		return user ? user.pseudo : undefined;
+	}
+	
+	
+	addMpChannel(mpChannelCreate: MpChannel): joinResponse {
+		const mpChannelExists = this.mpChannel.some(mp => 
+			(mp.user1.id === mpChannelCreate.user1.id && mp.user2.id === mpChannelCreate.user2.id) ||
+			(mp.user1.id === mpChannelCreate.user2.id && mp.user2.id === mpChannelCreate.user1.id)
+		);
+		
+		if (!mpChannelExists) {
+			this.mpChannel.push(mpChannelCreate);
+			return {
+				errorNumber: 0,
+				text: `Nouveau channel créé`
+			};
+		}
+		return {
+			errorNumber: 1,
+			text: `Le channel existe deja`
+		};
+	}
+
+	removeMpChannel(user1Id: number, user2Id: number): void {
+		this.mpChannel = this.mpChannel.filter(mp => 
+			!(mp.user1.id === user1Id && mp.user2.id === user2Id) &&
+			!(mp.user1.id === user2Id && mp.user2.id === user1Id)
+		);
+	}
+
+	removeAllMpChannelOfUser(userId: number): void {
+		this.mpChannel = this.mpChannel.filter(mp => 
+			(mp.user1.id !== userId) && (mp.user2.id !== userId) 
+		);
+	}
+	
+
+	findMpChannel(user1Id: number, user2Id: number): MpChannel | undefined {
+		return this.mpChannel.find(mp => 
+		  (mp.user1.id === user1Id && mp.user2.id === user2Id) ||
+		  (mp.user1.id === user2Id && mp.user2.id === user1Id)
+		);
+	}
+	  
+	getAllMpChannelsByUser(userId: number): MpChannel[]
+	{
+		return this.mpChannel.filter(mp => mp.user1.id === userId || mp.user2.id === userId);
+	}
+
+	mpChannelExists(user1Id: number, user2Id: number): boolean {
+		return this.mpChannel.some(mp => 
+		  (mp.user1.id === user1Id && mp.user2.id === user2Id) ||
+		  (mp.user1.id === user2Id && mp.user2.id === user1Id)
+		);
+	  }
+	  
+
+	  
 	addConnectedUser(user: UserTokenInfo): void {
 		const userExists = this.connectedUsers.some(u => u.id === user.id);
 		if (!userExists) {
@@ -281,7 +347,7 @@ export class ChannelService {
 			{
 				return {
 					errorNumber: 25,
-					text: `Vous essayez de rejoindre un channel alors que vous etes deja dedans ${his.channels[channelIndex].name}`
+					text: `Vous essayez de creer ou rejoindre un channel alors que vous etes deja dedans ${this.channels[channelIndex].name}`
 				};
 			}
 

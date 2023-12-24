@@ -19,6 +19,7 @@ export interface ClientToServerEvents {
 	kick: (e: addAdminInfo) => void
 	ban: (e: addAdminInfo) => void
 	mute: (e: addAdminInfo) => void
+	mp_create: (e: MpChannel) => void
 }
 
 export interface Channel {
@@ -40,6 +41,7 @@ export interface Message {
     timeSent?: string;
     message: string;
 	channelName: string;
+	type: "channel" | "mp";
 }
   
 export interface ChannelUtility {
@@ -51,6 +53,8 @@ export interface ChannelUtility {
 	setMessages: Dispatch<SetStateAction<Message[]>>;
 	recharger: () => void,
 	forceReload: number
+	mpChannels: MpChannel[],
+	setMpChannels: Dispatch<SetStateAction<MpChannel[]>>,
   }
 
 export interface ChannelCreate {
@@ -80,3 +84,9 @@ export interface Notif {
 }
 
 export type NotificationType = 'success' | 'danger' | 'info' | 'default' | 'warning';
+
+export interface MpChannel
+{
+	user1: User,
+	user2: User,
+}

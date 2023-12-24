@@ -10,6 +10,7 @@ export interface Message {
     timeSent: string;
     message: string;
 	channelName: string;
+	type: "channel" | "mp";
 }
   
 export interface ServerToClientEvents {
@@ -31,6 +32,12 @@ export interface Channel {
 	invited: string[]
 	ban: string[]
 	mute: string[]
+}
+
+export interface MpChannel
+{
+	user1: User,
+	user2: User
 }
 
 export interface ChannelCreate {

@@ -3,7 +3,7 @@ import React, { ReactNode, createContext, useContext, useState, useEffect } from
 import { useErrorMessage, ErrorMessageProvider } from './ErrorContexte';
 import { User } from './AuthInteface';
 import { useLocation } from 'react-router-dom';
-import { ChannelCreate, ClientToServerEvents, Message, ServerToClientEvents } from '../pages/Chat/chat.interface';
+import { ChannelCreate, ClientToServerEvents, Message, MpChannel, ServerToClientEvents } from '../pages/Chat/chat.interface';
 import { io, Socket } from 'socket.io-client';
 import { showNotification } from '../pages/Game/Notification';
 
@@ -51,10 +51,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 	const tokenUrl = query.get('token'); 
 
 	// Récupérez votre token JWT
-	const token = sessionStorage.getItem('token');
+	const token = localStorage.getItem('token');
 
 
-  // Chargez le token JWT depuis sessionStorage lors du démarrage
+  // Chargez le token JWT depuis localStorage lors du démarrage
   useEffect(() => {
 	const getUserData = async (authToken:string) => {
 	  try {
@@ -89,7 +89,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 	};
   
 	const authentificate = async () => {
-	  const tokenSession = tokenUrl || sessionStorage.getItem('token');
+	  const tokenSession = tokenUrl || localStorage.getItem('token');
 	  if (tokenSession) {
 		  await getUserData(tokenSession);
 		await login(tokenSession);
@@ -102,8 +102,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
 
   const login = async (token:string) => {
-	sessionStorage.removeItem('token');
-    sessionStorage.setItem('token', token);
+	localStorage.removeItem('token');
+    localStorage.setItem('token', token);
     setAuthToken(token);
 
 	const newChatSocket = io("http://localhost:4000", {
@@ -117,7 +117,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const logout = () => {
 	if (chatSocket)	chatSocket.disconnect()
-	sessionStorage.clear()
+	localStorage.clear()
 	setAuthToken(null);
 	setUser(null)
 };
@@ -132,7 +132,7 @@ useEffect(() => {
 			const updatedUser = { ...user, socketId: chatSocket.id };
 			setUser(updatedUser); 
 			try{
-				const savedChannels: ChannelCreate[] = JSON.parse(sessionStorage.getItem('channels') || '[]');
+				const savedChannels: ChannelCreate[] = JSON.parse(localStorage.getItem('channels') || '[]');
 				const updatedChannels = savedChannels.map(channel => {
 					return {
 						...channel, 
@@ -144,12 +144,12 @@ useEffect(() => {
 				updatedChannels.forEach((channel) => {
 					chatSocket.emit('join_channel', channel);
 				});
-				}
+			}
 			}catch (error) {
-				console.error('Error parsing JSON from sessionStorage:', error);
-				console.error('Data that caused the error:', sessionStorage.getItem('channels'));
+				console.error('Error parsing JSON from localStorage:', error);
+				console.error('Data that caused the error:', localStorage.getItem('channels'));
 				// Gérez l'erreur ou initialisez savedChannels à une valeur par défaut
-			  }
+			}
 			
 
 		});
@@ -160,13 +160,15 @@ useEffect(() => {
 	
 		chatSocket.on('chat', (e) => {
 			setMessages((messages) => [...messages, e]);
+			console.log("nouveau message")
+			console.log(e)
 		});
-
+		
 		chatSocket.on('notif', (e) => {
 			showNotification("Chat", e.message, e.type)
 			recharger()
 		})
-	
+
 		return () => {
 			chatSocket.off('connect');
 			chatSocket.off('disconnect');

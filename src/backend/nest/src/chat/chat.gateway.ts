@@ -13,6 +13,8 @@ import {
   addAdminInfo,
   Notif,
   UserTokenInfo,
+  CreateMpInfo,
+  MpChannel,
 } from './chat.interface';
 import { Server, Socket } from 'socket.io';
 import { ChannelService } from 'src/channel/channel.service';
@@ -238,7 +240,29 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	// Si la personne est mute, on envoie rien
 	if (await this.channelService.isMuted(payload)) return payload
 
-	this.server.to(payload.channelName).emit('chat', payload) 
+	if (payload.type === "channel")
+	{
+		this.server.to(payload.channelName).emit('chat', payload) 
+	}
+	else if (payload.type === "mp")
+	{
+		const other = this.channelService.getUserByPseudo(payload.channelName)
+		if (!other) return payload
+		const mpChannel = this.channelService.findMpChannel(payload.user.id, other.id)
+		if (!mpChannel) return payload
+		if (mpChannel.user2.socketId === payload.user.socketId)
+		{
+			this.server.to(mpChannel.user2.socketId).emit('chat', payload) 
+			this.server.to(mpChannel.user1.socketId).emit('chat', {...payload, channelName: mpChannel.user2.pseudo})
+		}
+		else
+		{
+			this.server.to(mpChannel.user1.socketId).emit('chat', payload) 
+			this.server.to(mpChannel.user2.socketId).emit('chat', {...payload, channelName: mpChannel.user1.pseudo})
+		}
+
+
+	}
     return payload;
   }
 
@@ -304,14 +328,61 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		timeSent: null,
 		message: `${payload.user.pseudo} modified the settings of ${payload.name}`,
 		channelName: payload.name,
+		type: "channel"
 	})
 	const notif : Notif = 
 	{ 
 		message: `Vous avez modifé les settings de ${payload.name}`,
 		type: "success" 
 	}
-	this.server.to(client.id).emit('notif',  notif);
-    
+	this.server.to(client.id).emit('notif',  notif); 
+  }
+
+  @SubscribeMessage('mp_create')
+  async mp_create(
+    @MessageBody() payload: MpChannel,
+  	@ConnectedSocket() client: Socket
+	): Promise<void> {
+		if (client.user.id !== payload.user1.id ) return ; // Securité
+		if (!payload.user1.socketId) return 
+
+
+		this.logger.log(`${payload.user1.pseudo} created mp channel with ${payload.user1.pseudo}`)
+
+		const response = this.channelService.addMpChannel(payload)
+
+		if (response.errorNumber == 0)
+		{
+			const notif : Notif = 
+			{ 
+				message: `Nouveau channel de message privé créé avec  ${payload.user2.pseudo}`,
+				type: "success" 
+			}
+			const notif2 : Notif = 
+			{ 
+				message: `${payload.user1.pseudo} a créé un nouveau channel de messages privés avec vous`,
+				type: "success" 
+			}
+			this.server.to(payload.user1.socketId).emit('notif',  notif); 
+			this.server.to(payload.user2.socketId).emit('notif',  notif2); 
+			this.server.to(payload.user1.socketId).emit('chat', 
+			{
+				user: payload.user1,
+				timeSent: null,
+				message: `Début de votre discussions avec ${payload.user2.pseudo}`,
+				channelName: payload.user2.pseudo,
+				type: "mp"
+			})
+			this.server.to(payload.user2.socketId).emit('chat', 
+			{
+				user: payload.user2,
+				timeSent: null,
+				message: `Début de votre discussions avec ${payload.user1.pseudo}`,
+				channelName: payload.user1.pseudo,
+				type: "mp"
+			})
+		}
+		
   }
 
 
@@ -339,6 +410,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   async handleDisconnect(client: Socket): Promise<void> {
     await this.channelService.removeUserFromAllChannels(client.id)
 	this.channelService.removeConnectedUser(client.user.id)
+	this.channelService.removeAllMpChannelOfUser(client.user.id)
     this.logger.log(`Socket disconnected: ${client.id}`)
   }
 

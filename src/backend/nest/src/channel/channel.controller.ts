@@ -1,5 +1,5 @@
-import { Controller, Get, Param, UseGuards } from '@nestjs/common'
-import { Channel, UserTokenInfo } from 'src/chat/chat.interface';
+import { Controller, Get, Param, UseGuards, Request} from '@nestjs/common'
+import { Channel, MpChannel, UserTokenInfo } from 'src/chat/chat.interface';
 import { ChannelService } from './channel.service';
 import { AuthGuard } from '@nestjs/passport';
 
@@ -8,9 +8,9 @@ import { AuthGuard } from '@nestjs/passport';
 export class ChannelController {
   constructor(private channelService: ChannelService) {}
 
-  @Get('/all/:user')
-  async getAllChannels(@Param() params): Promise<Channel[]> {
-    return await this.channelService.getAccessibleChannels(params.user)
+  @Get('/all')
+  async getAllChannels(@Request() req): Promise<Channel[]> {
+    return await this.channelService.getAccessibleChannels(req.user.pseudo)
   }
 
   @Get('/one/:channel')
@@ -28,5 +28,10 @@ export class ChannelController {
   @Get('/connected/:id')
   oneconnected(@Param() params): boolean{
     return this.channelService.isUserConnected(+params.id)
+  }
+
+  @Get('/mp')
+  getMyMps(@Request() req): MpChannel[] {
+    return this.channelService.getAllMpChannelsByUser(req.user.id)
   }
 }
