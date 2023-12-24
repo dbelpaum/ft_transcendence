@@ -20,6 +20,17 @@ export class ChannelService {
 	private connectedUsers: UserTokenInfo[] = []
 	private mpChannel : MpChannel[] = []
   
+	getUserByPseudo(pseudo: string): User | undefined {
+		const user = this.connectedUsers.find(u => u.pseudo === pseudo);
+		return user ? user : undefined;
+	}
+
+	getUserPseudoByID(userID: number): string | undefined {
+		const user = this.connectedUsers.find(u => u.id === userID);
+		return user ? user.pseudo : undefined;
+	}
+	
+	
 	addMpChannel(mpChannelCreate: MpChannel): joinResponse {
 		const mpChannelExists = this.mpChannel.some(mp => 
 			(mp.user1.id === mpChannelCreate.user1.id && mp.user2.id === mpChannelCreate.user2.id) ||
@@ -46,13 +57,19 @@ export class ChannelService {
 		);
 	}
 
+	removeAllMpChannelOfUser(userId: number): void {
+		this.mpChannel = this.mpChannel.filter(mp => 
+			(mp.user1.id !== userId) && (mp.user2.id !== userId) 
+		);
+	}
+	
+
 	findMpChannel(user1Id: number, user2Id: number): MpChannel | undefined {
 		return this.mpChannel.find(mp => 
 		  (mp.user1.id === user1Id && mp.user2.id === user2Id) ||
 		  (mp.user1.id === user2Id && mp.user2.id === user1Id)
 		);
-	  }
-	  
+	}
 	  
 	getAllMpChannelsByUser(userId: number): MpChannel[]
 	{

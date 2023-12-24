@@ -20,6 +20,8 @@ const MpChannelItem: React.FC<MpChannelsItemsProps> = ({ channelUtility, mpChann
 	const navigate = useNavigate();
 	if (!channelUtility.me) return null
 
+	if (!mpChannel.user1) return null
+	if (!mpChannel.user2) return null
 	const other = (mpChannel.user1.id === channelUtility.me.id) ? mpChannel.user2 : mpChannel.user1
 	
 	const handleChannelClick = () => {

@@ -41,6 +41,7 @@ export interface Message {
     timeSent?: string;
     message: string;
 	channelName: string;
+	type: "channel" | "mp";
 }
   
 export interface ChannelUtility {

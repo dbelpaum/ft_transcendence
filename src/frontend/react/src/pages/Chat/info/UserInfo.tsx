@@ -8,6 +8,7 @@ import {
   } from '../chat.interface';
 import { User } from '../../../context/AuthInteface';
 import crownIconPath from '../assets/couronne.svg';
+import { useNavigate } from 'react-router-dom';
 
 interface UserAndAdmin {
 	user: User;
@@ -26,6 +27,7 @@ interface userInfoProps {
 const UserInfo: React.FC<userInfoProps> = ({ channelUtility, userAndAdmin, channelUrl, iAmAdmin, currentChannel}) => {
 	const [showModal, setShowModal] = useState(false);
 	const modalRef = useRef<HTMLDivElement | null>(null)
+	const navigate = useNavigate();
 
 	useEffect(() => {
         // Attacher l'écouteur d'événement
@@ -138,7 +140,7 @@ const UserInfo: React.FC<userInfoProps> = ({ channelUtility, userAndAdmin, chann
 			channelUtility.socket.emit('mp_create', mpCreateInfo);
             setShowModal(false);
 			channelUtility.recharger()
-
+			navigate(`/chat?mp=${userAndAdmin.user.pseudo}`);
 		}
 	}
 

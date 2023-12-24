@@ -160,6 +160,8 @@ useEffect(() => {
 	
 		chatSocket.on('chat', (e) => {
 			setMessages((messages) => [...messages, e]);
+			console.log("nouveau message")
+			console.log(e)
 		});
 		
 		chatSocket.on('notif', (e) => {

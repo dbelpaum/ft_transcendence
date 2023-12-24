@@ -22,6 +22,7 @@ const ChannelWrite: React.FC<ChannelWriteProps> = ({ channelUtility }) => {
 	};
 	const query = useQuery();
 	const channelUrl = query.get('channel'); 
+	const mpUrl = query.get('mp'); 
 
 	useEffect(() => {
 		const handleScrollToBottom = () => {
@@ -84,7 +85,7 @@ const ChannelWrite: React.FC<ChannelWriteProps> = ({ channelUtility }) => {
 			};
 		}
 		
-	if (!channelUrl)
+	if (!channelUrl && !mpUrl)
 	{
 		return (
 			<div className="write-chat no-channel">
@@ -100,9 +101,9 @@ const ChannelWrite: React.FC<ChannelWriteProps> = ({ channelUtility }) => {
 		<div className='write-chat' ref={bottomRef}>
 			<h2>{channelUrl}</h2>
 			<div className='chat-box'>
-			{isUserInChannel ? (
+			{(isUserInChannel || mpUrl) ? (
 				channelUtility.message.map((message, index) => (
-					<MessageComponent channelUtility={channelUtility} message={message} key={index} channelUrl={channelUrl} />
+					<MessageComponent channelUtility={channelUtility} message={message} key={index} channelUrl={channelUrl} mpUrl={mpUrl}/>
 				))
 				) : (
 					<form onSubmit={handleJoinChannel} className="join-channel-form">

@@ -3,6 +3,7 @@ import { useParams } from 'react-router-dom';
 import "./UserProfil.css";
 import { Link } from "react-router-dom";
 import { useAuth } from "../../context/AuthContexte";
+import { User } from "../../context/AuthInteface";
 
 interface UserInfo {
 	id: number;
@@ -24,7 +25,7 @@ const UserProfile: React.FC = () => {
     const [userInfo, setUserInfo] = useState<UserInfo | null>(null);
     const [isFriend, setIsFriend] = useState<boolean>(false);
     const [isConnected, setIsConnected] = useState<boolean>(false);
-    const {authToken} = useAuth();
+    const {authToken, user} = useAuth();
 
     const { pseudo } = useParams<{ pseudo: string }>();
 
@@ -78,6 +79,7 @@ const UserProfile: React.FC = () => {
         return () => clearInterval(interval);
     }, [userInfo]);
 
+
     if (!userInfo) {
         return <div>Chargement...</div>;
     }
@@ -106,6 +108,9 @@ const UserProfile: React.FC = () => {
 				) : (
 					<button>Ajouter comme ami</button>
 				)}
+			</div>
+			<div className="mp">
+				<button onClick={triggerMp}>Enovoer un mp</button>
 			</div>
 		</main>
   );
