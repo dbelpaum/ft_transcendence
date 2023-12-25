@@ -137,14 +137,14 @@ export class ChannelService {
 
 	  
 	addConnectedUser(user: UserTokenInfo): void {
-		const userExists = this.connectedUsers.some(u => u.id === user.id);
+		const userExists = this.connectedUsers.some(u => u.socketId === user.socketId);
 		if (!userExists) {
 			this.connectedUsers.push(user);
 		}
 	}
 	  
-	removeConnectedUser(userId: number): void {
-		this.connectedUsers = this.connectedUsers.filter(u => u.id !== userId);
+	removeConnectedUser(userSocketId: string): void {
+		this.connectedUsers = this.connectedUsers.filter(u => u.socketId !== userSocketId);
 	}
 
 	isUserConnected(userId: number): boolean {

@@ -421,7 +421,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
   async handleDisconnect(client: Socket): Promise<void> {
     await this.channelService.removeUserFromAllChannels(client.id)
-	this.channelService.removeConnectedUser(client.user.id)
+	this.channelService.removeConnectedUser(client.id)
 	this.channelService.checkAndRemoveInactiveMpChannels(client.user.id)
 	const listOtherMpUserSocket = this.channelService.getSocketIdsInMpChannelsWithUser(client.user.id)
 	listOtherMpUserSocket.forEach(socketId => {
