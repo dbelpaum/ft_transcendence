@@ -290,7 +290,7 @@ export class ChannelService {
 
 
 		// Sinon, on supprime la personne de la liste des users
-		this.channels[channelIndex].users = this.channels[channelIndex].users.filter(user => user.pseudo !== adminInfo.user_to_modify.pseudo);
+		this.channels[channelIndex].users = this.channels[channelIndex].users.filter(user => user.id !== adminInfo.user_to_modify.id);
 		this.channels[channelIndex].host = this.channels[channelIndex].host.filter(pseudo => pseudo !== adminInfo.user_to_modify.pseudo);
 		return true
 	}
@@ -480,6 +480,20 @@ export class ChannelService {
 		  }
 	  }
 
+	}
+
+	async userInChannel(id: number, channelName: string): Promise<boolean>
+	{
+		const channelIndex = await this.getChannelByName(channelName)
+		if (channelIndex === -1) return false
+		return this.channels[channelIndex].users.some(u => u.id === id)
+	}
+
+	async userInChannelBySocketIt(socketId: string, channelName: string): Promise<boolean>
+	{
+		const channelIndex = await this.getChannelByName(channelName)
+		if (channelIndex === -1) return false
+		return this.channels[channelIndex].users.some(u => u.socketId === socketId)
 	}
 
 	async getAllChannels(): Promise<Channel[]> {

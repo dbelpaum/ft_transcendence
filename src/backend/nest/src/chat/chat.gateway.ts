@@ -240,6 +240,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
 	if (payload.type === "channel")
 	{
+		if (!await this.channelService.userInChannelBySocketIt(client.id, payload.channelName)) return payload
 		this.server.to(payload.channelName).emit('chat', payload) 
 	}
 	else if (payload.type === "mp")
