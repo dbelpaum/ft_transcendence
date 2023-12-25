@@ -14,10 +14,15 @@ export class FortyTwoService extends PassportStrategy(Strategy, '42') {
   }
 
   async validate(accessToken: string, refreshToken: string, profile: any): Promise<any> {
-    const user = {
-      fortytwoId: profile.id,
-      accessToken
-    };
-    return user;
+	try {
+		const user = {
+		  fortytwoId: profile.id,
+		  accessToken
+		};
+		return user;
+	  } catch (error) {
+		throw new Error('Erreur d\'autehntificaiton 42');
+		
+	  }
   }
 }

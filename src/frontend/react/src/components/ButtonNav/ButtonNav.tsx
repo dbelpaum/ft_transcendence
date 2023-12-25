@@ -32,19 +32,6 @@ function ButtonNav({ color, text, path }: ButtonNavProps) {
     };
 
 
-    const handleClick = () => {
-        fetch(path, {
-          method: 'GET',
-      })
-      .then(response => {
-          if (response.ok) {
-              window.location.href = path;
-          } else {
-              console.error('Error during the request:', response.statusText);
-          }
-      })
-      .catch(error => console.error('Fetch error:', error));
-            };
 
     return (
         <a style={buttonStyle} href={path} rel="noopener noreferrer">{text}</a>

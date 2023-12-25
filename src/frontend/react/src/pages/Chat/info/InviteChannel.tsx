@@ -2,11 +2,11 @@ import React, { useState, useEffect } from 'react';
 import {
 	Channel,
 	ChannelUtility
-  } from './chat.interface';
+  } from '../chat.interface';
 import { useLocation } from 'react-router-dom';
 import UserInfo from './UserInfo';
-import { User } from '../../context/AuthInteface';
-import { InviteToChannel } from './chat.interface';
+import { User } from '../../../context/AuthInteface';
+import { InviteToChannel } from '../chat.interface';
 interface ChannelInviteProps {
 	channelUtility: ChannelUtility;
 	channelUrl: string;
@@ -34,7 +34,7 @@ const InviteChannel: React.FC<ChannelInviteProps> = ({ channelUtility, channelUr
 	const handleInvite = (e: React.FormEvent) => {
 		e.preventDefault();
 		// Logique pour envoyer l'invitation ici
-		if (!channelUtility || !channelUtility.me)
+		if (!channelUtility || !channelUtility.me || !channelUtility.socket)
 			return
 		const inviteToChannel : InviteToChannel = 
 		{

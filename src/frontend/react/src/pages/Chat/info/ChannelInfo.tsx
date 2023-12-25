@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import {
 	ChannelUtility
-  } from './chat.interface';
+  } from '../chat.interface';
 import { useLocation } from 'react-router-dom';
 import UserInfo from './UserInfo';
-import { User } from '../../context/AuthInteface';
+import { User } from '../../../context/AuthInteface';
 import InviteChannel from './InviteChannel';
 import ModifyChannel from './ModifyChannel';
 

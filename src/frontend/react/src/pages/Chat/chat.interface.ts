@@ -1,13 +1,11 @@
 import { io, Socket } from 'socket.io-client';
 import { Dispatch, SetStateAction } from 'react';
 import { User } from '../../context/AuthInteface';
-
-  
-
   
 // Interface for when server emits events to clients.
 export interface ServerToClientEvents {
     chat: (e: Message) => void;
+    notif: (e: Notif) => void;
 }
   
 // Interface for when clients emit events to the server.
@@ -21,6 +19,7 @@ export interface ClientToServerEvents {
 	kick: (e: addAdminInfo) => void
 	ban: (e: addAdminInfo) => void
 	mute: (e: addAdminInfo) => void
+	mp_create: (e: MpChannel) => void
 }
 
 export interface Channel {
@@ -42,18 +41,20 @@ export interface Message {
     timeSent?: string;
     message: string;
 	channelName: string;
+	type: "channel" | "mp";
 }
   
 export interface ChannelUtility {
 	me: User|null;
-	socket: Socket<ServerToClientEvents, ClientToServerEvents>;
+	socket: Socket<ServerToClientEvents, ClientToServerEvents> | null;
 	channels: Channel[];
 	setChannels: Dispatch<SetStateAction<Channel[]>>;
 	message: Message[],
 	setMessages: Dispatch<SetStateAction<Message[]>>;
-
 	recharger: () => void,
 	forceReload: number
+	mpChannels: MpChannel[],
+	setMpChannels: Dispatch<SetStateAction<MpChannel[]>>,
   }
 
 export interface ChannelCreate {
@@ -73,6 +74,19 @@ export interface InviteToChannel
 export interface addAdminInfo
 {
 	channel: string
-	new_name: string
+	user_to_modify: User
 	user: User
+}
+
+export interface Notif {
+	message: string,
+	type: NotificationType
+}
+
+export type NotificationType = 'success' | 'danger' | 'info' | 'default' | 'warning';
+
+export interface MpChannel
+{
+	user1: User,
+	user2: User,
 }

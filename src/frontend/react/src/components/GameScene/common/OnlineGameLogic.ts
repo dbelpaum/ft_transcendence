@@ -107,10 +107,6 @@ export class OnlineGameLogic {
 		this.ball = new THREE.Mesh(sphereGeometry, ballMaterial);
 		this.ball.position.z = 0;
 
-		// const randomAngle = (Math.PI / 3) * (Math.random() * 2 - 1);
-		// this.ballVelX = Math.sin(randomAngle);
-		// this.ballVelY = -Math.cos(randomAngle);
-
 		this.scene.add(this.ground, this.player, this.opponent, this.ball);
 	}
 
@@ -167,30 +163,6 @@ export class OnlineGameLogic {
 		}
 	}
 
-	// private checkCollisions(paddle: THREE.Mesh): boolean {
-	// 	return (
-	// 		this.ball.position.x >= paddle.position.x - this.paddleWidth / 2 &&
-	// 		this.ball.position.x <= paddle.position.x + this.paddleWidth / 2 &&
-	// 		this.ball.position.y >=
-	// 			paddle.position.y - this.paddleHeight / 2 - this.ballRadius &&
-	// 		this.ball.position.y <=
-	// 			paddle.position.y + this.paddleHeight / 2 + this.ballRadius
-	// 	);
-	// }
-
-	// private newRound() {
-	// 	this.ball.position.x = 0;
-	// 	this.ball.position.y = 0;
-	// 	this.player.position.x = 0;
-	// 	this.opponent.position.x = 0;
-	// 	this.gameTick = 0;
-	// 	this.ballSpeedModifier = 1;
-
-	// 	const randomAngle = (Math.PI / 3) * (Math.random() * 2 - 1);
-	// 	this.ballVelX = Math.sin(randomAngle);
-	// 	this.ballVelY = -Math.cos(randomAngle);
-	// }
-
 	private isValidMovement(posX: number, offset: number): boolean {
 		return (
 			posX + offset > -this.camera.position.z + this.paddleWidth / 2 &&
@@ -209,44 +181,12 @@ export class OnlineGameLogic {
 				" Opponent";
 		}
 
-		// if (this.ball.position.x > 300 || this.ball.position.x < -300) {
-		// 	this.ballVelX = -this.ballVelX;
-		// }
-
-		// if (this.ball.position.y < -230 || this.ball.position.y > 230) {
-		// 	if (this.ball.position.y < -230) {
-		// 		this.opponentScore++;
-		// 	} else {
-		// 		this.playerScore++;
-		// 	}
-		// 	this.newRound();
-		// }
-
 		this.ball.position.x += this.ballVelX * this.ballSpeedModifier;
 		this.ball.position.y += this.ballVelY * this.ballSpeedModifier;
 
 		this.ball.position.z =
 			(185 + -0.004 * this.ball.position.y ** 2) * this.cameraInUse.id;
 
-		// if (this.checkCollisions(this.player)) {
-		// 	const hitIndex =
-		// 		(this.ball.position.x - this.player.position.x) /
-		// 		(this.paddleWidth / 2);
-		// 	const maxReflectionAngle = Math.PI / 3;
-		// 	const reflectionAngle = hitIndex * maxReflectionAngle;
-		// 	this.ballVelX = Math.sin(reflectionAngle);
-		// 	this.ballVelY = Math.cos(reflectionAngle);
-		// 	this.ballSpeedModifier = Math.exp(this.gameTick / 5000);
-		// } else if (this.checkCollisions(this.opponent)) {
-		// 	const hitIndex =
-		// 		(this.ball.position.x - this.opponent.position.x) /
-		// 		(this.paddleWidth / 2);
-		// 	const maxReflectionAngle = Math.PI / 3;
-		// 	const reflectionAngle = hitIndex * maxReflectionAngle;
-		// 	this.ballVelX = Math.sin(reflectionAngle);
-		// 	this.ballVelY = -Math.cos(reflectionAngle);
-		// 	this.ballSpeedModifier = Math.exp(this.gameTick / 5000);
-		// }
 
 		if (
 			this.isValidMovement(
@@ -275,7 +215,15 @@ export class OnlineGameLogic {
 		this.ballSpeedModifier = data.ballSpeedModifier;
 		this.player.position.x = data.paddlePlayer.x;
 		this.opponent.position.x = data.paddleOpponent.x;
-		// this.playerScore = data.scores[this.socket.id];
+		// scores: Record<Socket["id"], number>
+		const scores = data.scores as Record<Socket["id"], number>;
+		for (let key in scores) {
+			if (key === this.socket.id) {
+				this.playerScore = scores[key];
+			} else {
+				this.opponentScore = scores[key];
+			}
+		}
 	}
 
 	private animate() {
@@ -288,7 +236,6 @@ export class OnlineGameLogic {
 			this.receiveGameState(data);
 		});
 
-		// this.newRound();
 		this.animate();
 
 		// Add event listeners for keydown and keyup

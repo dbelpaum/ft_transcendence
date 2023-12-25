@@ -3,10 +3,10 @@ import {
 	Channel,
 	ChannelCreate,
 	ChannelUtility
-  } from './chat.interface';
+  } from '../chat.interface';
 import { useLocation } from 'react-router-dom';
 import UserInfo from './UserInfo';
-import { User } from '../../context/AuthInteface';
+import { User } from '../../../context/AuthInteface';
 
 
 interface ModifyChannelProps {
@@ -43,7 +43,7 @@ const ModifyChannel: React.FC<ModifyChannelProps> = ({ channelUtility, channelUr
 	const handleModifyChannel = (e: React.FormEvent) => {
 		e.preventDefault();
 		// Logique pour envoyer l'invitation ici
-		if (!channelUtility || !channelUtility.me)
+		if (!channelUtility || !channelUtility.me || !channelUtility.socket)
 			return
 		const modifiedChannel : ChannelCreate = {
 			name: currentChannel.name,
@@ -51,13 +51,18 @@ const ModifyChannel: React.FC<ModifyChannelProps> = ({ channelUtility, channelUr
 			type: channelType,
 			mdp: modifiedMdp
 		}
-
-		channelUtility.socket.emit('modify_channel', modifiedChannel);
-		console.log(modifiedChannel)
-		var savedChannels: ChannelCreate[] = JSON.parse(sessionStorage.getItem('channels') || '[]');
-		savedChannels = savedChannels.filter(chan => chan.name !== modifiedChannel.name)
-		const newChannels: ChannelCreate[]  = [...savedChannels, modifiedChannel];
-		sessionStorage.setItem('channels', JSON.stringify(newChannels));
+		try
+		{
+			channelUtility.socket.emit('modify_channel', modifiedChannel);
+			var savedChannels: ChannelCreate[] = JSON.parse(localStorage.getItem('channels') || '[]');
+			savedChannels = savedChannels.filter(chan => chan.name !== modifiedChannel.name)
+			const newChannels: ChannelCreate[]  = [...savedChannels, modifiedChannel];
+			localStorage.setItem('channels', JSON.stringify(newChannels));
+		}catch (error) {
+			console.error('Error parsing JSON from localStorage:', error);
+			console.error('Data that caused the error:', localStorage.getItem('channels'));
+			// Gérez l'erreur ou initialisez savedChannels à une valeur par défaut
+		}
 	};
     return (
         <div className="modify-channel-container">

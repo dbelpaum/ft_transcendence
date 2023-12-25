@@ -5,6 +5,7 @@ import { useAuth } from "../../context/AuthContexte";
 import { Link } from "react-router-dom";
 import FriendshipButton from "../../components/FriendshipButton/FriendshipButton";
 
+
 interface UserInfo {
     id: number;
     id42: number;
@@ -24,10 +25,13 @@ interface UserProfileProps {
 
 const UserProfile: React.FC = () => {
     const [userInfo, setUserInfo] = useState<UserInfo | null>(null);
-    const [isFriend, setIsFriend] = useState<boolean | null>(null);
-    const [friendshipStatus, setFriendshipStatus] = useState<string | null>(null); // 'friend' | 'pending' | 'blocked' | null
     const [buttonStatus, setButtonStatus] = useState<"addFriend" | "removeFriend" | "block" | "cancelRequest">('addFriend');
-    const { user } = useAuth();
+
+    const [isConnected, setIsConnected] = useState<boolean>(false);
+    const {authToken, user} = useAuth();
+    const [friendshipStatus, setFriendshipStatus] = useState<string | null>(null); // 'friend' | 'pending' | 'blocked' | null
+    
+
     const { pseudo } = useParams<{ pseudo: string }>();
 
     useEffect(() => {
@@ -47,6 +51,72 @@ const UserProfile: React.FC = () => {
             .catch(error => console.log(error));
 
     }, [pseudo]);
+
+
+	useEffect(() => {
+        if (!userInfo) {
+            console.log("Aucun pseudo utilisateur fourni");
+            return;
+        }
+
+        // Fonction pour faire la requête
+        const checkConnection = () => {
+            fetch(`http://localhost:4000/channel/connected/` + userInfo.id, 
+			{
+				headers: {
+					'Authorization': `Bearer ${authToken}`
+				}
+			})
+                .then(response => response.json())
+                .then((isConnected) => {
+                    setIsConnected(isConnected);
+                })
+                .catch(error => console.log(error));
+        };
+
+        // Appel initial
+        checkConnection();
+
+        // Configuration de l'intervalle
+        const interval = setInterval(checkConnection, 30000); // 30000 ms = 30 secondes
+
+        // Nettoyage en cas de démontage du composant
+        return () => clearInterval(interval);
+    }, [userInfo]);
+
+
+
+	useEffect(() => {
+        if (!userInfo) {
+            console.log("Aucun pseudo utilisateur fourni");
+            return;
+        }
+
+        // Fonction pour faire la requête
+        const checkConnection = () => {
+            fetch(`http://localhost:4000/channel/connected/` + userInfo.id, 
+			{
+				headers: {
+					'Authorization': `Bearer ${authToken}`
+				}
+			})
+                .then(response => response.json())
+                .then((isConnected) => {
+                    setIsConnected(isConnected);
+                })
+                .catch(error => console.log(error));
+        };
+
+        // Appel initial
+        checkConnection();
+
+        // Configuration de l'intervalle
+        const interval = setInterval(checkConnection, 30000); // 30000 ms = 30 secondes
+
+        // Nettoyage en cas de démontage du composant
+        return () => clearInterval(interval);
+    }, [userInfo]);
+
 
 
 useEffect(() => {
@@ -70,8 +140,8 @@ useEffect(() => {
         .catch(error => console.log(error));
      }, [user?.id42, userInfo?.id42]);
 
-    console.log(friendshipStatus);
-    console.log(buttonStatus);
+    // console.log(friendshipStatus);
+    // console.log(buttonStatus);
 
 
     // console.log(`L'utilisateur a ajouter est: ${userInfo?.pseudo}`);
@@ -103,39 +173,36 @@ useEffect(() => {
     }
 
     return (
-      <main className="user-profile-container">
-          <div className="profile-header">
-              <img src={userInfo.imageURL} alt={userInfo.pseudo} className="profile-pic"/>
-              <h1>{userInfo.firstname} {userInfo.lastname}</h1>
-              <p className="user-email">{userInfo.email}</p>
-              <p className="user-bio">{userInfo.bio}</p>
-          </div>
-          <div className="profile-details">
-              <h2>À propos de moi</h2>
-              <p>Pseudo: {userInfo.pseudo}</p>
-              <p>Membre depuis: {new Date(userInfo.createdAt).toLocaleDateString()}</p>
-          </div>
-          <div className="friend-action">
-          {friendshipStatus === 'notFriends' && (
+		<main className="user-profile-container">
+			<div className="profile-header">
+				<img src={userInfo.imageURL} alt={userInfo.pseudo} className="profile-pic"/>
+				<h1>{userInfo.firstname} {userInfo.lastname}
+					<span className='channel_status'>
+						<div className={isConnected ? "status_indicator connected" : "status_indicator"}></div>
+					</span>
+				</h1>
+				<p className="user-email">{userInfo.email}</p>
+				<p className="user-bio">{userInfo.bio}</p>
+			</div>
+			<div className="profile-details">
+				<h2>À propos de moi</h2>
+				<p>Pseudo: {userInfo.pseudo}</p>
+				<p>Membre depuis: {new Date(userInfo.createdAt).toLocaleDateString()}</p>
+				
+			</div>
+			<div className="friend-action">
+            {friendshipStatus === 'notFriends' && (
             <FriendshipButton
                 status={buttonStatus}
                 onButtonClick={ handleAddFriendClick}
                 color="green"
             />
           )}
-
-            
-
-
-            {/* {isFriend ===true && (
-                <FriendshipButton
-                    status={buttonStatus}
-                    onButtonClick={buttonStatus === 'addFriend' ? handleAddFriendClick : () => console.log('Probleme avec la requete d\'ami')}
-                    color={buttonStatus === 'addFriend' ? 'green' : 'grey'}
-                />
-            )} */}
-          </div>
-      </main>
+			</div>
+			<div className="mp">
+				<button>Envoyer un mp</button>
+			</div>
+		</main>
   );
 };
 

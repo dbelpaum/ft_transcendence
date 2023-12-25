@@ -4,6 +4,8 @@ import LogoutButton from '../../components/LogoutButton/LogoutButton';
 import EditableTextField from '../../components/EditableTextField/EditableTextField';
 import { useAuth } from '../../context/AuthContexte';
 import UserList from '../UserList/UserList';
+import { Link } from 'react-router-dom';
+import { User } from '../../context/AuthInteface';
 
 interface UserInfo {
   pseudo: string;
@@ -16,13 +18,12 @@ interface UserInfo {
 }
 
 function Profil() {
-  const { user } = useAuth();
+  const { user, login} = useAuth();
   const userId = user?.id42;
-  const [userInfo, setUserInfo] = useState<UserInfo | null>(null);
+  const [userInfo, setUserInfo] = useState<User | null>(null);
+
 
   useEffect(() => {
-	console.log("le user id")
-	console.log(userId)
     if (userId) {
       fetch(`http://localhost:4000/user/${userId}`)
         .then(response => response.json())
@@ -31,7 +32,7 @@ function Profil() {
     }
   }, [userId]);
 
-  const saveField = (field: keyof UserInfo, value: string) => {
+  const saveField = (field: keyof User, value: string) => {
     if (userId && userInfo) {
       const updatedUserInfo = { ...userInfo, [field]: value };
       setUserInfo(updatedUserInfo);
@@ -90,17 +91,17 @@ function Profil() {
               onSave={(value) => saveField('lastname', value)}
             />
             
-            <EditableTextField
+            {/* <EditableTextField
               label="Bio"
               value={userInfo.bio}
               onSave={(value) => saveField('bio', value)}
-            />
+            /> */}
 
           </>
         )}
 
 
-          <a href="/UserList"> Liste des joueurs</a>
+	<Link to="/UserList">Liste des joueurs</Link>
 
       </div>
     </main>
