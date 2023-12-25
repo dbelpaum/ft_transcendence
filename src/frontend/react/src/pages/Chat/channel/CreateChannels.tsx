@@ -102,8 +102,6 @@ const CreateChannel: React.FC<CreateChannelsProps> = ({ channelUtility }) => {
 					}
 					const dataMps : MpChannel[]= await responseMps.json();
 					channelUtility.setMpChannels(dataMps)
-					console.log("les mp")
-					console.log(dataMps)
 					if (channelUrl)
 					{
 						if (!dataChannels.some(c => c.name === channelUrl))

@@ -12,42 +12,71 @@ export class AuthentificationController {
 	private prisma: PrismaService,
 	private jwtService: JwtService,){}
 
+	
+	private delay(ms) {
+		return new Promise(resolve => setTimeout(resolve, ms));
+	  }
+	  
+	private async tryFetch(url, options, maxAttempts = 2, delayDuration = 1000) {
+		try {
+			const response = await fetch(url, options);
+			if (!response.ok) {
+			throw new Error(`API responded with status ${response.status}`);
+			}
+			return response.json();
+		} catch (error) {
+			if (maxAttempts > 1) {
+			console.log(`Tentative échouée. Tentatives restantes : ${maxAttempts - 1}`);
+			await this.delay(delayDuration); // Attendez ici avant de réessayer
+			return await this.tryFetch(url, options, maxAttempts - 1, delayDuration);
+			} else {
+			throw error;
+			}
+		}
+	}
   @Get('42')
   @UseGuards(AuthGuard('42'))
   async login42(@Req() req, ) {
     // L'utilisateur est automatiquement authentifié ici
   }
 
+  @Get('42/error')
+  error() {
+    // Gérer la page d'erreur
+    return 'Erreur d\'authentification';
+  }
+
   @Get('42/callback')
   @UseGuards(AuthGuard('42'))
   async callback42(@Req() req, @Res() res: Response) {
-    // Gérer le callback après l'authentification
-    // En fait on est la quand la personne a reussis a etre identifié
+	try{
+		// Gérer le callback après l'authentification
+		// En fait on est la quand la personne a reussis a etre identifié
 
-    // DOnc ici je refais une requete a l'api, a /me pour avoir les infos sur qui est la personne connecte
-    // Dans authorisation je met le access tocker que le premier appel en api m'a donné
-      const apiResponse = await fetch('https://api.intra.42.fr/v2/me', {
-        method: 'GET',
-        headers: {
-          'Authorization': `Bearer ${req.user.accessToken}`,
-          'Content-Type': 'application/json'
-        }
-      });
-    
-      //Ici j'ai la reponse de l'api
-      const userData = await apiResponse.json();
+		// DOnc ici je refais une requete a l'api, a /me pour avoir les infos sur qui est la personne connecte
+		// Dans authorisation je met le access tocker que le premier appel en api m'a donné
+		const apiOptions = {
+			method: 'GET',
+			headers: {
+			'Authorization': `Bearer ${req.user.accessToken}`,
+			'Content-Type': 'application/json'
+			}
+		};
+	
+		const userData = await this.tryFetch('https://api.intra.42.fr/v2/me', apiOptions);
+	
 
-      // Ici j'ai enregistrer dans la session les infos que j'ai reçu
-      // Tu peux aussi enregistrer celles qui t'interessent dans la bdd avec prisma, en une ligne ou 2
-    //   session.user = { id: userData.id, login: userData.login, email: userData.email, imageURL: userData.image.link, firstname: userData.first_name, lastname: userData.last_name};
-      const findUser = await this.prisma.user.findUnique({
-        where: {
-          id42: userData.id,
-        },
-      });
+		// Ici j'ai enregistrer dans la session les infos que j'ai reçu
+		// Tu peux aussi enregistrer celles qui t'interessent dans la bdd avec prisma, en une ligne ou 2
+		//   session.user = { id: userData.id, login: userData.login, email: userData.email, imageURL: userData.image.link, firstname: userData.first_name, lastname: userData.last_name};
+		const findUser = await this.prisma.user.findUnique({
+			where: {
+			id42: userData.id,
+			},
+		});
 
 		var dataToken;
-      	if (!findUser){
+		if (!findUser){
 			const newUser = {
 				id42: userData.id,
 				pseudo: userData.login,
@@ -64,18 +93,24 @@ export class AuthentificationController {
 				id42: UserBdd.id42,
 				pseudo: UserBdd.pseudo
 			}
-        
-      }
-      else{
+		}
+		else
+		{
 			dataToken = {
 				id: findUser.id,
 				id42: findUser.id42,
 				pseudo: findUser.pseudo
 
 			}
-      }
-	  const token = this.jwtService.sign(dataToken);
-      res.redirect(`http://localhost:3000/profil?token=${token}`);
+		}
+		const token = this.jwtService.sign(dataToken);
+		res.redirect(`http://localhost:3000/profil?token=${token}`);
+	}catch (error) {
+		// Gérez l'erreur ici
+		console.error('Erreur lors de l’appel à l’API externe', error);
+		res.redirect(`http://localhost:3000?error=errorAuthentification`);
+
+	}	
   }
 
     // Un nouveau controlleur 42/profil

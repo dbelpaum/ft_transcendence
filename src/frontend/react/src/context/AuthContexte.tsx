@@ -5,7 +5,7 @@ import { User } from './AuthInteface';
 import { useLocation } from 'react-router-dom';
 import { ChannelCreate, ClientToServerEvents, Message, MpChannel, ServerToClientEvents } from '../pages/Chat/chat.interface';
 import { io, Socket } from 'socket.io-client';
-import { showNotification } from '../pages/Game/Notification';
+import { showNotification, showNotificationError } from '../pages/Game/Notification';
 
 
 
@@ -48,7 +48,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 		return new URLSearchParams(useLocation().search);
 	};
 	const query = useQuery();
-	const tokenUrl = query.get('token'); 
+	const tokenUrl = query.get('token');
+	const error = query.get('error');
 
 	// Récupérez votre token JWT
 	const token = localStorage.getItem('token');
@@ -56,6 +57,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   // Chargez le token JWT depuis localStorage lors du démarrage
   useEffect(() => {
+	if (error === "errorAuthentification")
+	{
+		showNotificationError("Athentification error", "Erreur lors de la requete a l'api 42. Recommencez, ça devrait marcher")
+	}
 	const getUserData = async (authToken:string) => {
 	  try {
 		setIsLoading(true);

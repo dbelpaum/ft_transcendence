@@ -22,22 +22,14 @@ export class ChannelService {
   
 
 	checkAndRemoveInactiveMpChannels(userId: number): void {
-		// console.log("avant")
-		// console.log(this.mpChannel)
-		console.log(this.connectedUsers)
 		this.mpChannel = this.mpChannel.filter(mpChannel => {
-		  // Vérifie si l'utilisateur spécifié est dans le mpChannel
 		  if (mpChannel.user1.id === userId || mpChannel.user2.id === userId) {
-			// Vérifie si au moins un des utilisateurs du mpChannel est connecté
 			if (this.isUserConnected(mpChannel.user1.id)) return true
 			if (this.isUserConnected(mpChannel.user2.id)) return true
 			return false
 		  }
-		  // Si l'utilisateur spécifié n'est pas dans le mpChannel, le conserver
 		  return true;
 		});
-		// console.log("apres")
-		// console.log(this.mpChannel)
 	}
 
 	getSocketIdsInMpChannelsWithUser(userId: number): string[] {

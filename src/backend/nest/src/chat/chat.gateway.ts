@@ -13,7 +13,6 @@ import {
   addAdminInfo,
   Notif,
   UserTokenInfo,
-  CreateMpInfo,
   MpChannel,
 } from './chat.interface';
 import { Server, Socket } from 'socket.io';
@@ -247,7 +246,6 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	{
 		const other = this.channelService.getUserByPseudo(payload.channelName)
 		if (!other){
-			console.log("tu essaie de parler a quelqu'un de deco")
 			this.server.to(payload.user.socketId).emit("chat", 
 			{
 				user: payload.user,
@@ -403,12 +401,11 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		  // Validez le token ici
 		  const payload = jwt.verify(token, 'votre_secret_jwt');
 		  client.user = {
-			  id: payload.id,
-			  id42: payload.id42,
-			  pseudo: payload.pseudo,
+			  id: (payload as any).id,
+			  id42: (payload as any).id42,
+			  pseudo: (payload as any).pseudo,
 			  socketId: client.id
 			}
-			console.log("voila qui se co " + client.user.pseudo)
 
 
 		  this.channelService.addConnectedUser(client.user)
@@ -427,7 +424,6 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	this.channelService.removeConnectedUser(client.user.id)
 	this.channelService.checkAndRemoveInactiveMpChannels(client.user.id)
 	const listOtherMpUserSocket = this.channelService.getSocketIdsInMpChannelsWithUser(client.user.id)
-	console.log("voila qui se déco " + client.user.pseudo)
 	listOtherMpUserSocket.forEach(socketId => {
 		const socket = this.server.sockets.sockets.get(socketId);
 		if (socket) {
