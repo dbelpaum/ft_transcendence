@@ -110,7 +110,7 @@ const UserProfile: React.FC = () => {
 				)}
 			</div>
 			<div className="mp">
-				<button onClick={triggerMp}>Enovoer un mp</button>
+				<button>Envoyer un mp</button>
 			</div>
 		</main>
   );

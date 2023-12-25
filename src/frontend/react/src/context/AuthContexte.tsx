@@ -5,7 +5,7 @@ import { User } from './AuthInteface';
 import { useLocation } from 'react-router-dom';
 import { ChannelCreate, ClientToServerEvents, Message, MpChannel, ServerToClientEvents } from '../pages/Chat/chat.interface';
 import { io, Socket } from 'socket.io-client';
-import { showNotification } from '../pages/Game/Notification';
+import { showNotification, showNotificationError } from '../pages/Game/Notification';
 
 
 
@@ -48,7 +48,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 		return new URLSearchParams(useLocation().search);
 	};
 	const query = useQuery();
-	const tokenUrl = query.get('token'); 
+	const tokenUrl = query.get('token');
+	const error = query.get('error');
 
 	// Récupérez votre token JWT
 	const token = localStorage.getItem('token');
@@ -56,6 +57,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   // Chargez le token JWT depuis localStorage lors du démarrage
   useEffect(() => {
+	if (error === "errorAuthentification")
+	{
+		showNotificationError("Athentification error", "Erreur lors de la requete a l'api 42. Recommencez, ça devrait marcher")
+	}
 	const getUserData = async (authToken:string) => {
 	  try {
 		setIsLoading(true);
@@ -69,15 +74,15 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 		if (response.ok) {
 			const userData = await response.json();
 			if (Object.keys(userData).length !== 0) {
-			setUser(userData); // Utilisateur connecté
-			console.log("the user data");
-			} else {
-			setUser(null);
+				setUser(userData); // Utilisateur connecté
+				console.log("the user data");
+			}
+			else {
+				setUser(null);
 			}
 		}
 		else
 		{
-			console.log("je passe la")
 			setUser(null)
 		}
 		
@@ -89,23 +94,24 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 	};
   
 	const authentificate = async () => {
-	  const tokenSession = tokenUrl || localStorage.getItem('token');
-	  if (tokenSession) {
-		  await getUserData(tokenSession);
-		await login(tokenSession);
-	  }
-	  setIsLoading(false);
+		if (user) return
+		if (authToken) return
+		const tokenSession = tokenUrl || localStorage.getItem('token');
+		if (tokenSession) {
+			await getUserData(tokenSession);
+			await login(tokenSession);
+		}
+		setIsLoading(false);
 	};
   
 	authentificate();
-  }, [authToken]);
+  }, []);
 
 
   const login = async (token:string) => {
 	localStorage.removeItem('token');
     localStorage.setItem('token', token);
     setAuthToken(token);
-
 	const newChatSocket = io("http://localhost:4000", {
 		autoConnect: false,
 		auth: { token: token }
@@ -124,10 +130,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
 useEffect(() => {
 	if (!user || !chatSocket) return
-
+		console.log("is connected + " + isConnected)
 		chatSocket.connect();
-
 		chatSocket.on('connect', () => {
+
 			setIsConnected(true);
 			const updatedUser = { ...user, socketId: chatSocket.id };
 			setUser(updatedUser); 
@@ -156,6 +162,7 @@ useEffect(() => {
 	
 		chatSocket.on('disconnect', () => {
 			setIsConnected(false);
+			console.log("je me deco")
 		});
 	
 		chatSocket.on('chat', (e) => {

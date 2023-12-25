@@ -13,7 +13,6 @@ import {
   addAdminInfo,
   Notif,
   UserTokenInfo,
-  CreateMpInfo,
   MpChannel,
 } from './chat.interface';
 import { Server, Socket } from 'socket.io';
@@ -102,7 +101,6 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	this.server.to(client.id).emit('notif',  notifKicker);
 	this.server.to(payload.user_to_modify.socketId).emit('notif',  notifVictim);
 	
-	console.log(notifKicker)
   }
 
   @SubscribeMessage('ban')
@@ -247,7 +245,17 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	else if (payload.type === "mp")
 	{
 		const other = this.channelService.getUserByPseudo(payload.channelName)
-		if (!other) return payload
+		if (!other){
+			this.server.to(payload.user.socketId).emit("chat", 
+			{
+				user: payload.user,
+				timeSent: null,
+				message: `Votre correspondant ${payload.channelName} a quitté la discussion, inutile de lui parler il entends R`,
+				channelName: payload.channelName,
+				type: "mp"
+			})
+			return payload
+		}
 		const mpChannel = this.channelService.findMpChannel(payload.user.id, other.id)
 		if (!mpChannel) return payload
 		if (mpChannel.user2.socketId === payload.user.socketId)
@@ -388,20 +396,24 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
   async handleConnection(client: Socket): Promise<void> {
 	  try {
+		  
 		  const token = client.handshake.auth.token;
 		  // Validez le token ici
 		  const payload = jwt.verify(token, 'votre_secret_jwt');
 		  client.user = {
-			id: payload.id,
-			id42: payload.id42,
-			pseudo: payload.pseudo,
-			socketId: client.id
-		  }
+			  id: (payload as any).id,
+			  id42: (payload as any).id42,
+			  pseudo: (payload as any).pseudo,
+			  socketId: client.id
+			}
 
 
 		  this.channelService.addConnectedUser(client.user)
+		  this.channelService.updateSocketIdInMpChannels(client.user)
+		  
 		  // Si la vérification échoue, une exception sera lancée
 		} catch (e) {
+			console.log("client disconnected" + e)
 		client.disconnect(); // Déconnectez le client en cas d'échec de la vérification
 	  }
     this.logger.log(`Socket connected: ${client.id}`)
@@ -410,7 +422,22 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   async handleDisconnect(client: Socket): Promise<void> {
     await this.channelService.removeUserFromAllChannels(client.id)
 	this.channelService.removeConnectedUser(client.user.id)
-	this.channelService.removeAllMpChannelOfUser(client.user.id)
+	this.channelService.checkAndRemoveInactiveMpChannels(client.user.id)
+	const listOtherMpUserSocket = this.channelService.getSocketIdsInMpChannelsWithUser(client.user.id)
+	listOtherMpUserSocket.forEach(socketId => {
+		const socket = this.server.sockets.sockets.get(socketId);
+		if (socket) {
+		  socket.emit("chat", 
+			{
+				user: client.user,
+				timeSent: null,
+				message: `Votre correspondant ${client.user.pseudo} a quitté la discussion`,
+				channelName: client.user.pseudo,
+				type: "mp"
+			})
+		}
+	  });
+
     this.logger.log(`Socket disconnected: ${client.id}`)
   }
 

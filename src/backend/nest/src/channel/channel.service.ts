@@ -20,6 +20,46 @@ export class ChannelService {
 	private connectedUsers: UserTokenInfo[] = []
 	private mpChannel : MpChannel[] = []
   
+
+	checkAndRemoveInactiveMpChannels(userId: number): void {
+		this.mpChannel = this.mpChannel.filter(mpChannel => {
+		  if (mpChannel.user1.id === userId || mpChannel.user2.id === userId) {
+			if (this.isUserConnected(mpChannel.user1.id)) return true
+			if (this.isUserConnected(mpChannel.user2.id)) return true
+			return false
+		  }
+		  return true;
+		});
+	}
+
+	getSocketIdsInMpChannelsWithUser(userId: number): string[] {
+		let socketIds: string[] = [];
+	
+		this.mpChannel.forEach(mpChannel => {
+		  if (mpChannel.user1.id === userId && mpChannel.user2?.socketId) {
+			socketIds.push(mpChannel.user2.socketId);
+		  } else if (mpChannel.user2.id === userId && mpChannel.user1?.socketId) {
+			socketIds.push(mpChannel.user1.socketId);
+		  }
+		});
+	
+		return socketIds;
+	  }
+	
+
+	
+	removeMpChannelIfInactive(mpChannel: MpChannel): void {
+		const user1Connected = this.isUserConnected(mpChannel.user1.id);
+		const user2Connected = this.isUserConnected(mpChannel.user2.id);
+
+		if (!user1Connected && !user2Connected) {
+			const index = this.mpChannel.indexOf(mpChannel);
+			if (index !== -1) {
+			this.mpChannel.splice(index, 1);
+			}
+		}
+	}
+	
 	getUserByPseudo(pseudo: string): User | undefined {
 		const user = this.connectedUsers.find(u => u.pseudo === pseudo);
 		return user ? user : undefined;
@@ -49,6 +89,17 @@ export class ChannelService {
 			text: `Le channel existe deja`
 		};
 	}
+
+	updateSocketIdInMpChannels(updatedUser: UserTokenInfo): void {
+		this.mpChannel.forEach(mpChannel => {
+		  if (mpChannel.user1.id === updatedUser.id) {
+			mpChannel.user1.socketId = updatedUser.socketId;
+		  }
+		  if (mpChannel.user2.id === updatedUser.id) {
+			mpChannel.user2.socketId = updatedUser.socketId;
+		  }
+		});
+	  }
 
 	removeMpChannel(user1Id: number, user2Id: number): void {
 		this.mpChannel = this.mpChannel.filter(mp => 
