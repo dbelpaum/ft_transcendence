@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Patch } from '@nestjs/common';
+import { Body, Controller, Get, Param, Patch, Post } from '@nestjs/common';
 import { PrismaService } from 'src/prisma.service';
 
 @Controller('user')
@@ -112,6 +112,13 @@ export class UserController {
         });
     }
 
-    
+    @Patch(':id/bio')
+    async updateBio(@Param('id') id : string, @Body('bio') bio: string) {
+        return await this.prisma.user.update({
+            where: { id42: Number(id) },
+            data: { bio },
+        });
+    }
 
 }
+

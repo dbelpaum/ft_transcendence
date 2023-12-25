@@ -7,6 +7,16 @@ import UserList from '../UserList/UserList';
 import { Link } from 'react-router-dom';
 import { User } from '../../context/AuthInteface';
 
+interface UserInfo {
+  pseudo: string;
+  email: string;
+  id: number;
+  lastname: string;
+  firstname: string;
+  imageURL: string;
+  bio: string;
+}
+
 function Profil() {
   const { user, login} = useAuth();
   const userId = user?.id42;
@@ -81,6 +91,12 @@ function Profil() {
               onSave={(value) => saveField('lastname', value)}
             />
             
+            {/* <EditableTextField
+              label="Bio"
+              value={userInfo.bio}
+              onSave={(value) => saveField('bio', value)}
+            /> */}
+
           </>
         )}
 

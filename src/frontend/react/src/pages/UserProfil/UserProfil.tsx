@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from "react";
 import { useParams } from 'react-router-dom';
 import "./UserProfil.css";
-import { Link } from "react-router-dom";
 import { useAuth } from "../../context/AuthContexte";
-import { User } from "../../context/AuthInteface";
+import { Link } from "react-router-dom";
+import FriendshipButton from "../../components/FriendshipButton/FriendshipButton";
+
 
 interface UserInfo {
-	id: number;
+    id: number;
+    id42: number;
     pseudo: string;
     email: string;
     isFriend: boolean;
@@ -23,9 +25,12 @@ interface UserProfileProps {
 
 const UserProfile: React.FC = () => {
     const [userInfo, setUserInfo] = useState<UserInfo | null>(null);
-    const [isFriend, setIsFriend] = useState<boolean>(false);
+    const [buttonStatus, setButtonStatus] = useState<"addFriend" | "removeFriend" | "block" | "cancelRequest">('addFriend');
+
     const [isConnected, setIsConnected] = useState<boolean>(false);
     const {authToken, user} = useAuth();
+    const [friendshipStatus, setFriendshipStatus] = useState<string | null>(null); // 'friend' | 'pending' | 'blocked' | null
+    
 
     const { pseudo } = useParams<{ pseudo: string }>();
 
@@ -35,16 +40,16 @@ const UserProfile: React.FC = () => {
             return;
         }
 
-        console.log(`Le pseudo est: ${pseudo}`);
+        
 
         
         fetch(`http://localhost:4000/user/by-pseudo/${pseudo}`)
             .then(response => response.json())
             .then((data: UserInfo) => {
                 setUserInfo(data);
-                setIsFriend(data.isFriend);
             })
             .catch(error => console.log(error));
+
     }, [pseudo]);
 
 
@@ -80,8 +85,91 @@ const UserProfile: React.FC = () => {
     }, [userInfo]);
 
 
+
+	useEffect(() => {
+        if (!userInfo) {
+            console.log("Aucun pseudo utilisateur fourni");
+            return;
+        }
+
+        // Fonction pour faire la requête
+        const checkConnection = () => {
+            fetch(`http://localhost:4000/channel/connected/` + userInfo.id, 
+			{
+				headers: {
+					'Authorization': `Bearer ${authToken}`
+				}
+			})
+                .then(response => response.json())
+                .then((isConnected) => {
+                    setIsConnected(isConnected);
+                })
+                .catch(error => console.log(error));
+        };
+
+        // Appel initial
+        checkConnection();
+
+        // Configuration de l'intervalle
+        const interval = setInterval(checkConnection, 30000); // 30000 ms = 30 secondes
+
+        // Nettoyage en cas de démontage du composant
+        return () => clearInterval(interval);
+    }, [userInfo]);
+
+
+
+useEffect(() => {
+    if (!user?.id42 || !userInfo?.id42) {
+        return;
+    }
+    fetch(`http://localhost:4000/friendship/${user?.id42}/relation/${userInfo?.id42}`)
+        .then(response => response.json())
+        .then((data) => {
+            setFriendshipStatus(data.status);
+            if (data === 'friend') {
+                setButtonStatus('removeFriend');
+            } else if (data === 'pending') {
+                setButtonStatus('cancelRequest');
+            } else if (data === 'blocked') {
+                setButtonStatus('block');
+            } else {
+                setButtonStatus('addFriend');
+            }
+        })
+        .catch(error => console.log(error));
+     }, [user?.id42, userInfo?.id42]);
+
+    // console.log(friendshipStatus);
+    // console.log(buttonStatus);
+
+
+    // console.log(`L'utilisateur a ajouter est: ${userInfo?.pseudo}`);
+    // console.log(`L'utilisateur connecté est: ${user?.pseudo}`)
+
     if (!userInfo) {
         return <div>Chargement...</div>;
+    }
+
+    const handleAddFriendClick = () => {
+        // Envoyer la requête d'ami
+        fetch(`http://localhost:4000/friendship/${user?.id}/add-friend/${userInfo?.id}`, {
+            method: 'POST',
+            credentials: 'include',
+        })
+        .then(response => {
+            if (response.ok) {
+                setButtonStatus('cancelRequest');
+            }
+            // } else {
+            //     throw new Error('Échec de la demande d\'ami');
+            // }
+        })
+        .catch(error => {
+            console.error(error);
+            setButtonStatus('addFriend');
+        });
+
     }
 
     return (
@@ -103,11 +191,13 @@ const UserProfile: React.FC = () => {
 				
 			</div>
 			<div className="friend-action">
-				{userInfo.isFriend ? (
-					<p>Vous êtes déjà amis.</p>
-				) : (
-					<button>Ajouter comme ami</button>
-				)}
+            {friendshipStatus === 'notFriends' && (
+            <FriendshipButton
+                status={buttonStatus}
+                onButtonClick={ handleAddFriendClick}
+                color="green"
+            />
+          )}
 			</div>
 			<div className="mp">
 				<button>Envoyer un mp</button>
