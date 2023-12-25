@@ -932,7 +932,7 @@ let FriendshipController = class FriendshipController {
             },
         });
         if (!status) {
-            throw new Error('Friendship not found');
+            return { status: 'notFriends' };
         }
         return status;
     }
@@ -972,7 +972,7 @@ let FriendshipController = class FriendshipController {
                 status: 'pending',
             },
         });
-        return !!friendship;
+        return friendship;
     }
     async acceptFriend(requesterId, addresseeId) {
         const requester = await this.prisma.user.findUnique({

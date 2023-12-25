@@ -25,6 +25,7 @@ interface UserProfileProps {
 const UserProfile: React.FC = () => {
     const [userInfo, setUserInfo] = useState<UserInfo | null>(null);
     const [isFriend, setIsFriend] = useState<boolean | null>(null);
+    const [friendshipStatus, setFriendshipStatus] = useState<string | null>(null); // 'friend' | 'pending' | 'blocked' | null
     const [buttonStatus, setButtonStatus] = useState<"addFriend" | "removeFriend" | "block" | "cancelRequest">('addFriend');
     const { user } = useAuth();
     const { pseudo } = useParams<{ pseudo: string }>();
@@ -42,7 +43,6 @@ const UserProfile: React.FC = () => {
             .then(response => response.json())
             .then((data: UserInfo) => {
                 setUserInfo(data);
-                setIsFriend(data.isFriend);
             })
             .catch(error => console.log(error));
 
@@ -55,17 +55,27 @@ useEffect(() => {
     }
     fetch(`http://localhost:4000/friendship/${user?.id42}/relation/${userInfo?.id42}`)
         .then(response => response.json())
-        .then((data: boolean) => {
-            setIsFriend(data);
+        .then((data) => {
+            setFriendshipStatus(data.status);
+            if (data === 'friend') {
+                setButtonStatus('removeFriend');
+            } else if (data === 'pending') {
+                setButtonStatus('cancelRequest');
+            } else if (data === 'blocked') {
+                setButtonStatus('block');
+            } else {
+                setButtonStatus('addFriend');
+            }
         })
         .catch(error => console.log(error));
      }, [user?.id42, userInfo?.id42]);
 
-    console.log(isFriend)
+    console.log(friendshipStatus);
+    console.log(buttonStatus);
 
 
-    console.log(`L'utilisateur a ajouter est: ${userInfo?.pseudo}`);
-    console.log(`L'utilisateur connecté est: ${user?.pseudo}`)
+    // console.log(`L'utilisateur a ajouter est: ${userInfo?.pseudo}`);
+    // console.log(`L'utilisateur connecté est: ${user?.pseudo}`)
 
     if (!userInfo) {
         return <div>Chargement...</div>;
@@ -80,9 +90,10 @@ useEffect(() => {
         .then(response => {
             if (response.ok) {
                 setButtonStatus('cancelRequest');
-            } else {
-                throw new Error('Échec de la demande d\'ami');
             }
+            // } else {
+            //     throw new Error('Échec de la demande d\'ami');
+            // }
         })
         .catch(error => {
             console.error(error);
@@ -105,10 +116,10 @@ useEffect(() => {
               <p>Membre depuis: {new Date(userInfo.createdAt).toLocaleDateString()}</p>
           </div>
           <div className="friend-action">
-          {isFriend ===false && (
+          {friendshipStatus === 'notFriends' && (
             <FriendshipButton
-                status="addFriend"
-                onButtonClick={buttonStatus === 'addFriend' ? handleAddFriendClick : () => console.log('Probleme avec la requete d\'ami')}
+                status={buttonStatus}
+                onButtonClick={ handleAddFriendClick}
                 color="green"
             />
           )}
@@ -116,13 +127,13 @@ useEffect(() => {
             
 
 
-            {isFriend ===true && (
+            {/* {isFriend ===true && (
                 <FriendshipButton
                     status={buttonStatus}
                     onButtonClick={buttonStatus === 'addFriend' ? handleAddFriendClick : () => console.log('Probleme avec la requete d\'ami')}
                     color={buttonStatus === 'addFriend' ? 'green' : 'grey'}
                 />
-            )}
+            )} */}
           </div>
       </main>
   );

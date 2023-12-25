@@ -30,7 +30,7 @@ export class FriendshipController {
         });
 
         if (!status) {
-            throw new Error('Friendship not found');
+            return { status: 'notFriends'};
         }
 
         return status;
@@ -89,7 +89,7 @@ export class FriendshipController {
             },
         });
 
-        return !!friendship;
+        return friendship;
     }
 
 
