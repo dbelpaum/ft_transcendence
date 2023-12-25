@@ -69,15 +69,15 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 		if (response.ok) {
 			const userData = await response.json();
 			if (Object.keys(userData).length !== 0) {
-			setUser(userData); // Utilisateur connecté
-			console.log("the user data");
-			} else {
-			setUser(null);
+				setUser(userData); // Utilisateur connecté
+				console.log("the user data");
+			}
+			else {
+				setUser(null);
 			}
 		}
 		else
 		{
-			console.log("je passe la")
 			setUser(null)
 		}
 		
@@ -89,23 +89,24 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 	};
   
 	const authentificate = async () => {
-	  const tokenSession = tokenUrl || localStorage.getItem('token');
-	  if (tokenSession) {
-		  await getUserData(tokenSession);
-		await login(tokenSession);
-	  }
-	  setIsLoading(false);
+		if (user) return
+		if (authToken) return
+		const tokenSession = tokenUrl || localStorage.getItem('token');
+		if (tokenSession) {
+			await getUserData(tokenSession);
+			await login(tokenSession);
+		}
+		setIsLoading(false);
 	};
   
 	authentificate();
-  }, [authToken]);
+  }, []);
 
 
   const login = async (token:string) => {
 	localStorage.removeItem('token');
     localStorage.setItem('token', token);
     setAuthToken(token);
-
 	const newChatSocket = io("http://localhost:4000", {
 		autoConnect: false,
 		auth: { token: token }
@@ -124,10 +125,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
 useEffect(() => {
 	if (!user || !chatSocket) return
-
+		console.log("is connected + " + isConnected)
 		chatSocket.connect();
-
 		chatSocket.on('connect', () => {
+
 			setIsConnected(true);
 			const updatedUser = { ...user, socketId: chatSocket.id };
 			setUser(updatedUser); 
@@ -156,6 +157,7 @@ useEffect(() => {
 	
 		chatSocket.on('disconnect', () => {
 			setIsConnected(false);
+			console.log("je me deco")
 		});
 	
 		chatSocket.on('chat', (e) => {

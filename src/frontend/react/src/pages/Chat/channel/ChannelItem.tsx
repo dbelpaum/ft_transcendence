@@ -34,6 +34,7 @@ const ChannelItem: React.FC<ChannelsItemsProps> = ({ channelUtility, channel }) 
 				localStorage.setItem('channels', JSON.stringify(updatedChannels));
 				channelUtility.socket.disconnect()
 				channelUtility.socket.connect()
+				console.log("je ne devrais pas passer la")
 			}catch (error) {
 				console.error('Error parsing JSON from localStorage:', error);
 				console.error('Data that caused the error:', localStorage.getItem('channels'));
