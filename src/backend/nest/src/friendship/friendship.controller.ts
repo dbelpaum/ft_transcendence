@@ -25,14 +25,11 @@ export class FriendshipController {
                     addresseeId: Number(addresseeId),
                 },
             },
-            select: {
-                status: true,
-            },
         });
 
         if (!friendship) {
-            console.log("notFriend");
-            return { status: 'notFriend'};
+            console.log("notFriend a ete renvoye AAAAAAAAAAAAAAAAAA")
+            return { status: 'notFriend' };
         }
 
         return friendship;
@@ -86,7 +83,7 @@ export class FriendshipController {
             data: {
                 requesterId: Number(requesterId),
                 addresseeId: Number(addresseeId),
-                status: 'friend', // Le statut initial est "pending"
+                status: 'friend',
             },
         });
 
@@ -100,25 +97,39 @@ export class FriendshipController {
         @Param('requesterId') requesterId: string,
         @Param('addresseeId') addresseeId: string
     ) {
+        // Ensure that requesterId and addresseeId are not the same
         if (requesterId === addresseeId) {
+            // throw new HttpException('You cannot remove yourself as a friend', HttpStatus.BAD_REQUEST);
             throw new Error('You cannot remove yourself as a friend');
         }
 
-        // Deleting the friendship where the requester is the current user
-        const friendship = await this.prisma.friendship.deleteMany({
+        // Check if the friendship exists
+        const friendship = await this.prisma.friendship.findUnique({
             where: {
-                requesterId: Number(requesterId),
-                addresseeId: Number(addresseeId),
+                requesterId_addresseeId: {
+                    requesterId: Number(requesterId),
+                    addresseeId: Number(addresseeId),
+                },
             },
         });
 
-        // If no friendship is deleted, throw an error
-        if (friendship.count === 0) {
-            throw new Error('Friendship not found');
+        if (!friendship) {
+            // throw new HttpException('Friendship does not exist', HttpStatus.NOT_FOUND);
+            console.log("Friendship does not exist");
         }
 
-        return { message: 'Friendship removed' };
-}
+        // Delete the friendship
+        await this.prisma.friendship.delete({
+            where: {
+                requesterId_addresseeId: {
+                    requesterId: Number(requesterId),
+                    addresseeId: Number(addresseeId),
+                },
+            },
+        });
+
+        return { message: 'Friendship removed successfully' };
+    }
 
 
 
