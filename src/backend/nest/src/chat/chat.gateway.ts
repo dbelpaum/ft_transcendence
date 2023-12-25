@@ -247,28 +247,32 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	{
 		const other = this.channelService.getUserByPseudo(payload.channelName)
 		if (!other){
-			this.server.to(payload.user.socketId).emit("chat", 
-			{
-				user: payload.user,
-				timeSent: null,
-				message: `Votre correspondant ${payload.channelName} a quitté la discussion, inutile de lui parler il entends R`,
-				channelName: payload.channelName,
-				type: "mp"
+			const socketIdsUser = this.channelService.getSocketIdsByUserId(client.user.id)
+			socketIdsUser.map(socketId => {
+				this.server.to(socketId).emit("chat", 
+				{
+					user: payload.user,
+					timeSent: null,
+					message: `Votre correspondant ${payload.channelName} a quitté la discussion, inutile de lui parler il entends R`,
+					channelName: payload.channelName,
+					type: "mp"
+				})
 			})
+			
 			return payload
 		}
 		const mpChannel = this.channelService.findMpChannel(payload.user.id, other.id)
 		if (!mpChannel) return payload
-		if (mpChannel.user2.socketId === payload.user.socketId)
-		{
-			this.server.to(mpChannel.user2.socketId).emit('chat', payload) 
-			this.server.to(mpChannel.user1.socketId).emit('chat', {...payload, channelName: mpChannel.user2.pseudo})
-		}
-		else
-		{
-			this.server.to(mpChannel.user1.socketId).emit('chat', payload) 
-			this.server.to(mpChannel.user2.socketId).emit('chat', {...payload, channelName: mpChannel.user1.pseudo})
-		}
+		
+		const socketIdsUser2 = this.channelService.getSocketIdsByUserId(mpChannel.user2.id)
+		socketIdsUser2.map(socketId => 
+			this.server.to(socketId).emit('chat', {...payload, channelName: mpChannel.user1.pseudo}) 
+		)
+		const socketIdsUser1 = this.channelService.getSocketIdsByUserId(mpChannel.user1.id)
+		socketIdsUser1.map(socketId => 
+			this.server.to(socketId).emit('chat', {...payload, channelName: mpChannel.user2.pseudo})
+		)
+
 
 
 	}
@@ -410,7 +414,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
 
 		  this.channelService.addConnectedUser(client.user)
-		  this.channelService.updateSocketIdInMpChannels(client.user)
+		  //this.channelService.updateSocketIdInMpChannels(client.user)
 		  
 		  // Si la vérification échoue, une exception sera lancée
 		} catch (e) {

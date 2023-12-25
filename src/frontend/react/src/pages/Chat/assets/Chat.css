@@ -512,3 +512,9 @@ a{
 .user-profile-container .channel_status .status_indicator.connected{
 	background-color: green;
 }
+
+.mp{
+	display: flex;
+	justify-content: center;
+	margin-top: 24px;
+}

@@ -37,16 +37,21 @@ export class ChannelService {
 	
 		this.mpChannel.forEach(mpChannel => {
 		  if (mpChannel.user1.id === userId && mpChannel.user2?.socketId) {
-			socketIds.push(mpChannel.user2.socketId);
+			this.getSocketIdsByUserId(mpChannel.user2.id).map(theSockedId => socketIds.push(theSockedId))
 		  } else if (mpChannel.user2.id === userId && mpChannel.user1?.socketId) {
-			socketIds.push(mpChannel.user1.socketId);
+			this.getSocketIdsByUserId(mpChannel.user1.id).map(theSockedId => socketIds.push(theSockedId))
 		  }
 		});
 	
 		return socketIds;
 	  }
 	
-
+    // Cette méthode renvoie tous les socketId pour un utilisateur donné
+    getSocketIdsByUserId(userId: number): string[] {
+        return this.connectedUsers
+            .filter(user => user.id === userId) // Filtrer pour ne garder que les entrées correspondant à l'ID
+            .map(user => user.socketId);        // Extraire le socketId de chaque entrée
+    }
 	
 	removeMpChannelIfInactive(mpChannel: MpChannel): void {
 		const user1Connected = this.isUserConnected(mpChannel.user1.id);
