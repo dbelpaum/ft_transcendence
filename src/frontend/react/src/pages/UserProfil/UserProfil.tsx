@@ -27,7 +27,7 @@ interface UserProfileProps {
 
 const UserProfile: React.FC = () => {
     const [userInfo, setUserInfo] = useState<UserInfo | null>(null);
-    const [buttonStatus, setButtonStatus] = useState<"addFriend" | "removeFriend" | "block" | "cancelRequest">('addFriend');
+    const [buttonStatus, setButtonStatus] = useState<"addFriend" | "removeFriend" | "block" >('addFriend');
 
     const [isConnected, setIsConnected] = useState<boolean>(false);
     const {authToken, user, chatSocket, recharger} = useAuth();
@@ -126,22 +126,26 @@ useEffect(() => {
     if (!user?.id42 || !userInfo?.id42) {
         return;
     }
-    fetch(`http://localhost:4000/friendship/${user?.id42}/relation/${userInfo?.id42}`)
+    fetch(`http://localhost:4000/friendship/${user?.id}/relation/${userInfo?.id}`)
         .then(response => response.json())
-        .then((data) => {
-            setFriendshipStatus(data.status);
-            if (data === 'friend') {
+        .then((response) => {
+            console.log('test de response ' + response.status)
+            setFriendshipStatus(response.status);
+            if (friendshipStatus === 'friend') {
                 setButtonStatus('removeFriend');
-            } else if (data === 'pending') {
-                setButtonStatus('cancelRequest');
-            } else if (data === 'blocked') {
+            } else if (friendshipStatus === 'blocked') {
                 setButtonStatus('block');
+                console.log('On rentre dans le else if')
             } else {
+                
                 setButtonStatus('addFriend');
+                console.log('On rentre dans le else')
             }
         })
         .catch(error => console.log(error));
-     }, [user?.id42, userInfo?.id42]);
+     }, [user?.id, userInfo?.id]);
+
+     
 
     // console.log(friendshipStatus);
     // console.log(buttonStatus);
@@ -154,6 +158,8 @@ useEffect(() => {
         return <div>Chargement...</div>;
     }
 
+    console.log('Friendship status initial ' + friendshipStatus);
+
     const handleAddFriendClick = () => {
         // Envoyer la requête d'ami
         fetch(`http://localhost:4000/friendship/${user?.id}/add-friend/${userInfo?.id}`, {
@@ -162,7 +168,8 @@ useEffect(() => {
         })
         .then(response => {
             if (response.ok) {
-                setButtonStatus('cancelRequest');
+                setButtonStatus('removeFriend');
+                setFriendshipStatus('friend');
             }
             // } else {
             //     throw new Error('Échec de la demande d\'ami');
@@ -173,7 +180,28 @@ useEffect(() => {
             setButtonStatus('addFriend');
         });
 
+
+
     }
+
+    const handleRemoveFriendClick = async () => {
+        try {
+            const response = await fetch(`http://localhost:4000/friendship/${user?.id}/remove-friend/${userInfo?.id}`, {
+                method: 'POST',
+                credentials: 'include',
+            });
+    
+            if (!response.ok) {
+                throw new Error('Failed to remove friend');
+            }
+    
+            setButtonStatus('addFriend');
+            setFriendshipStatus('notFriend');
+        } catch (error) {
+            console.error(error);
+        }
+    }
+
 
 	const triggerMp = () => {
 		if (user && chatSocket)
@@ -189,8 +217,6 @@ useEffect(() => {
 		}
 
 	}
-
-
 
     return (
 		<main className="user-profile-container">
@@ -211,13 +237,23 @@ useEffect(() => {
 				
 			</div>
 			<div className="friend-action">
-            {friendshipStatus === 'notFriends' && (
-				<FriendshipButton
-					status={buttonStatus}
-					onButtonClick={ handleAddFriendClick}
-					color="green"
-				/>
+            {friendshipStatus === 'notFriend' && (
+            <FriendshipButton
+                status={buttonStatus}
+                onButtonClick={ handleAddFriendClick}
+                color="green"
+            />
           )}
+
+            {friendshipStatus === 'friend' && (
+            <FriendshipButton
+                status={'removeFriend'}
+                onButtonClick={handleRemoveFriendClick}
+                color="red"
+                />
+            )}
+
+
 			</div>
 			<div className="mp">
 				<button onClick={triggerMp}>Envoyer un mp</button>

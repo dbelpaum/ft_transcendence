@@ -29,7 +29,7 @@ model User {
 model Friendship {
   id          Int       @id @default(autoincrement())
   createdAt   DateTime  @default(now())
-  status      String    @default("pending") // Peut être 'pending', 'accepted', 'blocked'
+  status      String    @default("friend") // peut etre friend , notFriend , blocked
   requesterId Int
   requester   User      @relation("RequesterRelation", fields: [requesterId], references: [id])
   addresseeId Int
