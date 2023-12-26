@@ -37,16 +37,21 @@ export class ChannelService {
 	
 		this.mpChannel.forEach(mpChannel => {
 		  if (mpChannel.user1.id === userId && mpChannel.user2?.socketId) {
-			socketIds.push(mpChannel.user2.socketId);
+			this.getSocketIdsByUserId(mpChannel.user2.id).map(theSockedId => socketIds.push(theSockedId))
 		  } else if (mpChannel.user2.id === userId && mpChannel.user1?.socketId) {
-			socketIds.push(mpChannel.user1.socketId);
+			this.getSocketIdsByUserId(mpChannel.user1.id).map(theSockedId => socketIds.push(theSockedId))
 		  }
 		});
 	
 		return socketIds;
 	  }
 	
-
+    // Cette méthode renvoie tous les socketId pour un utilisateur donné
+    getSocketIdsByUserId(userId: number): string[] {
+        return this.connectedUsers
+            .filter(user => user.id === userId) // Filtrer pour ne garder que les entrées correspondant à l'ID
+            .map(user => user.socketId);        // Extraire le socketId de chaque entrée
+    }
 	
 	removeMpChannelIfInactive(mpChannel: MpChannel): void {
 		const user1Connected = this.isUserConnected(mpChannel.user1.id);
@@ -137,14 +142,14 @@ export class ChannelService {
 
 	  
 	addConnectedUser(user: UserTokenInfo): void {
-		const userExists = this.connectedUsers.some(u => u.id === user.id);
+		const userExists = this.connectedUsers.some(u => u.socketId === user.socketId);
 		if (!userExists) {
 			this.connectedUsers.push(user);
 		}
 	}
 	  
-	removeConnectedUser(userId: number): void {
-		this.connectedUsers = this.connectedUsers.filter(u => u.id !== userId);
+	removeConnectedUser(userSocketId: string): void {
+		this.connectedUsers = this.connectedUsers.filter(u => u.socketId !== userSocketId);
 	}
 
 	isUserConnected(userId: number): boolean {
@@ -290,7 +295,7 @@ export class ChannelService {
 
 
 		// Sinon, on supprime la personne de la liste des users
-		this.channels[channelIndex].users = this.channels[channelIndex].users.filter(user => user.pseudo !== adminInfo.user_to_modify.pseudo);
+		this.channels[channelIndex].users = this.channels[channelIndex].users.filter(user => user.id !== adminInfo.user_to_modify.id);
 		this.channels[channelIndex].host = this.channels[channelIndex].host.filter(pseudo => pseudo !== adminInfo.user_to_modify.pseudo);
 		return true
 	}
@@ -480,6 +485,20 @@ export class ChannelService {
 		  }
 	  }
 
+	}
+
+	async userInChannel(id: number, channelName: string): Promise<boolean>
+	{
+		const channelIndex = await this.getChannelByName(channelName)
+		if (channelIndex === -1) return false
+		return this.channels[channelIndex].users.some(u => u.id === id)
+	}
+
+	async userInChannelBySocketIt(socketId: string, channelName: string): Promise<boolean>
+	{
+		const channelIndex = await this.getChannelByName(channelName)
+		if (channelIndex === -1) return false
+		return this.channels[channelIndex].users.some(u => u.socketId === socketId)
 	}
 
 	async getAllChannels(): Promise<Channel[]> {
