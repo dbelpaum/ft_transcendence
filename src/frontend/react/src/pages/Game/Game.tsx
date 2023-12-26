@@ -70,19 +70,24 @@ const Game: React.FC = () => {
 			setLobbyData(data);
 		});
 
+		socket.on("server.matchmaking.found", (data: any) => {
+			showNotificationSuccess("Matchmaking", "Found an opponent !");
+			setInLobby(true);
+			setGameStarted(true);
+		});
+
 		socket.on("server.game.start", (data: any) => {
 			if (!gameStarted) setGameStarted(true);
 		});
 
 		return () => {
 			// changer la dépendance gameStarted pour arreter de deco quand le jeu se lance
-			// if (socket) {
-			// 	socket.disconnect();
-			// 	setSocket(null); // Set socket to null after disconnecting
-			// 	console.log("zeubi");
-			// }
+			if (socket) {
+				socket.disconnect();
+				setSocket(null); // Set socket to null after disconnecting
+			}
 		};
-	}, [gameStarted]);
+	}, []);
 
 	const handleLeaveLobby = () => {
 		setInLobby(false);

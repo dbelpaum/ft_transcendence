@@ -1046,7 +1046,7 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
-var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m;
+var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m, _o, _p;
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.GameGateway = void 0;
 const websockets_1 = __webpack_require__(/*! @nestjs/websockets */ "@nestjs/websockets");
@@ -1110,6 +1110,12 @@ let GameGateway = class GameGateway {
     onClientMovement(client, data) {
         client.data.lobby?.instance.clientMove(client.id, data);
     }
+    onMatchmakingJoin(client) {
+        this.lobbyManager.joinMatchmaking(client);
+    }
+    onMatchmakingLeave(client) {
+        this.lobbyManager.leaveMatchmaking(client);
+    }
 };
 exports.GameGateway = GameGateway;
 __decorate([
@@ -1154,6 +1160,18 @@ __decorate([
     __metadata("design:paramtypes", [typeof (_l = typeof types_1.AuthenticatedSocket !== "undefined" && types_1.AuthenticatedSocket) === "function" ? _l : Object, typeof (_m = typeof dtos_1.ClientMovementDto !== "undefined" && dtos_1.ClientMovementDto) === "function" ? _m : Object]),
     __metadata("design:returntype", void 0)
 ], GameGateway.prototype, "onClientMovement", null);
+__decorate([
+    (0, websockets_1.SubscribeMessage)(ClientEvents_1.ClientEvents.MatchmakingJoin),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [typeof (_o = typeof types_1.AuthenticatedSocket !== "undefined" && types_1.AuthenticatedSocket) === "function" ? _o : Object]),
+    __metadata("design:returntype", void 0)
+], GameGateway.prototype, "onMatchmakingJoin", null);
+__decorate([
+    (0, websockets_1.SubscribeMessage)(ClientEvents_1.ClientEvents.MatchmakingLeave),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [typeof (_p = typeof types_1.AuthenticatedSocket !== "undefined" && types_1.AuthenticatedSocket) === "function" ? _p : Object]),
+    __metadata("design:returntype", void 0)
+], GameGateway.prototype, "onMatchmakingLeave", null);
 exports.GameGateway = GameGateway = __decorate([
     (0, common_1.UsePipes)(new validation_pipe_1.WsValidationPipe()),
     (0, websockets_1.WebSocketGateway)({ namespace: 'game' }),
@@ -1417,6 +1435,7 @@ const lobby_1 = __webpack_require__(/*! ./lobby */ "./src/game/lobby/lobby.ts");
 const schedule_1 = __webpack_require__(/*! @nestjs/schedule */ "@nestjs/schedule");
 const ServerExceptions_1 = __webpack_require__(/*! ../ServerExceptions */ "./src/game/ServerExceptions.ts");
 const SocketExceptions_1 = __webpack_require__(/*! ../shared/server/SocketExceptions */ "./src/game/shared/server/SocketExceptions.ts");
+const ServerEvents_1 = __webpack_require__(/*! ../shared/server/ServerEvents */ "./src/game/shared/server/ServerEvents.ts");
 class LobbyManager {
     constructor() {
         this.lobbies = new Map();
@@ -1426,12 +1445,24 @@ class LobbyManager {
     }
     terminateSocket(client) {
         client.data.lobby?.removeClient(client);
+        console.log("Client %s disconnected", client.id);
+    }
+    getUniqueCode() {
+        let code;
+        do {
+            code = Math.floor(1000 + Math.random() * 9000).toString();
+        } while (Array.from(this.lobbies.values()).some(lobby => lobby.id === code));
+        return code;
     }
     createLobby(mode) {
-        const lobby = new lobby_1.Lobby(this.server, mode);
+        const lobby = new lobby_1.Lobby(this.server, mode, this.getUniqueCode(), this);
         this.lobbies.set(lobby.id, lobby);
         console.log("Created lobby %s", lobby.id);
         return lobby;
+    }
+    deleteLobby(lobbyId) {
+        this.lobbies.delete(lobbyId);
+        console.log(`Deleted lobby ${lobbyId}`);
     }
     joinLobby(lobbyId, client) {
         const lobby = this.lobbies.get(lobbyId);
@@ -1445,18 +1476,32 @@ class LobbyManager {
     }
     lobbiesCleaner() {
         console.log("Remaining lobbies : " + this.lobbies.size);
-        console.log("Checking for empty lobbies...");
         for (const [lobbyId, lobby] of this.lobbies) {
-            if (lobby.clients.size === 0) {
-                this.lobbies.delete(lobbyId);
-                console.log("Removed empty lobby %s", lobbyId);
-            }
+            console.log(lobbyId + ": " + lobby.clients.size + " clients");
         }
+    }
+    joinMatchmaking(client) {
+        const publicLobby = Array.from(this.lobbies.values()).find((lobby) => lobby.lobbyType === "public" && lobby.clients.size < lobby.maxClients);
+        if (publicLobby) {
+            this.joinLobby(publicLobby.id, client);
+            console.log("Joined existing public lobby %s", publicLobby.id);
+        }
+        else {
+            const newPublicLobby = this.createLobby("vanilla");
+            newPublicLobby.lobbyType = "public";
+            this.joinLobby(newPublicLobby.id, client);
+            console.log("Created new public lobby %s", newPublicLobby.id);
+            client.emit(ServerEvents_1.ServerEvents.MatchmakingStatus, { status: "joined" });
+        }
+    }
+    leaveMatchmaking(client) {
+        client.data.lobby?.removeClient(client);
+        client.emit(ServerEvents_1.ServerEvents.MatchmakingStatus, { status: "left" });
     }
 }
 exports.LobbyManager = LobbyManager;
 __decorate([
-    (0, schedule_1.Cron)("*/3 * * * *"),
+    (0, schedule_1.Cron)("*/1 * * * *"),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", []),
     __metadata("design:returntype", void 0)
@@ -1477,10 +1522,12 @@ exports.Lobby = void 0;
 const instance_1 = __webpack_require__(/*! ../instance/instance */ "./src/game/instance/instance.ts");
 const ServerEvents_1 = __webpack_require__(/*! ../shared/server/ServerEvents */ "./src/game/shared/server/ServerEvents.ts");
 class Lobby {
-    constructor(server, mode) {
+    constructor(server, mode, id, lobbyManager) {
         this.server = server;
         this.mode = mode;
-        this.id = Math.floor(1000 + Math.random() * 9000).toString();
+        this.id = id;
+        this.lobbyManager = lobbyManager;
+        this.lobbyType = "private";
         this.maxClients = 2;
         this.createdAt = new Date();
         this.clients = new Map();
@@ -1496,7 +1543,13 @@ class Lobby {
             this.hostSocketId = client.id;
         else
             this.guestSocketId = client.id;
-        this.dispatchLobbyState();
+        if (this.lobbyType === "private")
+            this.dispatchLobbyState();
+        else if (this.lobbyType === "public" && this.clients.size === 2) {
+            this.dispatchLobbyState();
+            this.dispatchToLobby(ServerEvents_1.ServerEvents.MatchmakingFound, {});
+            this.instance.triggerStart();
+        }
     }
     removeClient(client) {
         this.clients.delete(client.id);
@@ -1508,6 +1561,8 @@ class Lobby {
             this.guestSocketId = null;
         client.leave(this.id);
         client.data.lobby = null;
+        if (this.clients.size === 0)
+            this.lobbyManager.deleteLobby(this.id);
         this.dispatchLobbyState();
     }
     isAllReady() {
@@ -1529,6 +1584,7 @@ class Lobby {
             playersStateObject[key] = value;
         });
         const payload = {
+            lobbyType: this.lobbyType,
             lobbyId: this.id,
             hostId: this.hostSocketId,
             guestId: this.guestSocketId,
@@ -1573,6 +1629,8 @@ var ClientEvents;
     ClientEvents["LobbyJoin"] = "client.lobby.join";
     ClientEvents["LobbyLeave"] = "client.lobby.leave";
     ClientEvents["ClientMovement"] = "client.game.move";
+    ClientEvents["MatchmakingJoin"] = "client.matchmaking.join";
+    ClientEvents["MatchmakingLeave"] = "client.matchmaking.leave";
 })(ClientEvents || (exports.ClientEvents = ClientEvents = {}));
 
 
@@ -1595,6 +1653,8 @@ var ServerEvents;
     ServerEvents["GameMessage"] = "server.game.message";
     ServerEvents["GameState"] = "server.game.state";
     ServerEvents["GameGuestPosition"] = "server.game.guestposition";
+    ServerEvents["MatchmakingStatus"] = "server.matchmaking.status";
+    ServerEvents["MatchmakingFound"] = "server.matchmaking.found";
 })(ServerEvents || (exports.ServerEvents = ServerEvents = {}));
 
 

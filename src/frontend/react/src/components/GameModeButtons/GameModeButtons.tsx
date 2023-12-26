@@ -39,17 +39,23 @@ const GameModeButtons: React.FC = () => {
 
 	const handleMatchmaking = () => {
 		if (socket) {
-			setIsMatchmaking(!isMatchmaking);
 
 			// Emit matchmaking event
-			if (!isMatchmaking) {
-				socket.emit("client.matchmaking.enter", {});
-				showNotificationSuccess("Matchmaking", "Looking for opponent...");
-			}
+			if (!isMatchmaking)
+				socket.emit("client.matchmaking.join", {});
 			else
-				showNotificationWarning("Matchmaking", "Left matchmaking")
+				socket.emit("client.matchmaking.leave", {});
 
-			// You might want to listen for a response from the server here, but for simplicity, it's omitted in this example.
+			socket.once("server.matchmaking.status", (data: any) => {
+				if (data.status === "joined") {
+					setIsMatchmaking(true);
+					showNotificationSuccess("Matchmaking", "Looking for opponent...");
+				}
+				else if (data.status === "left") {
+					setIsMatchmaking(false);
+					showNotificationWarning("Matchmaking", "Left matchmaking");
+				}
+			});
 		}
 	};
 
