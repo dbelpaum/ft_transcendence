@@ -123,7 +123,7 @@ useEffect(() => {
     if (!user?.id42 || !userInfo?.id42) {
         return;
     }
-    fetch(`http://localhost:4000/friendship/${user?.id42}/relation/${userInfo?.id42}`)
+    fetch(`http://localhost:4000/friendship/${user?.id}/relation/${userInfo?.id}`)
         .then(response => response.json())
         .then((response) => {
             console.log('test de response ' + response.status)
@@ -140,7 +140,7 @@ useEffect(() => {
             }
         })
         .catch(error => console.log(error));
-     }, [user?.id42, userInfo?.id42]);
+     }, [user?.id, userInfo?.id]);
 
      
 
@@ -229,7 +229,7 @@ useEffect(() => {
 
             {friendshipStatus === 'friend' && (
             <FriendshipButton
-                status={buttonStatus}
+                status={'removeFriend'}
                 onButtonClick={handleRemoveFriendClick}
                 color="red"
                 />
