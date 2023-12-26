@@ -4,6 +4,8 @@ import "./UserProfil.css";
 import { useAuth } from "../../context/AuthContexte";
 import { Link } from "react-router-dom";
 import FriendshipButton from "../../components/FriendshipButton/FriendshipButton";
+import { MpChannel } from "../Chat/chat.interface";
+import { useNavigate } from 'react-router-dom';
 
 
 interface UserInfo {
@@ -28,8 +30,9 @@ const UserProfile: React.FC = () => {
     const [buttonStatus, setButtonStatus] = useState<"addFriend" | "removeFriend" | "block" >('addFriend');
 
     const [isConnected, setIsConnected] = useState<boolean>(false);
-    const {authToken, user} = useAuth();
+    const {authToken, user, chatSocket, recharger} = useAuth();
     const [friendshipStatus, setFriendshipStatus] = useState<string | null>(null); // 'friend' | 'pending' | 'blocked' | null
+	const navigate = useNavigate();
     
 
     const { pseudo } = useParams<{ pseudo: string }>();
@@ -200,6 +203,21 @@ useEffect(() => {
     }
 
 
+	const triggerMp = () => {
+		if (user && chatSocket)
+		{
+			const mpCreateInfo : MpChannel =
+			{
+				user1: user,
+				user2: userInfo,
+			}
+			chatSocket.emit('mp_create', mpCreateInfo);
+			recharger()
+			navigate(`/chat?mp=${userInfo.pseudo}`);
+		}
+
+	}
+
     return (
 		<main className="user-profile-container">
 			<div className="profile-header">
@@ -238,7 +256,7 @@ useEffect(() => {
 
 			</div>
 			<div className="mp">
-				<button>Envoyer un mp</button>
+				<button onClick={triggerMp}>Envoyer un mp</button>
 			</div>
 		</main>
   );

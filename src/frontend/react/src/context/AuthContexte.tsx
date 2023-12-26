@@ -75,7 +75,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 			const userData = await response.json();
 			if (Object.keys(userData).length !== 0) {
 				setUser(userData); // Utilisateur connecté
-				console.log("the user data");
 			}
 			else {
 				setUser(null);
@@ -87,7 +86,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 		}
 		
 	  } catch (error) {
-		console.error('Erreur lors de la vérification de l’utilisateur', error);
+		setUser(null)
 	  } finally {
 		setIsLoading(false);
 	  }
