@@ -5,4 +5,6 @@ export enum ServerEvents {
 	GameMessage = "server.game.message",
 	GameState = "server.game.state",
 	GameGuestPosition = "server.game.guestposition",
+	MatchmakingStatus = "server.matchmaking.status",
+	MatchmakingFound = "server.matchmaking.found",
 }

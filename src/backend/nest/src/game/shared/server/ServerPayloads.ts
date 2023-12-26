@@ -6,6 +6,7 @@ export type ServerPayloads = {
 	};
 
 	[ServerEvents.LobbyState]: {
+		lobbyType: string;
 		lobbyId: string;
 		hostId: string;
 		guestId: string;

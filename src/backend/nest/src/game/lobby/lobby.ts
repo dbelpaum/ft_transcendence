@@ -4,11 +4,10 @@ import { Server, Socket } from "socket.io";
 import { Instance } from "../instance/instance";
 import { ServerEvents } from "../shared/server/ServerEvents";
 import { ServerPayloads } from "../shared/server/ServerPayloads";
+import { LobbyManager } from "./lobby.manager";
 
 export class Lobby {
-	public readonly id: string = Math.floor(
-		1000 + Math.random() * 9000
-	).toString();
+	public lobbyType = "private";
 	public readonly maxClients: number = 2;
 	public readonly createdAt: Date = new Date();
 	public hostSocketId: Socket["id"];
@@ -25,7 +24,9 @@ export class Lobby {
 
 	constructor(
 		private readonly server: Server,
-		public readonly mode: string
+		public readonly mode: string,
+		public readonly id: string,
+		private readonly lobbyManager: LobbyManager
 	) { }
 
 	public addClient(client: AuthenticatedSocket): void {
@@ -37,7 +38,13 @@ export class Lobby {
 		if (!this.hostSocketId) this.hostSocketId = client.id;
 		else this.guestSocketId = client.id;
 
-		this.dispatchLobbyState();
+		if (this.lobbyType === "private")
+			this.dispatchLobbyState();
+		else if (this.lobbyType === "public" && this.clients.size === 2) {
+			this.dispatchLobbyState();
+			this.dispatchToLobby(ServerEvents.MatchmakingFound, {});
+			this.instance.triggerStart();
+		}
 	}
 
 	public removeClient(client: AuthenticatedSocket): void {
@@ -49,6 +56,8 @@ export class Lobby {
 		} else this.guestSocketId = null;
 		client.leave(this.id);
 		client.data.lobby = null;
+		if (this.clients.size === 0)
+			this.lobbyManager.deleteLobby(this.id);
 
 		this.dispatchLobbyState();
 	}
@@ -74,6 +83,7 @@ export class Lobby {
 		});
 
 		const payload: ServerPayloads[ServerEvents.LobbyState] = {
+			lobbyType: this.lobbyType,
 			lobbyId: this.id,
 			hostId: this.hostSocketId,
 			guestId: this.guestSocketId,

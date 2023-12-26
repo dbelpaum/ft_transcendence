@@ -3,12 +3,14 @@ import "./GameModeButtons.css";
 import { SocketContext } from "../../pages/Game/SocketContext";
 import { Socket } from "socket.io-client";
 import SoloGameScene from "../GameScene/SoloGameScene";
-import { showNotificationSuccess } from "../../pages/Game/Notification";
+import { showNotificationSuccess, showNotificationWarning } from "../../pages/Game/Notification";
+import { PulseLoader } from "react-spinners";
 
 const GameModeButtons: React.FC = () => {
 	const socket = useContext(SocketContext) as unknown as Socket;
 	const [roomCode, setRoomCode] = useState<string>("");
 	const [showSoloGame, setShowSoloGame] = React.useState<boolean>(false);
+	const [isMatchmaking, setIsMatchmaking] = useState<boolean>(false);
 
 	const handleSelectSoloMode = () => {
 		setShowSoloGame(true);
@@ -31,6 +33,28 @@ const GameModeButtons: React.FC = () => {
 			socket.emit("client.lobby.join", {
 				mode: "vanilla",
 				lobbyId: roomCode,
+			});
+		}
+	};
+
+	const handleMatchmaking = () => {
+		if (socket) {
+
+			// Emit matchmaking event
+			if (!isMatchmaking)
+				socket.emit("client.matchmaking.join", {});
+			else
+				socket.emit("client.matchmaking.leave", {});
+
+			socket.once("server.matchmaking.status", (data: any) => {
+				if (data.status === "joined") {
+					setIsMatchmaking(true);
+					showNotificationSuccess("Matchmaking", "Looking for opponent...");
+				}
+				else if (data.status === "left") {
+					setIsMatchmaking(false);
+					showNotificationWarning("Matchmaking", "Left matchmaking");
+				}
 			});
 		}
 	};
@@ -93,7 +117,7 @@ const GameModeButtons: React.FC = () => {
 					</div>
 
 					<div>
-						<button className="buttonStyle">Matchmaking</button>
+						<button className="buttonStyle" onClick={handleMatchmaking}>Matchmaking {isMatchmaking && <PulseLoader size={10} color={"#ffffff"} />}</button>
 					</div>
 					<button onClick={handlePing}>Ping</button>
 				</>

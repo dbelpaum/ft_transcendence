@@ -5,5 +5,7 @@ export enum ClientEvents {
 	LobbyCreate = 'client.lobby.create',
 	LobbyJoin = "client.lobby.join",
 	LobbyLeave = "client.lobby.leave",
-	ClientMovement = "client.game.move"
+	ClientMovement = "client.game.move",
+	MatchmakingJoin = "client.matchmaking.join",
+	MatchmakingLeave = "client.matchmaking.leave",
 }

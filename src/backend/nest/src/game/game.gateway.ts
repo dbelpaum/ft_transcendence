@@ -90,4 +90,14 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 	onClientMovement(client: AuthenticatedSocket, data: ClientMovementDto): void {
 		client.data.lobby?.instance.clientMove(client.id, data);
 	}
+
+	@SubscribeMessage(ClientEvents.MatchmakingJoin)
+	onMatchmakingJoin(client: AuthenticatedSocket): void {
+		this.lobbyManager.joinMatchmaking(client);
+	}
+
+	@SubscribeMessage(ClientEvents.MatchmakingLeave)
+	onMatchmakingLeave(client: AuthenticatedSocket): void {
+		this.lobbyManager.leaveMatchmaking(client);
+	}
 }
