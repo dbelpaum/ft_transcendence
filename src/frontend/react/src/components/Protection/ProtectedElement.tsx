@@ -7,11 +7,11 @@ import { useAuth } from '../../context/AuthContexte';
 import { useErrorMessage } from '../../context/ErrorContexte';
 
 
-type ProtectedChatProps = {
+type ProtectedElementProps = {
 	children: ReactElement;
   };
 
-export const ProtectedChat: React.FC<ProtectedChatProps> = ({ children }) => {
+export const ProtectedElement: React.FC<ProtectedElementProps> = ({ children }) => {
 
 	const { user, isLoading } = useAuth(); 
 	const { setErrorMessage } = useErrorMessage();
@@ -22,7 +22,6 @@ export const ProtectedChat: React.FC<ProtectedChatProps> = ({ children }) => {
 				message: 'Vous devez être connecté pour accéder à cette page.',
 				type: 'error'
 			});
-			console.log(user)
 		}
 	}, [user, isLoading, setErrorMessage]);
 	

@@ -3,8 +3,8 @@ export interface User {
     id42: number;
     pseudo: string;
     email: string;
-    imageUrl?: string;
-    firstname?: string;
-    lastname?: string;
+    imageURL: string;
+    firstname: string;
+    lastname: string;
 	socketId?: string;
 }

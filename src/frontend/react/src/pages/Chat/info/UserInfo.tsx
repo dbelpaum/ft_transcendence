@@ -4,9 +4,11 @@ import {
   ChannelUtility,
 	Message,
 	addAdminInfo,
-  } from './chat.interface';
-import { User } from '../../context/AuthInteface';
-import crownIconPath from './couronne.svg';
+	MpChannel,
+  } from '../chat.interface';
+import { User } from '../../../context/AuthInteface';
+import crownIconPath from '../assets/couronne.svg';
+import { useNavigate } from 'react-router-dom';
 
 interface UserAndAdmin {
 	user: User;
@@ -25,6 +27,7 @@ interface userInfoProps {
 const UserInfo: React.FC<userInfoProps> = ({ channelUtility, userAndAdmin, channelUrl, iAmAdmin, currentChannel}) => {
 	const [showModal, setShowModal] = useState(false);
 	const modalRef = useRef<HTMLDivElement | null>(null)
+	const navigate = useNavigate();
 
 	useEffect(() => {
         // Attacher l'écouteur d'événement
@@ -52,7 +55,7 @@ const UserInfo: React.FC<userInfoProps> = ({ channelUtility, userAndAdmin, chann
 			const adminInfo : addAdminInfo =
 			{
 				channel: channelUrl,
-				new_name: userAndAdmin.user.pseudo,
+				user_to_modify: userAndAdmin.user,
 				user: channelUtility.me,
 			}
 			channelUtility.socket.emit('add_admin', adminInfo);
@@ -68,7 +71,7 @@ const UserInfo: React.FC<userInfoProps> = ({ channelUtility, userAndAdmin, chann
 			const adminInfo : addAdminInfo =
 			{
 				channel: channelUrl,
-				new_name: userAndAdmin.user.pseudo,
+				user_to_modify: userAndAdmin.user,
 				user: channelUtility.me,
 			}
 			channelUtility.socket.emit('remove_admin', adminInfo);
@@ -84,7 +87,7 @@ const UserInfo: React.FC<userInfoProps> = ({ channelUtility, userAndAdmin, chann
 			const kickInfo : addAdminInfo =
 			{
 				channel: channelUrl,
-				new_name: userAndAdmin.user.pseudo,
+				user_to_modify: userAndAdmin.user,
 				user: channelUtility.me,
 			}
 			channelUtility.socket.emit('kick', kickInfo);
@@ -100,7 +103,7 @@ const UserInfo: React.FC<userInfoProps> = ({ channelUtility, userAndAdmin, chann
 			const banInfo : addAdminInfo =
 			{
 				channel: channelUrl,
-				new_name: userAndAdmin.user.pseudo,
+				user_to_modify: userAndAdmin.user,
 				user: channelUtility.me,
 			}
 			channelUtility.socket.emit('ban', banInfo);
@@ -116,7 +119,7 @@ const UserInfo: React.FC<userInfoProps> = ({ channelUtility, userAndAdmin, chann
 			const muteInfo : addAdminInfo =
 			{
 				channel: channelUrl,
-				new_name: userAndAdmin.user.pseudo,
+				user_to_modify: userAndAdmin.user,
 				user: channelUtility.me,
 			}
 			channelUtility.socket.emit('mute', muteInfo);
@@ -126,12 +129,26 @@ const UserInfo: React.FC<userInfoProps> = ({ channelUtility, userAndAdmin, chann
 		}
 	}
 
+	const triggerMp = () => {
+		if (channelUrl && channelUtility && channelUtility.me && channelUtility.socket)
+		{
+			const mpCreateInfo : MpChannel =
+			{
+				user1: channelUtility.me,
+				user2: userAndAdmin.user,
+			}
+			channelUtility.socket.emit('mp_create', mpCreateInfo);
+            setShowModal(false);
+			channelUtility.recharger()
+			navigate(`/chat?mp=${userAndAdmin.user.pseudo}`);
+		}
+	}
 
 
+	
 
   return (
         <div className='userChannel'>
-			
 			<span><img src={crownIconPath} alt="Couronne" className={`crownIcon ${userAndAdmin.isAdmin ? 'appear' : ''}`} /></span>
 			<a href={`http://localhost:3000/users/${userAndAdmin.user.pseudo}`} target="_blank" rel="noopener noreferrer">
 				<span 
@@ -141,7 +158,10 @@ const UserInfo: React.FC<userInfoProps> = ({ channelUtility, userAndAdmin, chann
 				</span>
 			</a>
 			<div className="container_button">
-			{(iAmAdmin && (channelUtility.me.pseudo !== userAndAdmin.user.pseudo)) && (
+			{(iAmAdmin 
+				&& (channelUtility.me.pseudo !== userAndAdmin.user.pseudo)) 
+				&& (!userAndAdmin.isOwner) 
+				&& (
 				<button className="action-button" onClick={toggleModal}>Actions</button>
 			)}
 				{showModal && (
@@ -150,12 +170,16 @@ const UserInfo: React.FC<userInfoProps> = ({ channelUtility, userAndAdmin, chann
 						<span onClick={handleBanClick}>Ban</span>
 						<span onClick={handleMuteClick}>Mute</span>
 						{
-							!userAndAdmin.isAdmin ? 
+							(!userAndAdmin.isAdmin) ? 
 							(<span onClick={handleAdminClick}>Make Admin</span>) : 
 							(<span onClick={handleRemoveAdminClick}>Remove Admin</span>)
 						}
 					</div>
 				)}
+			{(channelUtility.me.pseudo !== userAndAdmin.user.pseudo)
+				&& (
+				<button className="mp-button" onClick={triggerMp}>Mp</button>
+			)}
 			</div>
 			
         </div>

@@ -3,9 +3,9 @@ import {
 	Channel,
 	ChannelCreate,
 	ChannelUtility
-  } from './chat.interface';
+  } from '../chat.interface';
 import CreateChannel from './CreateChannels';
-import { ReactComponent as LeaveIcon } from './leave.svg';
+import { ReactComponent as LeaveIcon } from '../assets/leave.svg';
 import { useNavigate } from 'react-router-dom';
 
 
@@ -16,7 +16,9 @@ interface ChannelsItemsProps {
   
 const ChannelItem: React.FC<ChannelsItemsProps> = ({ channelUtility, channel }) => {
 
+	
 	const navigate = useNavigate();
+	if (!channelUtility.me) return null
 	
 	const handleChannelClick = () => {
 		navigate(`/chat?channel=${channel.name}`);
@@ -25,11 +27,18 @@ const ChannelItem: React.FC<ChannelsItemsProps> = ({ channelUtility, channel }) 
 	const handleSubmitLeaveChannel = () => {
 		if (channelUtility.socket)
 		{
-			const savedChannels: ChannelCreate[] = JSON.parse(sessionStorage.getItem('channels') || '[]');
-			const updatedChannels = savedChannels.filter(the_channel => the_channel.name !== channel.name);
-			sessionStorage.setItem('channels', JSON.stringify(updatedChannels));
-			channelUtility.socket.disconnect()
-			channelUtility.socket.connect()
+			try
+			{
+				const savedChannels: ChannelCreate[] = JSON.parse(localStorage.getItem('channels') || '[]');
+				const updatedChannels = savedChannels.filter(the_channel => the_channel.name !== channel.name);
+				localStorage.setItem('channels', JSON.stringify(updatedChannels));
+				channelUtility.socket.disconnect()
+				channelUtility.socket.connect()
+			}catch (error) {
+				console.error('Error parsing JSON from localStorage:', error);
+				console.error('Data that caused the error:', localStorage.getItem('channels'));
+				// Gérez l'erreur ou initialisez savedChannels à une valeur par défaut
+			}
 
 		}
 	}

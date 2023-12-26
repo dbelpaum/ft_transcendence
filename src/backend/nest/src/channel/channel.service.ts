@@ -4,7 +4,9 @@ import {
 	ChannelCreate,
 	InviteToChannel,
 	Message,
+	MpChannel,
 	User, 
+	UserTokenInfo, 
 	addAdminInfo, 
 	joinResponse} from "../chat/chat.interface"
 	import { SubscribeMessage, WebSocketGateway, MessageBody,  WebSocketServer, OnGatewayConnection, OnGatewayDisconnect,
@@ -15,7 +17,163 @@ import { Server, Socket } from 'socket.io';
 @Injectable()
 export class ChannelService {
 	private channels: Channel[] = []
+	private connectedUsers: UserTokenInfo[] = []
+	private mpChannel : MpChannel[] = []
   
+
+	checkAndRemoveInactiveMpChannels(userId: number): void {
+		this.mpChannel = this.mpChannel.filter(mpChannel => {
+		  if (mpChannel.user1.id === userId || mpChannel.user2.id === userId) {
+			if (this.isUserConnected(mpChannel.user1.id)) return true
+			if (this.isUserConnected(mpChannel.user2.id)) return true
+			return false
+		  }
+		  return true;
+		});
+	}
+
+	getSocketIdsInMpChannelsWithUser(userId: number): string[] {
+		let socketIds: string[] = [];
+	
+		this.mpChannel.forEach(mpChannel => {
+		  if (mpChannel.user1.id === userId && mpChannel.user2?.socketId) {
+			this.getSocketIdsByUserId(mpChannel.user2.id).map(theSockedId => socketIds.push(theSockedId))
+		  } else if (mpChannel.user2.id === userId && mpChannel.user1?.socketId) {
+			this.getSocketIdsByUserId(mpChannel.user1.id).map(theSockedId => socketIds.push(theSockedId))
+		  }
+		});
+	
+		return socketIds;
+	  }
+	
+    // Cette méthode renvoie tous les socketId pour un utilisateur donné
+    getSocketIdsByUserId(userId: number): string[] {
+        return this.connectedUsers
+            .filter(user => user.id === userId) // Filtrer pour ne garder que les entrées correspondant à l'ID
+            .map(user => user.socketId);        // Extraire le socketId de chaque entrée
+    }
+	
+	removeMpChannelIfInactive(mpChannel: MpChannel): void {
+		const user1Connected = this.isUserConnected(mpChannel.user1.id);
+		const user2Connected = this.isUserConnected(mpChannel.user2.id);
+
+		if (!user1Connected && !user2Connected) {
+			const index = this.mpChannel.indexOf(mpChannel);
+			if (index !== -1) {
+			this.mpChannel.splice(index, 1);
+			}
+		}
+	}
+	
+	getUserByPseudo(pseudo: string): User | undefined {
+		const user = this.connectedUsers.find(u => u.pseudo === pseudo);
+		return user ? user : undefined;
+	}
+
+	getUserPseudoByID(userID: number): string | undefined {
+		const user = this.connectedUsers.find(u => u.id === userID);
+		return user ? user.pseudo : undefined;
+	}
+	
+	
+	addMpChannel(mpChannelCreate: MpChannel): joinResponse {
+		const mpChannelExists = this.mpChannel.some(mp => 
+			(mp.user1.id === mpChannelCreate.user1.id && mp.user2.id === mpChannelCreate.user2.id) ||
+			(mp.user1.id === mpChannelCreate.user2.id && mp.user2.id === mpChannelCreate.user1.id)
+		);
+		
+		if (!mpChannelExists) {
+			this.mpChannel.push(mpChannelCreate);
+			return {
+				errorNumber: 0,
+				text: `Nouveau channel créé`
+			};
+		}
+		return {
+			errorNumber: 1,
+			text: `Le channel existe deja`
+		};
+	}
+
+	updateSocketIdInMpChannels(updatedUser: UserTokenInfo): void {
+		this.mpChannel.forEach(mpChannel => {
+		  if (mpChannel.user1.id === updatedUser.id) {
+			mpChannel.user1.socketId = updatedUser.socketId;
+		  }
+		  if (mpChannel.user2.id === updatedUser.id) {
+			mpChannel.user2.socketId = updatedUser.socketId;
+		  }
+		});
+	  }
+
+	removeMpChannel(user1Id: number, user2Id: number): void {
+		this.mpChannel = this.mpChannel.filter(mp => 
+			!(mp.user1.id === user1Id && mp.user2.id === user2Id) &&
+			!(mp.user1.id === user2Id && mp.user2.id === user1Id)
+		);
+	}
+
+	removeAllMpChannelOfUser(userId: number): void {
+		this.mpChannel = this.mpChannel.filter(mp => 
+			(mp.user1.id !== userId) && (mp.user2.id !== userId) 
+		);
+	}
+	
+
+	findMpChannel(user1Id: number, user2Id: number): MpChannel | undefined {
+		return this.mpChannel.find(mp => 
+		  (mp.user1.id === user1Id && mp.user2.id === user2Id) ||
+		  (mp.user1.id === user2Id && mp.user2.id === user1Id)
+		);
+	}
+	  
+	getAllMpChannelsByUser(userId: number): MpChannel[]
+	{
+		return this.mpChannel.filter(mp => mp.user1.id === userId || mp.user2.id === userId);
+	}
+
+	mpChannelExists(user1Id: number, user2Id: number): boolean {
+		return this.mpChannel.some(mp => 
+		  (mp.user1.id === user1Id && mp.user2.id === user2Id) ||
+		  (mp.user1.id === user2Id && mp.user2.id === user1Id)
+		);
+	  }
+	  
+
+	  
+	addConnectedUser(user: UserTokenInfo): void {
+		const userExists = this.connectedUsers.some(u => u.socketId === user.socketId);
+		if (!userExists) {
+			this.connectedUsers.push(user);
+		}
+	}
+	  
+	removeConnectedUser(userSocketId: string): void {
+		this.connectedUsers = this.connectedUsers.filter(u => u.socketId !== userSocketId);
+	}
+
+	isUserConnected(userId: number): boolean {
+		return this.connectedUsers.some(u => u.id === userId);
+	}
+	  
+	getConnectedUserById(userId: number): UserTokenInfo | undefined {
+		return this.connectedUsers.find(u => u.id === userId);
+	}
+
+	getConnectedUserById42(userId42: number): UserTokenInfo | undefined {
+		return this.connectedUsers.find(u => u.id42 === userId42);
+	}
+
+	getConnectedUserByPseudo(pseudo: string): UserTokenInfo | undefined {
+		return this.connectedUsers.find(u => u.pseudo === pseudo);
+	}
+
+	getAllConnectedUsers(): UserTokenInfo[] {
+		return this.connectedUsers;
+	}
+	  
+	  
+
 	async addChannel(channelCreate: ChannelCreate): Promise<void> {
 	  const channel = await this.getChannelByName(channelCreate.name)
 	  if (channel === -1) {
@@ -91,97 +249,109 @@ export class ChannelService {
 		if (!this.userIsHost(adminInfo.user.pseudo,this.channels[channelIndex])) return
 
 		// Sinon, on ajoute le nom a la liste des admins
-		this.channels[channelIndex].host.push(adminInfo.new_name)
+		this.channels[channelIndex].host.push(adminInfo.user_to_modify.pseudo)
 
 	}
 
-	async removeAdminToChannel(adminInfo: addAdminInfo) : Promise<void>
+	async removeAdminToChannel(adminInfo: addAdminInfo) : Promise<boolean>
 	{
 		// Si le channel existe pas, on ne fait rien
 		const channelIndex = await this.getChannelByName(adminInfo.channel)
-		if (channelIndex === -1) return;
+		if (channelIndex === -1) return false;
 
 
 		// Si l'utilisateur n'est pas administrateur, on ne fait rien
-		if (!this.userIsHost(adminInfo.user.pseudo,this.channels[channelIndex])) return
+		if (!this.userIsHost(adminInfo.user.pseudo,this.channels[channelIndex])) return false
 
 		// Si l'utilisateur a supprimer des admins est nous meme, on ne fait rien
-		if (adminInfo.new_name === adminInfo.user.pseudo) return
+		if (adminInfo.user_to_modify.pseudo === adminInfo.user.pseudo) return false
 
 		// Si l'utilisateur a ban est le channel owener, on ne fait rien
-		if (adminInfo.new_name === this.channels[channelIndex].owner.pseudo) return 
+		if (adminInfo.user_to_modify.socketId === this.channels[channelIndex].owner.socketId) return false 
 
-		// Sinon, on ajoute le nom a la liste des admins
+		// Sinon, on enleve le nom a la liste des admins
 
-		const adminIndex = this.channels[channelIndex].host.indexOf(adminInfo.new_name);
+		const adminIndex = this.channels[channelIndex].host.indexOf(adminInfo.user_to_modify.pseudo);
 		if (adminIndex !== -1) {
 			this.channels[channelIndex].host.splice(adminIndex, 1);
 		}
+		return true
 	}
 
-	async kick(adminInfo: addAdminInfo) : Promise<void>
+	async kick(adminInfo: addAdminInfo) : Promise<boolean>
 	{
 		// Si le channel existe pas, on ne fait rien
 		const channelIndex = await this.getChannelByName(adminInfo.channel)
-		if (channelIndex === -1) return;
+		if (channelIndex === -1) return false;
 
 		// Si l'utilisateur n'est pas administrateur, on ne fait rien
-		if (!this.userIsHost(adminInfo.user.pseudo,this.channels[channelIndex])) return
+		if (!this.userIsHost(adminInfo.user.pseudo,this.channels[channelIndex])) return false
 
 		// Si l'utilisateur a kick est nous meme, on ne fait rien
-		if (adminInfo.new_name === adminInfo.user.pseudo) return
+		if (adminInfo.user_to_modify.pseudo === adminInfo.user.pseudo) return false
 
 		// Si l'utilisateur a ban est le channel owener, on ne fait rien
-		if (adminInfo.new_name === this.channels[channelIndex].owner.pseudo) return 
+		if (adminInfo.user_to_modify.socketId === this.channels[channelIndex].owner.socketId) return false
+
 
 		// Sinon, on supprime la personne de la liste des users
-		this.channels[channelIndex].users = this.channels[channelIndex].users.filter(user => user.pseudo !== adminInfo.new_name);
+		this.channels[channelIndex].users = this.channels[channelIndex].users.filter(user => user.id !== adminInfo.user_to_modify.id);
+		this.channels[channelIndex].host = this.channels[channelIndex].host.filter(pseudo => pseudo !== adminInfo.user_to_modify.pseudo);
+		return true
 	}
   
-	async ban(adminInfo: addAdminInfo) : Promise<void>
+	async ban(adminInfo: addAdminInfo) : Promise<boolean>
 	{
 		// Si le channel existe pas, on ne fait rien
 		const channelIndex = await this.getChannelByName(adminInfo.channel)
-		if (channelIndex === -1) return;
+		if (channelIndex === -1) return false;
 
 
 		// Si l'utilisateur n'est pas administrateur, on ne fait rien
-		if (!this.userIsHost(adminInfo.user.pseudo,this.channels[channelIndex])) return
+		if (!this.userIsHost(adminInfo.user.pseudo,this.channels[channelIndex])) return false
 
 		// Si l'utilisateur a ban est nous meme, on ne fait rien
-		if (adminInfo.new_name === adminInfo.user.pseudo) return
+		if (adminInfo.user_to_modify.pseudo === adminInfo.user.pseudo) return false
 
 		// Si l'utilisateur a ban est le channel owener, on ne fait rien
-		if (adminInfo.new_name === this.channels[channelIndex].owner.pseudo) return 
+		if (adminInfo.user_to_modify.socketId === this.channels[channelIndex].owner.socketId) return false 
+
 
 		// Sinon, on ajoute la personne de la liste des bannis
-		this.channels[channelIndex].ban.push(adminInfo.new_name)
+		this.channels[channelIndex].ban.push(adminInfo.user_to_modify.pseudo)
 
 		// puis on supprime la personne de la liste des users
-		this.channels[channelIndex].users = this.channels[channelIndex].users.filter(user => user.pseudo !== adminInfo.new_name);
+		this.channels[channelIndex].users = this.channels[channelIndex].users.filter(user => user.pseudo !== adminInfo.user_to_modify.pseudo);
+		this.channels[channelIndex].host = this.channels[channelIndex].host.filter(pseudo => pseudo !== adminInfo.user_to_modify.pseudo);
+
+		
+		return true
 	}
 
-	async mute(adminInfo: addAdminInfo): Promise<void> {
+	async mute(adminInfo: addAdminInfo): Promise<boolean> {
 		// Si le channel existe pas, on ne fait rien
 		const channelIndex = await this.getChannelByName(adminInfo.channel)
-		if (channelIndex === -1) return;
+		if (channelIndex === -1) return false;
 
 
 		// Si l'utilisateur n'est pas administrateur, on ne fait rien
-		if (!this.userIsHost(adminInfo.user.pseudo,this.channels[channelIndex])) return
+		if (!this.userIsHost(adminInfo.user.pseudo,this.channels[channelIndex])) return false
 
 		// Si l'utilisateur a ban est nous meme, on ne fait rien
-		if (adminInfo.new_name === adminInfo.user.pseudo) return
+		if (adminInfo.user_to_modify.pseudo === adminInfo.user.pseudo) return false
 
 		// Si l'utilisateur a ban est le channel owener, on ne fait rien
-		if (adminInfo.new_name === this.channels[channelIndex].owner.pseudo) return 
+		if (adminInfo.user_to_modify.socketId === this.channels[channelIndex].owner.socketId) return false 
 
-		this.channels[channelIndex].mute.push(adminInfo.new_name);
+
+		this.channels[channelIndex].mute.push(adminInfo.user_to_modify.pseudo);
 	
 		// Minuterie pour démuter automatiquement après 120 secondes
 		setTimeout(() => {
-			this.channels[channelIndex].mute = this.channels[channelIndex].mute.filter(m => m !== adminInfo.new_name);
+			this.channels[channelIndex].mute = this.channels[channelIndex].mute.filter(m => m !== adminInfo.user_to_modify.pseudo);
 		}, 120000);
+
+		return true
 	  }
 
 	  async isMuted(message: Message): Promise<boolean> {
@@ -194,6 +364,9 @@ export class ChannelService {
 	  }
 
 	async modifyChannel(channelCreate: ChannelCreate): Promise<void> {
+		if (!this.typeIsValid(channelCreate.type)){
+			return 
+		}
 		// Si le channel existe pas, on ne fait rien
 		const channelIndex = await this.getChannelByName(channelCreate.name)
 		if (channelIndex === -1) return;
@@ -206,9 +379,22 @@ export class ChannelService {
 		this.channels[channelIndex].mdp = channelCreate.mdp
 	}
 	  
+	typeIsValid(type:string) : boolean
+	{
+		if (type == "private") return true
+		if (type == "public") return true
+		if (type == "protected") return true
+		return false
+	}
 
 	async addUserToChannel(channelCreate: ChannelCreate): Promise<joinResponse> {
 
+		if (!this.typeIsValid(channelCreate.type)){
+			return {
+				errorNumber: 10,
+				text: "Le type du channel n'est pas ok " + channelCreate.type
+			}
+		}
 		// Si le channel existe
 		const channelIndex = await this.getChannelByName(channelCreate.name)
 		if (channelIndex !== -1) {
@@ -217,7 +403,7 @@ export class ChannelService {
 			{
 				return {
 					errorNumber: 25,
-					text: "L'utilisateur " + channelCreate.user.pseudo + " essaie de rejoindre un channel alors qu'il est deja dedans : " + this.channels[channelIndex].name
+					text: `Vous essayez de creer ou rejoindre un channel alors que vous etes deja dedans ${this.channels[channelIndex].name}`
 				};
 			}
 
@@ -226,7 +412,7 @@ export class ChannelService {
 			{
 				return {
 					errorNumber: 26,
-					text: "L'utilisateur " + channelCreate.user.pseudo + " essaie de rejoindre un channel alors qu'il a été ban : " + this.channels[channelIndex].name
+					text: "Vous essayez de rejoindre un channel alors que vous avez été ban : " + this.channels[channelIndex].name
 				};
 			}
 
@@ -238,7 +424,7 @@ export class ChannelService {
 				{
 					return {
 						errorNumber: 20,
-						text: "L'utilisateur " + channelCreate.user.pseudo + " essaie de rejoindre un channel privé sans avoir été invité : " + this.channels[channelIndex].name
+						text: "Vous essayez de rejoindre un channel privé sans avoir été invité : " + this.channels[channelIndex].name
 					};
 
 				}
@@ -250,16 +436,17 @@ export class ChannelService {
 				{
 					return {
 						errorNumber: 21,
-						text: "L'utilisateur " + channelCreate.user.pseudo + " essaie de rejoindre un channel privé avec le mauvais mdp: " + this.channels[channelIndex].name
+						text: "Vous essayez de rejoindre un channel privé avec le mauvais mdp: " + this.channels[channelIndex].name
 					};
 
 				}
 			}
 				// Dans tout les autres cas, on ajoute l'utilisateur
 			this.channels[channelIndex].users.push(channelCreate.user)
+			this.channels[channelIndex].invited.push(channelCreate.user.pseudo)
 			return {
 				errorNumber: 0,
-				text: "Utilisateur ajouté dans le channel"
+				text: `Vous avez rejoint le channel ${this.channels[channelIndex].name}`
 			};
 		}
 		// Si le channel existe pas, on le créé
@@ -297,6 +484,21 @@ export class ChannelService {
 			await this.removeChannel(channelName)
 		  }
 	  }
+
+	}
+
+	async userInChannel(id: number, channelName: string): Promise<boolean>
+	{
+		const channelIndex = await this.getChannelByName(channelName)
+		if (channelIndex === -1) return false
+		return this.channels[channelIndex].users.some(u => u.id === id)
+	}
+
+	async userInChannelBySocketIt(socketId: string, channelName: string): Promise<boolean>
+	{
+		const channelIndex = await this.getChannelByName(channelName)
+		if (channelIndex === -1) return false
+		return this.channels[channelIndex].users.some(u => u.socketId === socketId)
 	}
 
 	async getAllChannels(): Promise<Channel[]> {

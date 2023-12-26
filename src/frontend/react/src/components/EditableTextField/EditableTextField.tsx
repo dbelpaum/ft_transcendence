@@ -9,8 +9,9 @@ interface EditableTextFieldProps {
 }
 
 function EditableTextField({ label, value, onSave, editable = true }: EditableTextFieldProps) {
-  const [inputValue, setInputValue] = useState(value);
+  const [inputValue, setInputValue] = useState(value || '');
   const [isEdited, setIsEdited] = useState(false);
+
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setInputValue(e.target.value);

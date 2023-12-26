@@ -3,8 +3,9 @@ import React, { ReactNode, createContext, useContext, useState, useEffect } from
 import { useErrorMessage, ErrorMessageProvider } from './ErrorContexte';
 import { User } from './AuthInteface';
 import { useLocation } from 'react-router-dom';
-import { ChannelCreate, ClientToServerEvents, Message, ServerToClientEvents } from '../pages/Chat/chat.interface';
+import { ChannelCreate, ClientToServerEvents, Message, MpChannel, ServerToClientEvents } from '../pages/Chat/chat.interface';
 import { io, Socket } from 'socket.io-client';
+import { showNotification, showNotificationError } from '../pages/Game/Notification';
 
 
 
@@ -19,7 +20,8 @@ type AuthContextType = {
 	chatSocket: Socket<ServerToClientEvents, ClientToServerEvents> | null;
 	messages: Message[];
 	setMessages: React.Dispatch<React.SetStateAction<Message[]>>;
-
+	recharger: () => void;
+	forceReload: number;
   };
 
 type AuthProviderProps = {
@@ -35,73 +37,80 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 	const [chatSocket, setChatSocket] = useState<Socket<ServerToClientEvents, ClientToServerEvents> | null>(null);
 	const [isConnected, setIsConnected] = useState(false);
 	const [messages, setMessages] = useState<Message[]>([]);
+	const [forceReload, setForceReload] = useState<number>(0);
+
+
+	const recharger = (): void => {
+		setForceReload(prev => prev + 1);
+	};
 
 	const useQuery = () => {
 		return new URLSearchParams(useLocation().search);
 	};
 	const query = useQuery();
-	const tokenUrl = query.get('token'); 
+	const tokenUrl = query.get('token');
+	const error = query.get('error');
 
 	// Récupérez votre token JWT
-	const token = sessionStorage.getItem('token');
-	const socket: Socket<ServerToClientEvents, ClientToServerEvents> = io("http://localhost:4000",
-	{ 
-		autoConnect: false,
-		auth: {
-			token: token // Envoyez le token JWT ici
-		}
-	});
+	const token = localStorage.getItem('token');
 
-  // Chargez le token JWT depuis sessionStorage lors du démarrage
+
+  // Chargez le token JWT depuis localStorage lors du démarrage
   useEffect(() => {
-	const getUserData = async (authToken:string) => {
-		try {
-		  setIsLoading(true);
-		  console.log("token " + authToken)
-		  const response = await fetch(process.env.REACT_APP_URL_SERVER + 'authentification/42/profil', 
-		  {
-			  credentials: 'include',
-			  headers: {
-				  'Authorization': `Bearer ${authToken}`
-				}
-			});
-		  const userData = await response.json();
-		  if (Object.keys(userData).length != 0) {
-			  setUser(userData); // Utilisateur connecté
-			  console.log("the user data")
-		  }
-		  else
-			setUser(null)
-		} catch (error) {
-		  console.error('Erreur lors de la vérification de l’utilisateur', error);
-		} finally {
-		  setIsLoading(false);
-		}
-	  };
-	if (tokenUrl)
+	if (error === "errorAuthentification")
 	{
-		login(tokenUrl)
-		getUserData(tokenUrl);
-		setIsLoading(false);
-		return ;
+		showNotificationError("Athentification error", "Erreur lors de la requete a l'api 42. Recommencez, ça devrait marcher")
 	}
-
-	const tokenSession = sessionStorage.getItem('token');
-	if (tokenSession) {
-		login(tokenSession)
-		getUserData(tokenSession);
+	const getUserData = async (authToken:string) => {
+	  try {
+		setIsLoading(true);
+		console.log("token " + authToken);
+		const response = await fetch(process.env.REACT_APP_URL_SERVER + 'authentification/42/profil', {
+		  credentials: 'include',
+		  headers: {
+			'Authorization': `Bearer ${authToken}`
+		  }
+		});
+		if (response.ok) {
+			const userData = await response.json();
+			if (Object.keys(userData).length !== 0) {
+				setUser(userData); // Utilisateur connecté
+			}
+			else {
+				setUser(null);
+			}
+		}
+		else
+		{
+			setUser(null)
+		}
+		
+	  } catch (error) {
+		setUser(null)
+	  } finally {
 		setIsLoading(false);
-		return ;
-	}
-	setIsLoading(false);
-
-
+	  }
+	};
+  
+	const authentificate = async () => {
+		if (user) return
+		if (authToken) return
+		const tokenSession = tokenUrl || localStorage.getItem('token');
+		if (tokenSession) {
+			await getUserData(tokenSession);
+			await login(tokenSession);
+		}
+		setIsLoading(false);
+	};
+  
+	authentificate();
   }, []);
 
-  const login = async (token:string) => {
-    sessionStorage.setItem('token', token);
-    setAuthToken(token);
 
+  const login = async (token:string) => {
+	localStorage.removeItem('token');
+    localStorage.setItem('token', token);
+    setAuthToken(token);
 	const newChatSocket = io("http://localhost:4000", {
 		autoConnect: false,
 		auth: { token: token }
@@ -112,56 +121,84 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
 
   const logout = () => {
-	sessionStorage.removeItem('token');
+	if (chatSocket)	chatSocket.disconnect()
+	localStorage.clear()
 	setAuthToken(null);
 	setUser(null)
 };
 
 useEffect(() => {
 	if (!user || !chatSocket) return
-
+		console.log("is connected + " + isConnected)
 		chatSocket.connect();
-
 		chatSocket.on('connect', () => {
+
 			setIsConnected(true);
 			const updatedUser = { ...user, socketId: chatSocket.id };
 			setUser(updatedUser); 
-			const savedChannels: ChannelCreate[] = JSON.parse(sessionStorage.getItem('channels') || '[]');
-			const updatedChannels = savedChannels.map(channel => {
-				return {
-					...channel, 
-					user: updatedUser
-				};
-			});
-			if (updatedChannels && updatedUser)
-			{
+			try{
+				const savedChannels: ChannelCreate[] = JSON.parse(localStorage.getItem('channels') || '[]');
+				const updatedChannels = savedChannels.map(channel => {
+					return {
+						...channel, 
+						user: updatedUser
+					};
+				});
+				if (updatedChannels && updatedUser)
+				{
 				updatedChannels.forEach((channel) => {
 					chatSocket.emit('join_channel', channel);
 				});
 			}
+			}catch (error) {
+				console.error('Error parsing JSON from localStorage:', error);
+				console.error('Data that caused the error:', localStorage.getItem('channels'));
+				// Gérez l'erreur ou initialisez savedChannels à une valeur par défaut
+			}
+			
 
 		});
 	
 		chatSocket.on('disconnect', () => {
 			setIsConnected(false);
+			console.log("je me deco")
 		});
 	
 		chatSocket.on('chat', (e) => {
 			setMessages((messages) => [...messages, e]);
-			
+			console.log("nouveau message")
+			console.log(e)
 		});
-	
+		
+		chatSocket.on('notif', (e) => {
+			showNotification("Chat", e.message, e.type)
+			recharger()
+		})
+
 		return () => {
 			chatSocket.off('connect');
 			chatSocket.off('disconnect');
 			chatSocket.off('chat');
 		};
-}, [user, chatSocket]);
+}, [chatSocket]);
 
 
 
 return (
-    <AuthContext.Provider value={{ user, setUser, isLoading, login, logout, authToken, setAuthToken, chatSocket, messages, setMessages}}>
+    <AuthContext.Provider value={{ 
+		user, 
+		setUser, 
+		isLoading, 
+		login, 
+		logout, 
+		authToken, 
+		setAuthToken, 
+		chatSocket, 
+		messages, 
+		setMessages,
+		recharger,
+		forceReload
+		}}>
       {children}
     </AuthContext.Provider>
   );

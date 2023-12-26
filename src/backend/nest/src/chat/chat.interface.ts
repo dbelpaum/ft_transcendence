@@ -10,6 +10,7 @@ export interface Message {
     timeSent: string;
     message: string;
 	channelName: string;
+	type: "channel" | "mp";
 }
   
 export interface ServerToClientEvents {
@@ -31,6 +32,12 @@ export interface Channel {
 	invited: string[]
 	ban: string[]
 	mute: string[]
+}
+
+export interface MpChannel
+{
+	user1: User,
+	user2: User
 }
 
 export interface ChannelCreate {
@@ -55,6 +62,21 @@ export interface InviteToChannel
 export interface addAdminInfo
 {
 	channel: string
-	new_name: string
+	user_to_modify: User
 	user: User
 }
+
+export interface UserTokenInfo{
+	id: number,
+	id42: number,
+	pseudo: string,
+	socketId: string
+}
+
+export interface Notif
+{
+	message: string,
+	type: NotificationType
+}
+
+export type NotificationType = 'success' | 'danger' | 'info' | 'default' | 'warning';

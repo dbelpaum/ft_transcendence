@@ -40,6 +40,7 @@ a{
 	width: 50%;
 	background-color: white;
 	padding: 20px;
+	overflow-y: scroll;
   }
 
   .channel_item{
@@ -369,13 +370,27 @@ a{
 }
 
 .action-button {
-    padding: 5px 10px;
+    padding: 8px 15px;
     margin-left: 10px;
     background-color: #007bff;
     color: white;
     border: none;
     border-radius: 4px;
     cursor: pointer;
+}
+
+.mp-button {
+    padding: 8px 15px;
+    margin-left: 10px;
+    background-color: #bf00ff;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.mp-button:hover {
+    background-color: #ac00e5;
 }
 
 .action-button:hover {
@@ -481,4 +496,25 @@ a{
 {
 	transform: scale(1.1);
 
+}
+
+.user-profile-container .channel_status
+{
+	position: relative;
+	left: 5px;
+	top: -3px;
+}
+
+.user-profile-container .channel_status .status_indicator{
+	background-color: #c22929;
+}
+
+.user-profile-container .channel_status .status_indicator.connected{
+	background-color: green;
+}
+
+.mp{
+	display: flex;
+	justify-content: center;
+	margin-top: 24px;
 }

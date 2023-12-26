@@ -2,11 +2,11 @@ import React, { useState, useEffect } from 'react';
 import {
 	Channel,
 	ChannelUtility
-  } from './chat.interface';
+  } from '../chat.interface';
 import { useLocation } from 'react-router-dom';
 import UserInfo from './UserInfo';
-import { User } from '../../context/AuthInteface';
-import { InviteToChannel } from './chat.interface';
+import { User } from '../../../context/AuthInteface';
+import { InviteToChannel } from '../chat.interface';
 interface ChannelInviteProps {
 	channelUtility: ChannelUtility;
 	channelUrl: string;
