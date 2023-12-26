@@ -22,6 +22,8 @@ model User {
   createdAt               DateTime      @default(now())
   friendshipsAsRequester  Friendship[]  @relation("RequesterRelation")
   friendshipsAsAddressee  Friendship[]  @relation("AddresseeRelation")
+  myScores                Score[]       @relation("UserScores1")
+  opponentScores          Score[]       @relation("UserScores2")
 
   @@map("users")
 }
@@ -29,7 +31,7 @@ model User {
 model Friendship {
   id          Int       @id @default(autoincrement())
   createdAt   DateTime  @default(now())
-  status      String    @default("friend") // peut etre friend , notFriend , blocked
+  status      String    @default("friend") // peut être friend, notFriend, blocked
   requesterId Int
   requester   User      @relation("RequesterRelation", fields: [requesterId], references: [id])
   addresseeId Int
@@ -38,4 +40,13 @@ model Friendship {
   @@unique([requesterId, addresseeId])
 }
 
+model Score {
+  id          Int       @id @default(autoincrement())
+  user1Id     Int
+  user1       User      @relation("UserScores1", fields: [user1Id], references: [id])
+  user2Id     Int
+  user2       User      @relation("UserScores2", fields: [user2Id], references: [id])
+  createdAt   DateTime  @default(now())
 
+  @@unique([user1Id, user2Id])
+}
