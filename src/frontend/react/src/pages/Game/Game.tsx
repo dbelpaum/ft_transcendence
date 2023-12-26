@@ -54,6 +54,7 @@ const Game: React.FC = () => {
 
 	useEffect(() => {
 		const socket = io("http://localhost:4000/game");
+		socket.connect();
 		setSocket(socket);
 
 		socket.on("exception", (data: any) => {
