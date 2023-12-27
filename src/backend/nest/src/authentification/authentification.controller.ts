@@ -1,16 +1,18 @@
 // auth.controller.ts
-import { Controller, Get, Req, Res, UseGuards, Query } from '@nestjs/common';
+import { Controller, Get, Req, Res, UseGuards, Query, Post, Body } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { Request, Response } from 'express';
 import { PrismaService } from '../prisma.service';
 import { JwtStrategy } from './jwt.strategy';
 import { JwtService } from '@nestjs/jwt';
+import { AuthentificationService } from './authentification.service';
 
 @Controller('authentification')
 export class AuthentificationController {
   constructor (
 	private prisma: PrismaService,
-	private jwtService: JwtService,){}
+	private jwtService: JwtService,
+	private authentificationService: AuthentificationService){}
 
 	
 	private delay(ms) {
@@ -118,25 +120,68 @@ export class AuthentificationController {
     // Mais si je me suis connecté sur /42
     // Et que je reviens dans 42/profil, j'ai toutes les infos
     // Le front pourra toujours faire un appel en appel a cet url pour avoir les infos
-  @Get('42/profil')
-  @UseGuards(AuthGuard('jwt'))
-  async profilSession42(@Req() req, ) {
-    // Gérer le callback après l'authentification
-    if (req.user)
-    {
-	  const userBdd = await this.prisma.user.findUnique({
-        where: {
-          id42: req.user.id42,
-        },
-      });
-	  if (userBdd)
-		return userBdd
-    }
-    else
-    {
-      return {undefined}
-    }
-}
+	@Get('42/profil')
+	@UseGuards(AuthGuard('jwt'))
+  	async profilSession42(@Req() req, ) {
+		// Gérer le callback après l'authentification
+		if (req.user)
+		{
+			const userBdd = await this.prisma.user.findUnique({
+			where: {
+				id42: req.user.id42,
+			},
+			});
+			if (userBdd)
+			return userBdd
+		}
+		else
+		{
+			return {undefined}
+		}
+	}
+
+	@Get('/auth-enabled')
+	@UseGuards(AuthGuard('jwt'))
+	async getAuthEnabled(@Req() req: Request) {
+		console.log("voila")
+		console.log(req.user.id)
+		const data = await this.prisma.user.findUnique({
+		    where: { id: parseInt(req.user.id)},
+		});
+		return {isActive: data.isTwoFactorAuthEnabled}
+	}
+
+	@Get('/2fa/generate')
+	@UseGuards(AuthGuard('jwt'))
+	async generate2faQrCode(@Req() req: Request) {
+		if (req.user)
+		{
+			console.log("coucou " + req.user.id)
+			const dataAuth = await this.authentificationService.generateTwoFactorAuthenticationSecret(req.user.id)
+			console.log(dataAuth.qrCode)
+			return {
+				qrCode : dataAuth.qrCode
+			}
+		}
+		return undefined
+	}
+
+	@Post('2fa/turn-on')
+	@UseGuards(AuthGuard('jwt'))
+	async turnOnTwoFactorAuthentication(@Req() request, @Body() body) {
+	  const isCodeValid =
+		this.authentificationService.isTwoFactorAuthenticationCodeValid(
+		  body.twoFactorAuthenticationCode,
+		  request.user,
+		);
+	  if (!isCodeValid) {
+			throw new Error(`Wrong authentication code`);
+	  }
+	  await this.prisma.user.update({
+		where: { id: request.user.id },
+		data: { twoFactorSecret: secret },
+	});
+	}
 }
 
 // Ca c'est le resultat de l'api en /me (en vrai y'a encore pleins d'autre choses derriere)
