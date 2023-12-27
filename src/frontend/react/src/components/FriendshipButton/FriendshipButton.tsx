@@ -3,7 +3,7 @@ import './FriendshipButton.css'
 
 
 type FriendshipButtonProps = {
-    status: 'addFriend' | 'removeFriend' | 'block' | 'cancelRequest';
+    status: 'addFriend' | 'removeFriend' | 'block' | 'cancelRequest' | 'unblock';
     onButtonClick: () => void;
     color?: string;
 };
@@ -19,6 +19,9 @@ const FriendshipButton: React.FC<FriendshipButtonProps> = ({ status, onButtonCli
             break;
         case 'block':
             buttonText = 'Bloquer';
+            break;
+        case 'unblock':
+            buttonText = 'Débloquer';
             break;
         case 'cancelRequest':
             buttonText = 'Annuler la demande d\'ami';
