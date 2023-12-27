@@ -17,8 +17,7 @@ export class OnlineGameLogic {
 		camera: new THREE.PerspectiveCamera(),
 		id: 0,
 	};
-	private playerScore = 0;
-	private opponentScore = 0;
+	private scores: Record<string, number> = {};
 	private mainLight: THREE.HemisphereLight;
 	private ground: THREE.Mesh;
 	private player: THREE.Mesh;
@@ -170,17 +169,17 @@ export class OnlineGameLogic {
 		);
 	}
 
-	public renderScene() {
-		const divGameScore = document.getElementById("gameScore");
-		if (divGameScore) {
-			divGameScore.textContent =
-				"Player " +
-				this.playerScore +
-				" - " +
-				this.opponentScore +
-				" Opponent";
+	private displayScores() {
+		let i = 1;
+		for (const [key, value] of Object.entries(this.scores)) {
+			const divScore = document.getElementById("gameScore" + i++);
+			if (divScore) {
+				divScore.innerText = key.toString() + " " + value.toString();
+			}
 		}
+	}
 
+	public renderScene() {
 		this.ball.position.x += this.ballVelX * this.ballSpeedModifier;
 		this.ball.position.y += this.ballVelY * this.ballSpeedModifier;
 
@@ -203,6 +202,7 @@ export class OnlineGameLogic {
 		this.sendGameState();
 
 		this.renderer.render(this.scene, this.cameraInUse.camera);
+		this.displayScores();
 		this.gameTick++;
 	}
 
@@ -215,15 +215,7 @@ export class OnlineGameLogic {
 		this.ballSpeedModifier = data.ballSpeedModifier;
 		this.player.position.x = data.paddlePlayer.x;
 		this.opponent.position.x = data.paddleOpponent.x;
-		// scores: Record<Socket["id"], number>
-		const scores = data.scores as Record<Socket["id"], number>;
-		for (let key in scores) {
-			if (key === this.socket.id) {
-				this.playerScore = scores[key];
-			} else {
-				this.opponentScore = scores[key];
-			}
-		}
+		this.scores = data.scores as Record<string, number>;
 	}
 
 	private animate() {

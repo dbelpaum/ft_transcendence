@@ -21,6 +21,9 @@ export class Lobby {
 		Socket["id"],
 		boolean
 	>();
+	private name = "";
+	public host: AuthenticatedSocket;
+	public guest: AuthenticatedSocket;
 
 	constructor(
 		private readonly server: Server,
@@ -35,8 +38,16 @@ export class Lobby {
 		client.data.lobby = this;
 		this.readyStatus.set(client.id, false);
 
-		if (!this.hostSocketId) this.hostSocketId = client.id;
-		else this.guestSocketId = client.id;
+		if (!this.hostSocketId) {
+			this.hostSocketId = client.id;
+			this.host = client;
+		}
+		else {
+			this.guestSocketId = client.id;
+			this.guest = client;
+		}
+
+		if (this.name === "") this.name = client.auth.pseudo;
 
 		if (this.lobbyType === "private")
 			this.dispatchLobbyState();
@@ -82,17 +93,30 @@ export class Lobby {
 			playersStateObject[key] = value;
 		});
 
+		const hostData = this.host ? {
+			socketId: this.hostSocketId,
+			pseudo: this.host.auth.pseudo,
+			avatar: this.host.auth.avatar
+		} : null;
+
+		const guestData = this.guest ? {
+			socketId: this.guestSocketId,
+			pseudo: this.guest.auth.pseudo,
+			avatar: this.guest.auth.avatar
+		} : null;
+
 		const payload: ServerPayloads[ServerEvents.LobbyState] = {
 			lobbyType: this.lobbyType,
 			lobbyId: this.id,
-			hostId: this.hostSocketId,
-			guestId: this.guestSocketId,
 			hasStarted: this.instance.hasStarted,
 			hasFinished: this.instance.hasFinished,
 			playersCount: this.clients.size,
 			playersState: playersStateObject,
 			isSuspended: this.instance.isSuspended,
 			scores: this.instance.scores,
+			host: hostData,
+			guest: guestData,
+			name: this.name
 		};
 
 		this.dispatchToLobby(ServerEvents.LobbyState, payload);

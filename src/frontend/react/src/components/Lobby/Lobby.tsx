@@ -7,14 +7,15 @@ import { showNotificationSuccess } from "../../pages/Game/Notification";
 interface LobbyProps {
 	lobbyData: {
 		lobbyId: string;
-		hostId: string;
-		guestId: string;
 		hasStarted: boolean;
 		hasFinished: boolean;
 		isSuspended: boolean;
 		playersCount: number;
 		scores: Record<string, number>;
 		playersState: Record<string, boolean>;
+		host: { socketId: string, pseudo: string, avatar: string },
+		guest: { socketId: string, pseudo: string, avatar: string },
+		name: string;
 	};
 	isReady: boolean;
 	onLeaveLobby: () => void;
@@ -49,24 +50,23 @@ const Lobby: React.FC<LobbyProps> = ({
 
 	return (
 		<div>
-			<h2>{lobbyData.hostId}'s lobby</h2>
+			<h2>{lobbyData.name}'s lobby</h2>
 			<p>
 				Room code: {lobbyData.lobbyId}{" "}
 				<button onClick={copyToClipboard}>Copy</button>{" "}
 			</p>
 			<p>{lobbyData.playersCount}/2</p>
 			<p>
-				Host: {lobbyData.hostId}{" "}
-				{lobbyData.playersState[lobbyData.hostId] ? "✅" : "❌"}
+				Host: {lobbyData.host.pseudo}{" "}
+				{lobbyData.playersState[lobbyData.host.socketId] ? "✅" : "❌"}
 			</p>
 			<p>
 				Guest:{" "}
-				{lobbyData.guestId
-					? `${lobbyData.guestId} ${
-							lobbyData.playersState[lobbyData.guestId]
-								? "✅"
-								: "❌"
-					  }`
+				{lobbyData.guest
+					? `${lobbyData.guest.pseudo} ${lobbyData.playersState[lobbyData.guest.socketId]
+						? "✅"
+						: "❌"
+					}`
 					: "Waiting for Opponent"}
 			</p>
 			{/* <h3>Scores:</h3> */}

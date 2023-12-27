@@ -1,16 +1,3 @@
-#gameScore {
-	position: absolute;
-	top: 50px;
-	left: 50%;
-	transform: translateX(-50%);
-	padding: 10px;
-	color: #ffffff;
-	font-family: "Arial", sans-serif;
-	font-size: 32px;
-	border-radius: 5px;
-	z-index: 1000;
-}
-
 .keycap {
 	display: inline-block;
 	padding: 5px 10px;
@@ -23,6 +10,22 @@
 	background: linear-gradient(to bottom, #f8f8f8, #e0e0e0);
 	box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2),
 		inset 0 -2px 2px rgba(255, 255, 255, 0.5);
+}
+
+.game-container {
+	display: flex;
+	justify-content: space-around; /* Add horizontal space between components */
+	align-items: center;
+}
+
+.gameScore1,
+.gameScore2 {
+	margin: 0px 100px; /* Adjust the top and bottom margins and horizontal spacing */
+	/* Add styling for game scores as needed */
+}
+
+.OnlineGameScene {
+	flex: 2; /* Adjust the flex value based on your layout preferences */
 }
 
 .scoreRankingOverlay {

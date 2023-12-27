@@ -1,19 +1,16 @@
 import { IsBoolean, IsInt, IsNumber, IsString, Max, Min } from 'class-validator';
 
-export class LobbyCreateDto
-{
+export class LobbyCreateDto {
 	@IsString()
 	mode: 'vanilla' | 'special';
 }
 
-export class LobbyJoinDto
-{
+export class LobbyJoinDto {
 	@IsString()
 	lobbyId: string;
 }
 
-export class ClientMovementDto
-{
+export class ClientMovementDto {
 	@IsBoolean()
 	movingLeft: boolean;
 

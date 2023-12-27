@@ -24,6 +24,8 @@ export class Instance {
 	private paddleGuest: Paddle;
 	private gameTick: number;
 	private updateInterval: NodeJS.Timeout | null = null;
+	private hostPseudo: string;
+	private guestPseudo: string;
 	constructor(private readonly lobby: Lobby) {
 		this.ball = {
 			radius: 5,
@@ -52,9 +54,12 @@ export class Instance {
 			return;
 		}
 
+		this.hostPseudo = this.lobby.host.auth.pseudo;
+		this.guestPseudo = this.lobby.guest.auth.pseudo;
+		if (this.hostPseudo === this.guestPseudo) this.guestPseudo += "_";
 		this.hasStarted = true;
-		this.scores[this.lobby.hostSocketId] = 0;
-		this.scores[this.lobby.guestSocketId] = 0;
+		this.scores[this.hostPseudo] = 0;
+		this.scores[this.guestPseudo] = 0;
 		this.lobby.dispatchToLobby(ServerEvents.GameStart, {});
 		this.newRound();
 		this.startGameRuntime();
@@ -108,11 +113,11 @@ export class Instance {
 	private checkGoal(): void {
 		//Check si la balle est sortie du terrain
 		if (this.ball.position.y > 270) {
-			this.scores[this.lobby.hostSocketId]++;
+			this.scores[this.hostPseudo]++;
 			this.newRound();
 		}
 		else if (this.ball.position.y < -270) {
-			this.scores[this.lobby.guestSocketId]++;
+			this.scores[this.guestPseudo]++;
 			this.newRound();
 		}
 	}
@@ -151,7 +156,7 @@ export class Instance {
 			this.ball.velocity.x = -this.ball.velocity.x;
 		}
 
-		// console.log("Scores: " + this.scores[this.lobby.hostSocketId] + " h-g " + this.scores[this.lobby.guestSocketId])
+		// console.log("Scores: " + this.scores[this.hostPseudo] + " h-g " + this.scores[this.guestPseudo])
 		// console.log(this.ball.speedModifier);
 	}
 
@@ -175,7 +180,7 @@ export class Instance {
 		this.sendGameState();
 
 		// Check for game end conditions and stop the game if necessary
-		if (this.scores[this.lobby.hostSocketId] >= 5 || this.scores[this.lobby.guestSocketId] >= 5) {
+		if (this.scores[this.hostPseudo] >= 5 || this.scores[this.guestPseudo] >= 5) {
 			this.hasFinished = true;
 			this.stopGameRuntime();
 			return;
@@ -203,8 +208,8 @@ export class Instance {
 				z: this.paddleHost.position.z
 			},
 			scores: {
-				[this.lobby.hostSocketId]: this.scores[this.lobby.hostSocketId],
-				[this.lobby.guestSocketId]: this.scores[this.lobby.guestSocketId],
+				[this.hostPseudo]: this.scores[this.hostPseudo],
+				[this.guestPseudo]: this.scores[this.guestPseudo],
 			}
 		});
 		this.lobby.sendToUser(this.lobby.guestSocketId, ServerEvents.GameState, {
@@ -225,8 +230,8 @@ export class Instance {
 				z: this.paddleGuest.position.z
 			},
 			scores: {
-				[this.lobby.hostSocketId]: this.scores[this.lobby.hostSocketId],
-				[this.lobby.guestSocketId]: this.scores[this.lobby.guestSocketId],
+				[this.hostPseudo]: this.scores[this.hostPseudo],
+				[this.guestPseudo]: this.scores[this.guestPseudo],
 			}
 		});
 	}

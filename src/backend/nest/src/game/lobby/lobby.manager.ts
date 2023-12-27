@@ -6,6 +6,8 @@ import { ServerException } from "../ServerExceptions";
 import { SocketExceptions } from "../shared/server/SocketExceptions";
 import { LobbyMode } from "./types";
 import { ServerEvents } from "../shared/server/ServerEvents";
+import { jwtDecode } from "jwt-decode";
+
 
 export class LobbyManager {
 	public server: Server;
@@ -16,6 +18,24 @@ export class LobbyManager {
 	>();
 
 	public initializeSocket(client: AuthenticatedSocket): void {
+		try {
+			const token = client.handshake.auth.token;
+			const payload = jwtDecode(token) as any;
+			client.auth = {
+				id: payload.id,
+				id42: payload.id42,
+				pseudo: payload.pseudo,
+				jwt: token,
+				iat: payload.iat,
+				exp: payload.exp,
+				avatar: "https://t4.ftcdn.net/jpg/05/49/98/39/360_F_549983970_bRCkYfk0P6PP5fKbMhZMIb07mCJ6esXL.jpg"	// A changer avec une requête bdd ou autre
+			}
+			// console.log(client);
+		} catch (e) {
+			console.log(e)
+			client.disconnect(); // Déconnectez le client en cas d'échec de la vérification
+			return;
+		}
 		client.data.lobby = null;
 	}
 

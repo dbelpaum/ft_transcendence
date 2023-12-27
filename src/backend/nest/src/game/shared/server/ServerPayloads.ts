@@ -8,14 +8,15 @@ export type ServerPayloads = {
 	[ServerEvents.LobbyState]: {
 		lobbyType: string;
 		lobbyId: string;
-		hostId: string;
-		guestId: string;
 		hasStarted: boolean;
 		hasFinished: boolean;
 		isSuspended: boolean;
 		playersCount: number;
 		playersState: Record<string, boolean>;
 		scores: Record<string, number>;
+		host: { socketId: string, pseudo: string, avatar: string },
+		guest: { socketId: string, pseudo: string, avatar: string },
+		name
 	};
 
 	[ServerEvents.GameMessage]: {
