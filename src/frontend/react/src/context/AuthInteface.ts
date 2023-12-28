@@ -6,6 +6,7 @@ export interface User {
     imageURL: string;
     firstname: string;
     lastname: string;
+    bio: string;
 	socketId?: string;
 }
 

@@ -1,5 +1,7 @@
-import { Controller , Post, Param, Get} from '@nestjs/common';
+import { Controller , Post, Param, Get, UseGuards} from '@nestjs/common';
 import { PrismaService } from 'src/prisma.service';
+import { AuthGuard } from '@nestjs/passport';
+
 
 @Controller('friendship')
 export class FriendshipController {
@@ -10,6 +12,42 @@ export class FriendshipController {
         const friendships = await this.prisma.friendship.findMany();
         return friendships;
     }
+
+
+    @Get(':userId/friends-and-blocked')
+    @UseGuards(AuthGuard('jwt'))
+async getFriendsAndBlocked(@Param('userId') userId: string) {
+    const friends = await this.prisma.friendship.findMany({
+        where: {
+            OR: [
+                { requesterId: Number(userId), status: 'friend' },
+                
+            ],
+        },
+        include: {
+            addressee: true
+        }
+    });
+
+    const blocked = await this.prisma.friendship.findMany({
+        where: {
+            requesterId: Number(userId),
+            status: 'blocked',
+        },
+        include: {
+            addressee: true
+        }
+    });
+
+    console.log("friends:", JSON.stringify(friends, null, 2));
+console.log("blocked:", JSON.stringify(blocked, null, 2));
+
+    return { friends, blocked };
+}
+
+
+
+
 
     /* voir si ami ou pas */
 

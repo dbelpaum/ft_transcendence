@@ -6,7 +6,9 @@ import { useAuth } from '../../context/AuthContexte';
 import UserList from '../UserList/UserList';
 import { Link } from 'react-router-dom';
 import { User } from '../../context/AuthInteface';
+import FriendshipList from '../../components/FriendshipList/FriendshipList';
 import Button2FA from '../../components/2FA/Button2FA';
+
 
 interface UserInfo {
   pseudo: string;
@@ -22,6 +24,7 @@ function Profil() {
   const { user, login} = useAuth();
   const userId = user?.id42;
   const [userInfo, setUserInfo] = useState<User | null>(null);
+  const [showFriendshipList, setShowFriendshipList] = useState(false);
 
 
   useEffect(() => {
@@ -37,11 +40,15 @@ function Profil() {
     if (userId && userInfo) {
       const updatedUserInfo = { ...userInfo, [field]: value };
       setUserInfo(updatedUserInfo);
+
+      const jwtToken = localStorage.getItem('token'); // Récupérez le JWT depuis le localStorage
+
       
       fetch(`http://localhost:4000/user/${userId}/${field}`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': `Bearer ${jwtToken}`,
         },
         body: JSON.stringify({ [field]: value }),
       })
@@ -92,14 +99,20 @@ function Profil() {
               onSave={(value) => saveField('lastname', value)}
             />
             
-            {/* <EditableTextField
+            <EditableTextField
               label="Bio"
               value={userInfo.bio}
               onSave={(value) => saveField('bio', value)}
-            /> */}
+            />
 
           </>
+
         )}
+
+<button onClick={() => setShowFriendshipList(!showFriendshipList)}>
+        Afficher la liste d'amis et d'utilisateurs bloqués
+      </button>
+      {showFriendshipList && user?.id && <FriendshipList userId={user?.id} />}
 
 
 	<Link to="/UserList">Liste des joueurs</Link>
