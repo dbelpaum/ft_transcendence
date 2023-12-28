@@ -69,6 +69,7 @@ export class Lobby {
 		client.data.lobby = null;
 		if (this.clients.size === 0)
 			this.lobbyManager.deleteLobby(this.id);
+		this.readyStatus.delete(client.id);
 
 		this.dispatchLobbyState();
 	}
