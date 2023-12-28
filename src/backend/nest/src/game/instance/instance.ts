@@ -171,15 +171,13 @@ export class Instance {
 			}
 		});
 		this.stopGameRuntime();
-    enregistrerScores(this.lobby.hostSocketId, this.lobby.guestSocketId, this.scores[this.lobby.hostSocketId], this.scores[this.lobby.guestSocketId])
-    .then((nouveauScore) => {
-
-      console.log('New score added:', nouveauScore);
-      })
-    .catch((erreur) => {
-
-      console.error('Error during adding score in db', erreur);
-    })
+		enregistrerScores(this.lobby.host.auth.id.toString(), this.lobby.guest.auth.id.toString(), this.scores[this.hostPseudo], this.scores[this.guestPseudo])
+			.then((nouveauScore) => {
+				console.log('New score added:', nouveauScore);
+			})
+			.catch((erreur) => {
+				console.error('Error during adding score in db', erreur);
+			})
 	}
 
 	private gameRuntime(): void {

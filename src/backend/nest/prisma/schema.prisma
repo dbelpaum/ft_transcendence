@@ -46,10 +46,10 @@ model Friendship {
 
 model Score {
   id          Int       @id @default(autoincrement())
-  user1Id     String      
+  user1Id     Int      
   user1Score  Int
  // user1       User      @relation("UserScores1", fields: [user1Id], references: [id])
-  user2Id     String       
+  user2Id     Int       
   user2Score  Int
  // user2       User      @relation("UserScores2", fields: [user2Id], references: [id])
   createdAt   DateTime  @default(now())
