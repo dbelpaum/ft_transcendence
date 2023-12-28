@@ -1,28 +1,28 @@
 export interface User {
-    id: number;
-    pseudo: string;
-    email?: string;
+	id: number;
+	pseudo: string;
+	email?: string;
 	socketId: string
 	isTwoFactorAuthEnabled: boolean
 	twoFactorSecret: string
 }
-  
+
 export interface Message {
-    user: User;
-    timeSent: string;
-    message: string;
+	user: User;
+	timeSent: string;
+	message: string;
 	channelName: string;
 	type: "channel" | "mp";
 }
-  
+
 export interface ServerToClientEvents {
 	chat: (e: Message) => void
-  }
-  
-  export interface ClientToServerEvents {
+}
+
+export interface ClientToServerEvents {
 	chat: (e: Message) => void
 	join_channel: (e: { user: User; channelName: string }) => void
-  }
+}
 
 export interface Channel {
 	name: string
@@ -36,8 +36,7 @@ export interface Channel {
 	mute: string[]
 }
 
-export interface MpChannel
-{
+export interface MpChannel {
 	user1: User,
 	user2: User
 }
@@ -54,21 +53,19 @@ export interface joinResponse {
 	text: string
 }
 
-export interface InviteToChannel
-{
+export interface InviteToChannel {
 	channel_name: string,
 	invited_name: string,
 	user: User
 }
 
-export interface addAdminInfo
-{
+export interface addAdminInfo {
 	channel: string
 	user_to_modify: User
 	user: User
 }
 
-export interface UserTokenInfo{
+export interface UserTokenInfo {
 	id: number,
 	id42: number,
 	pseudo: string,
@@ -76,8 +73,7 @@ export interface UserTokenInfo{
 
 }
 
-export interface Notif
-{
+export interface Notif {
 	message: string,
 	type: NotificationType
 }

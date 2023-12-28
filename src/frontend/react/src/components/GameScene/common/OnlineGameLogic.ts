@@ -17,8 +17,7 @@ export class OnlineGameLogic {
 		camera: new THREE.PerspectiveCamera(),
 		id: 0,
 	};
-	private playerScore = 0;
-	private opponentScore = 0;
+	private scores: Record<string, number> = {};
 	private mainLight: THREE.HemisphereLight;
 	private ground: THREE.Mesh;
 	private player: THREE.Mesh;
@@ -170,17 +169,17 @@ export class OnlineGameLogic {
 		);
 	}
 
-	public renderScene() {
-		const divGameScore = document.getElementById("gameScore");
-		if (divGameScore) {
-			divGameScore.textContent =
-				"Player " +
-				this.playerScore +
-				" - " +
-				this.opponentScore +
-				" Opponent";
+	private displayScores() {
+		let i = 1;
+		for (const [key, value] of Object.entries(this.scores)) {
+			const divScore = document.getElementById("gameScore" + i++);
+			if (divScore) {
+				divScore.innerText = key.toString() + " " + value.toString();
+			}
 		}
+	}
 
+	public renderScene() {
 		this.ball.position.x += this.ballVelX * this.ballSpeedModifier;
 		this.ball.position.y += this.ballVelY * this.ballSpeedModifier;
 
@@ -200,13 +199,38 @@ export class OnlineGameLogic {
 
 		this.camera3D.position.set(this.player.position.x, -300, 180);
 
-		this.sendGameState();
-
 		this.renderer.render(this.scene, this.cameraInUse.camera);
+		this.displayScores();
 		this.gameTick++;
 	}
 
-	private sendGameState() { }
+	private gameOver(data: any) {
+		// Create overlay container
+		const overlay = document.createElement('div');
+		overlay.classList.add('overlay');
+
+		// Winner text
+		const winnerText = document.createElement('p');
+		winnerText.innerText = `Winner: ${data.winner}`;
+		overlay.appendChild(winnerText);
+
+		// Loser text
+		const loserText = document.createElement('p');
+		loserText.innerText = `Loser: ${data.loser}`;
+		overlay.appendChild(loserText);
+
+		// Back to menu button
+		const backToMenuButton = document.createElement('button');
+		backToMenuButton.innerText = 'Back to menu';
+		backToMenuButton.addEventListener('click', () => {
+			window.location.href = '/game';
+		});
+		overlay.appendChild(backToMenuButton);
+
+		// Append overlay to the body
+		document.body.appendChild(overlay);
+		this.dispose();
+	}
 
 	private receiveGameState(data: any) {
 		this.ball.position.x = data.ballPosition.x;
@@ -215,15 +239,7 @@ export class OnlineGameLogic {
 		this.ballSpeedModifier = data.ballSpeedModifier;
 		this.player.position.x = data.paddlePlayer.x;
 		this.opponent.position.x = data.paddleOpponent.x;
-		// scores: Record<Socket["id"], number>
-		const scores = data.scores as Record<Socket["id"], number>;
-		for (let key in scores) {
-			if (key === this.socket.id) {
-				this.playerScore = scores[key];
-			} else {
-				this.opponentScore = scores[key];
-			}
-		}
+		this.scores = data.scores as Record<string, number>;
 	}
 
 	private animate() {
@@ -235,6 +251,10 @@ export class OnlineGameLogic {
 		this.socket.on("server.game.state", (data: any) => {
 			this.receiveGameState(data);
 		});
+
+		this.socket.on("server.game.over", (data: any) => {
+			this.gameOver(data);
+		})
 
 		this.animate();
 

@@ -12,6 +12,8 @@ import {
 	showNotificationWarning,
 } from "./Notification";
 import SocketContext from "./SocketContext";
+import { User } from '../../context/AuthInteface';
+import { useAuth } from '../../context/AuthContexte';
 
 const DebugPanel: React.FC<{ variables: Record<string, any> }> = ({
 	variables,
@@ -38,6 +40,7 @@ const Game: React.FC = () => {
 	const [gameStarted, setGameStarted] = useState<boolean>(false);
 	const [showScoreRanking, setShowScoreRanking] = useState<boolean>(false); // Ajout d'un état pour afficher ou masquer la superposition du classement
 	const [isReady, setIsReady] = useState<boolean>(false);
+	const user = useAuth().user as User;
 
 	const toggleScoreRanking = () => {
 		setShowScoreRanking(!showScoreRanking);
@@ -53,7 +56,13 @@ const Game: React.FC = () => {
 	};
 
 	useEffect(() => {
-		const socket = io("http://localhost:4000/game");
+		const socket = io("http://localhost:4000/game",
+			{
+				auth: {
+					token: localStorage.getItem('token')
+				}
+			});
+
 		socket.connect();
 		setSocket(socket);
 
@@ -126,13 +135,14 @@ const Game: React.FC = () => {
 					</>
 				)}
 				{gameStarted && (
-					<div>
-						<div className="gameScore" id="gameScore"></div>
+					<div className="game-container">
+						<div className="gameScore1" id="gameScore1"></div>
 						<OnlineGameScene
 							width={800}
 							height={600}
 							isHost={lobbyData.hostId === socket.id}
 						/>
+						<div className="gameScore2" id="gameScore2"></div>
 					</div>
 				)}
 
