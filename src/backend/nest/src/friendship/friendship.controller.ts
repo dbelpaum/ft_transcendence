@@ -18,11 +18,11 @@ async getFriendsAndBlocked(@Param('userId') userId: string) {
         where: {
             OR: [
                 { requesterId: Number(userId), status: 'friend' },
-                { addresseeId: Number(userId), status: 'friend' },
+                
             ],
         },
         include: {
-            requester: true,
+            // requester: true,
             addressee: true
         }
     });
@@ -36,6 +36,9 @@ async getFriendsAndBlocked(@Param('userId') userId: string) {
             addressee: true
         }
     });
+
+    console.log("friends:", JSON.stringify(friends, null, 2));
+console.log("blocked:", JSON.stringify(blocked, null, 2));
 
     return { friends, blocked };
 }
