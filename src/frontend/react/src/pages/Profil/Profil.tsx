@@ -36,11 +36,15 @@ function Profil() {
     if (userId && userInfo) {
       const updatedUserInfo = { ...userInfo, [field]: value };
       setUserInfo(updatedUserInfo);
+
+      const jwtToken = localStorage.getItem('token'); // Récupérez le JWT depuis le localStorage
+
       
       fetch(`http://localhost:4000/user/${userId}/${field}`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': `Bearer ${jwtToken}`,
         },
         body: JSON.stringify({ [field]: value }),
       })
@@ -91,11 +95,11 @@ function Profil() {
               onSave={(value) => saveField('lastname', value)}
             />
             
-            {/* <EditableTextField
+            <EditableTextField
               label="Bio"
               value={userInfo.bio}
               onSave={(value) => saveField('bio', value)}
-            /> */}
+            />
 
           </>
         )}
