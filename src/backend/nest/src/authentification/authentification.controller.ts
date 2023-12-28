@@ -6,6 +6,7 @@ import { PrismaService } from '../prisma.service';
 import { JwtStrategy } from './jwt.strategy';
 import { JwtService } from '@nestjs/jwt';
 import { AuthentificationService } from './authentification.service';
+import { UserTokenInfo } from 'src/chat/chat.interface';
 
 @Controller('authentification')
 export class AuthentificationController {
@@ -28,9 +29,8 @@ export class AuthentificationController {
 			return response.json();
 		} catch (error) {
 			if (maxAttempts > 1) {
-			console.log(`Tentative échouée. Tentatives restantes : ${maxAttempts - 1}`);
-			await this.delay(delayDuration); // Attendez ici avant de réessayer
-			return await this.tryFetch(url, options, maxAttempts - 1, delayDuration);
+				await this.delay(delayDuration); // Attendez ici avant de réessayer
+				return await this.tryFetch(url, options, maxAttempts - 1, delayDuration);
 			} else {
 			throw error;
 			}
@@ -93,7 +93,8 @@ export class AuthentificationController {
 			dataToken = {
 				id: UserBdd.id,
 				id42: UserBdd.id42,
-				pseudo: UserBdd.pseudo
+				pseudo: UserBdd.pseudo,
+				isConnected: true
 			}
 		}
 		else
@@ -101,7 +102,8 @@ export class AuthentificationController {
 			dataToken = {
 				id: findUser.id,
 				id42: findUser.id42,
-				pseudo: findUser.pseudo
+				pseudo: findUser.pseudo,
+				isConnected: !findUser.isTwoFactorAuthEnabled
 
 			}
 		}
@@ -113,7 +115,7 @@ export class AuthentificationController {
 		res.redirect(`http://localhost:3000?error=errorAuthentification`);
 
 	}	
-  }
+}
 
     // Un nouveau controlleur 42/profil
     // Si quelqu'un est pas connecté, il va ecrire "Aucun utilisateur connecté"
@@ -121,44 +123,52 @@ export class AuthentificationController {
     // Et que je reviens dans 42/profil, j'ai toutes les infos
     // Le front pourra toujours faire un appel en appel a cet url pour avoir les infos
 	@Get('42/profil')
-	@UseGuards(AuthGuard('jwt'))
-  	async profilSession42(@Req() req, ) {
+	@UseGuards(AuthGuard('jwt2fa'))
+  	async profilSession42(@Req() req) {
 		// Gérer le callback après l'authentification
-		if (req.user)
+
+		// 2fa n'est pas passé
+		if (!req.user.isConnected) 
 		{
-			const userBdd = await this.prisma.user.findUnique({
+			return {
+				need2fa: true,
+				id: req.user.id,
+				pseudo: req.user.pseudo
+			}
+		}
+		const userBdd = await this.prisma.user.findUnique({
 			where: {
-				id42: req.user.id42,
+				id: req.user.id,
 			},
 			});
-			if (userBdd)
-			return userBdd
-		}
-		else
-		{
-			return {undefined}
-		}
+		if (userBdd) return userBdd
+		return {undefined}
+
 	}
 
 	@Get('/auth-enabled')
 	@UseGuards(AuthGuard('jwt'))
-	async getAuthEnabled(@Req() req: Request) {
-		console.log("voila")
-		console.log(req.user.id)
+	async getAuthEnabled(@Req() req: Request & { user: UserTokenInfo }) {
 		const data = await this.prisma.user.findUnique({
-		    where: { id: parseInt(req.user.id)},
+		    where: { id: req.user.id},
 		});
 		return {isActive: data.isTwoFactorAuthEnabled}
 	}
 
-	@Get('/2fa/generate')
+	@Post('/2fa/turn-on')
 	@UseGuards(AuthGuard('jwt'))
-	async generate2faQrCode(@Req() req: Request) {
+	async generate2faQrCode(@Req() req: Request & { user: UserTokenInfo }) {
 		if (req.user)
 		{
-			console.log("coucou " + req.user.id)
+			("coucou " + req.user.id)
 			const dataAuth = await this.authentificationService.generateTwoFactorAuthenticationSecret(req.user.id)
-			console.log(dataAuth.qrCode)
+			if (!dataAuth) throw new Error("Error creating 2fa authentification secret")
+			await this.prisma.user.update({
+				where: { id: req.user.id },
+				data: { 
+					twoFactorSecret: dataAuth.secret,
+					isTwoFactorAuthEnabled: true},
+			});
 			return {
 				qrCode : dataAuth.qrCode
 			}
@@ -166,21 +176,36 @@ export class AuthentificationController {
 		return undefined
 	}
 
-	@Post('2fa/turn-on')
+	@Post('/2fa/turn-off')
 	@UseGuards(AuthGuard('jwt'))
-	async turnOnTwoFactorAuthentication(@Req() request, @Body() body) {
-	  const isCodeValid =
-		this.authentificationService.isTwoFactorAuthenticationCodeValid(
-		  body.twoFactorAuthenticationCode,
-		  request.user,
-		);
-	  if (!isCodeValid) {
-			throw new Error(`Wrong authentication code`);
-	  }
-	  await this.prisma.user.update({
-		where: { id: request.user.id },
-		data: { twoFactorSecret: secret },
-	});
+	async turnOff2fa(@Req() req: Request & { user: UserTokenInfo }) {
+		await this.prisma.user.update({
+			where: { id: req.user.id },
+			data: { 
+				twoFactorSecret: "",
+				isTwoFactorAuthEnabled: false},
+		});
+		return {}
+	}
+
+	@Post('/2fa/validate')
+	@UseGuards(AuthGuard('jwt2fa'))
+	async turnOnTwoFactorAuthentication(@Req() req, @Body() body) {
+		const isCodeValid = await this.authentificationService.isTwoFactorAuthenticationCodeValid(
+				body.twoFactorAuthenticationCode,
+				req.user,
+			);
+		if (!isCodeValid) return {success:false}
+		const dataToken = {
+			id: req.user.id,
+			id42: req.user.id42,
+			pseudo: req.user.pseudo,
+			isConnected: true
+		}
+		const token = this.jwtService.sign(dataToken);
+		return {newToken: token, success:true}
+		
+
 	}
 }
 

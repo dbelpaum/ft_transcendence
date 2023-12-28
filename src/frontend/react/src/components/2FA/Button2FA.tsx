@@ -40,9 +40,10 @@ const Button2FA = () => {
 
   const enable2FA = () => {
     // Requête pour activer la 2FA
-    const url = 'http://localhost:4000/authentification/2fa/generate';
+    const url = 'http://localhost:4000/authentification/2fa/turn-on';
 
     fetch(url, {
+		method: 'POST',
 		credentials: 'include',
 		headers: {
 			'Authorization': `Bearer ${authToken}`,
@@ -62,24 +63,21 @@ const Button2FA = () => {
   };
 
   const disable2FA = () => {
-	console.log("disable 2fA")
-    // Requête pour désactiver la 2FA
-    // const url = 'http://localhost:4000/authentification/disable-2fa';
+    const url = 'http://localhost:4000/authentification/2fa/turn-off';
 
-    // fetch(url, {
-    //   method: 'POST',
-    //   credentials: 'include',
-    //   headers: {
-    //     'Authorization': `Bearer ${authToken}`,
-    //     'Content-Type': 'application/json'
-    //   }
-    // })
-    // .then(response => response.json())
-    // .then(data => {
-    //   setIsActive(false);
-    //   console.log("2FA désactivée :", data);
-    // })
-    // .catch(error => console.error('Erreur lors de la désactivation de la 2FA:', error));
+    fetch(url, {
+      method: 'POST',
+      credentials: 'include',
+      headers: {
+        'Authorization': `Bearer ${authToken}`,
+        'Content-Type': 'application/json'
+      }
+    })
+    .then(response => response.json())
+    .then(data => {
+      setIsActive(false);
+    })
+    .catch(error => console.error('Erreur lors de la désactivation de la 2FA:', error));
   };
 
   return (

@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { authenticator } from 'otplib';
 import { toDataURL } from 'qrcode';
-import { User } from 'src/chat/chat.interface';
+import { User, UserTokenInfo } from 'src/chat/chat.interface';
 import { PrismaService } from 'src/prisma.service';
 
 
@@ -41,10 +41,13 @@ export class AuthentificationService {
 		return toDataURL(otpAuthUrl);
 	}
 
-	isTwoFactorAuthenticationCodeValid(twoFactorAuthenticationCode: string, user: User) {
+	async isTwoFactorAuthenticationCodeValid(twoFactorAuthenticationCode: string, user: UserTokenInfo) {
+		const userBdd = await this.prisma.user.findUnique({
+            where: { id: user.id },
+        });
 		return authenticator.verify({
 		  token: twoFactorAuthenticationCode,
-		  secret: user.twoFactorSecret,
+		  secret: userBdd.twoFactorSecret,
 		});
 	  }
 }

@@ -21,7 +21,7 @@ model User {
 	imageURL                String?
 	createdAt               DateTime      @default(now())
 	isTwoFactorAuthEnabled  Boolean       @default(false) // Double auth désactivée par défaut
-	twoFactorSecret         String?  
+	twoFactorSecret         String? 	  @default("")
 	friendshipsAsRequester  Friendship[]  @relation("RequesterRelation")
 	friendshipsAsAddressee  Friendship[]  @relation("AddresseeRelation")
 	myScores                Score[]       @relation("UserScores1")

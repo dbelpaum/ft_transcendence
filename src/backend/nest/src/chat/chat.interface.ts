@@ -72,7 +72,8 @@ export interface UserTokenInfo{
 	id: number,
 	id42: number,
 	pseudo: string,
-	socketId: string
+	socketId: string,
+
 }
 
 export interface Notif

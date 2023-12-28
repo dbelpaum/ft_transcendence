@@ -15,6 +15,8 @@ import { ErrorMessageProvider, useErrorMessage } from './context/ErrorContexte';
 import { ProtectedElement } from './components/Protection/ProtectedElement';
 import { ReactNotifications, Store } from 'react-notifications-component'
 import 'react-notifications-component/dist/theme.css'
+import ModalCode2FA from './components/2FA/ModalCode2FA';
+import './components/responsive.css';
 
 
 
@@ -37,6 +39,7 @@ function App() {
 							<Route path='/users/:pseudo' element={<ProtectedElement><UserProfile /></ProtectedElement>} />
 						</Routes>
 					</div>
+					<ModalCode2FA />
 				</AuthProvider >
 			</Router>
 			
