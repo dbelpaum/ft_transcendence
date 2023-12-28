@@ -57,11 +57,11 @@ const Game: React.FC = () => {
 
 	useEffect(() => {
 		const socket = io("http://localhost:4000/game",
-			{
-				auth: {
-					token: localStorage.getItem('token')
-				}
-			});
+		{
+			auth: {
+				token: localStorage.getItem('token')
+			}
+		});
 
 		socket.connect();
 		setSocket(socket);

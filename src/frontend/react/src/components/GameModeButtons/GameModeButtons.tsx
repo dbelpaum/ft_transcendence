@@ -1,16 +1,37 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useState, useEffect } from "react";
 import "./GameModeButtons.css";
 import { SocketContext } from "../../pages/Game/SocketContext";
 import { Socket } from "socket.io-client";
 import SoloGameScene from "../GameScene/SoloGameScene";
 import { showNotificationSuccess, showNotificationWarning } from "../../pages/Game/Notification";
 import { PulseLoader } from "react-spinners";
+import { useLocation } from 'react-router-dom';
 
 const GameModeButtons: React.FC = () => {
 	const socket = useContext(SocketContext) as unknown as Socket;
 	const [roomCode, setRoomCode] = useState<string>("");
 	const [showSoloGame, setShowSoloGame] = React.useState<boolean>(false);
 	const [isMatchmaking, setIsMatchmaking] = useState<boolean>(false);
+
+	const useQuery = () => {
+		return new URLSearchParams(useLocation().search);
+	};
+	const query = useQuery();
+	const roomUrl = query.get('room');
+	const createUrl = query.get('create');
+	const idOther = query.get('id');
+	const mp = query.get('mp');
+	if (roomUrl && socket)
+	{
+		socket.emit("client.lobby.join", {
+			mode: "vanilla",
+			lobbyId: roomUrl,
+		});
+	}
+	if (createUrl && idOther && mp && socket)
+	{
+		socket.emit("client.lobby.create", { mode: "vanilla" });
+	}
 
 	const handleSelectSoloMode = () => {
 		setShowSoloGame(true);
