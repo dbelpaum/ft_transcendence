@@ -1,7 +1,7 @@
-import React, { useEffect, useState, useContext } from "react";
+import React, { useContext } from "react";
 import { SocketContext } from "../../pages/Game/SocketContext";
 import { Socket } from "socket.io-client";
-import ClipboardJS from "clipboard";
+import "./Lobby.css";
 import { showNotificationSuccess } from "../../pages/Game/Notification";
 
 interface LobbyProps {
@@ -50,37 +50,29 @@ const Lobby: React.FC<LobbyProps> = ({
 
 	return (
 		<div>
-			<h2>{lobbyData.name}'s lobby</h2>
+			<h1>{lobbyData.name}'s lobby</h1>
 			<p>
-				Room code: {lobbyData.lobbyId}{" "}
-				<button onClick={copyToClipboard}>Copy</button>{" "}
+				<span className="roomCode">Room code:</span>{" "}
+				<button onClick={copyToClipboard} className="copyButton">📋 {lobbyData.lobbyId}</button>{" "}
 			</p>
-			<p>{lobbyData.playersCount}/2</p>
-			<p>
-				Host: {lobbyData.host.pseudo}{" "}
-				{lobbyData.playersState[lobbyData.host.socketId] ? "✅" : "❌"}
-			</p>
-			<p>
-				Guest:{" "}
-				{lobbyData.guest
-					? `${lobbyData.guest.pseudo} ${lobbyData.playersState[lobbyData.guest.socketId]
-						? "✅"
-						: "❌"
-					}`
-					: "Waiting for Opponent"}
-			</p>
-			{/* <h3>Scores:</h3> */}
-			<button onClick={handleReadyToggle}>
+			<div className="userContainer">
+				<p className="userColumn">
+					<img src={lobbyData.host.avatar} alt="avatar" />
+					<p className="pseudo">{lobbyData.host.pseudo}</p>{" "}
+					{lobbyData.playersState[lobbyData.host.socketId] ? "✅" : "❌"}
+				</p>
+				<p className="userColumn">
+					{lobbyData.guest && <><img src={lobbyData.guest.avatar} alt="avatar" />
+						<p className="pseudo">{lobbyData.guest.pseudo}</p>
+						{lobbyData.playersState[lobbyData.guest.socketId] ? "✅" : "❌"}</>
+					}
+					{!lobbyData.guest && <p>Waiting for opponent</p>}
+				</p>
+			</div>
+			<button onClick={handleReadyToggle} className={isReady ? "unreadyButton" : "readyButton"}>
 				{isReady ? "Unready" : "Ready"}
 			</button>
-			<ul>
-				{Object.entries(lobbyData.scores).map(([player, score]) => (
-					<li key={player}>
-						{player}: {score}
-					</li>
-				))}
-			</ul>
-			<button onClick={handleLeaveLobby}>Leave Lobby</button>
+			<button onClick={handleLeaveLobby} className="leaveLobbyButton">Leave Lobby</button>
 		</div>
 	);
 };
