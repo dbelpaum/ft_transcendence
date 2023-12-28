@@ -1,0 +1,92 @@
+/* ModalCode2FA.css */
+.modal-code-2fa {
+	position: fixed;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	background-color: rgba(0, 0, 0, 0.7);
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	z-index: 1000;
+	backdrop-filter: blur(4px); /* Floute l'arrière-plan */
+	background-color: rgba(255, 255, 255, 0.2); 
+  }
+  
+  .modal-code-2fa .modal-container {
+	background-color: #FFF5;
+	border-radius: 10px;
+	text-align: center;
+	position: relative;
+	width: 90%;
+	animation: fadeInScaleUp 1.5s ease-out forwards;
+	padding: 40px;
+  	box-sizing: border-box;
+
+  }
+
+  .modal-code-2fa .modal-close-btn {
+	position: absolute;
+	right: 3px;
+	top: 11px;
+	border: none;
+	font-size: large;
+	cursor: pointer;
+  }
+  
+  
+  .modal-code-2fa h2 {
+	margin: 0 0 10px;
+	font-size: 40px;
+  }
+  
+  .modal-code-2fa p {
+	margin-bottom: 20px;
+	font-size: 22px;
+  	color: black;
+  }
+  
+  .modal-code-2fa  .container-code
+  {
+	display: flex;
+	justify-content: center;
+  }
+
+  .modal-code-2fa .code-input {
+	width: 80%;
+	padding: 10px;
+	border: 1px solid #ddd;
+	border-radius: 5px;
+	font-size: 50px;
+	text-align: center;
+  }
+  
+  .submit-btn {
+	background-color: #007bff;
+	color: white;
+	border: none;
+	padding: 10px 20px;
+	font-size: 1rem;
+	border-radius: 5px;
+	cursor: pointer;
+  }
+
+  .modal-code-2fa .submit-btn img{
+	display: block;
+	width: 40px;
+  }
+  .submit-btn:hover {
+	background-color: #0056b3;
+  }
+  
+  @keyframes fadeInScaleUp {
+	from {
+	  opacity: 0;
+	  transform: scale(0.95);
+	}
+	to {
+	  opacity: 1;
+	  transform: scale(1);
+	}
+  }
