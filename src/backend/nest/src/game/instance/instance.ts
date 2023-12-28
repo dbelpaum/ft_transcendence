@@ -160,6 +160,19 @@ export class Instance {
 		// console.log(this.ball.speedModifier);
 	}
 
+	private gameOver(): void {
+		this.hasFinished = true;
+		this.lobby.dispatchToLobby(ServerEvents.GameOver, {
+			winner: this.scores[this.hostPseudo] >= 5 ? this.hostPseudo : this.guestPseudo,
+			loser: this.scores[this.hostPseudo] >= 5 ? this.guestPseudo : this.hostPseudo,
+			scores: {
+				[this.hostPseudo]: this.scores[this.hostPseudo],
+				[this.guestPseudo]: this.scores[this.guestPseudo],
+			}
+		});
+		this.stopGameRuntime();
+	}
+
 	private gameRuntime(): void {
 		// Update ball position
 		this.ball.position.x += this.ball.velocity.x * this.ball.speedModifier;
@@ -181,8 +194,7 @@ export class Instance {
 
 		// Check for game end conditions and stop the game if necessary
 		if (this.scores[this.hostPseudo] >= 5 || this.scores[this.guestPseudo] >= 5) {
-			this.hasFinished = true;
-			this.stopGameRuntime();
+			this.gameOver();
 			return;
 		}
 

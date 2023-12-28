@@ -19,6 +19,12 @@ export type ServerPayloads = {
 		name
 	};
 
+	[ServerEvents.GameOver]: {
+		winner: string;
+		loser: string;
+		scores: Record<string, number>;
+	};
+
 	[ServerEvents.GameMessage]: {
 		message: string;
 	};

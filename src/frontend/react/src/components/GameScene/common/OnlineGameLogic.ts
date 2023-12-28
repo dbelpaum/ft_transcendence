@@ -199,14 +199,38 @@ export class OnlineGameLogic {
 
 		this.camera3D.position.set(this.player.position.x, -300, 180);
 
-		this.sendGameState();
-
 		this.renderer.render(this.scene, this.cameraInUse.camera);
 		this.displayScores();
 		this.gameTick++;
 	}
 
-	private sendGameState() { }
+	private gameOver(data: any) {
+		// Create overlay container
+		const overlay = document.createElement('div');
+		overlay.classList.add('overlay');
+
+		// Winner text
+		const winnerText = document.createElement('p');
+		winnerText.innerText = `Winner: ${data.winner}`;
+		overlay.appendChild(winnerText);
+
+		// Loser text
+		const loserText = document.createElement('p');
+		loserText.innerText = `Loser: ${data.loser}`;
+		overlay.appendChild(loserText);
+
+		// Back to menu button
+		const backToMenuButton = document.createElement('button');
+		backToMenuButton.innerText = 'Back to menu';
+		backToMenuButton.addEventListener('click', () => {
+			window.location.href = '/game';
+		});
+		overlay.appendChild(backToMenuButton);
+
+		// Append overlay to the body
+		document.body.appendChild(overlay);
+		this.dispose();
+	}
 
 	private receiveGameState(data: any) {
 		this.ball.position.x = data.ballPosition.x;
@@ -227,6 +251,10 @@ export class OnlineGameLogic {
 		this.socket.on("server.game.state", (data: any) => {
 			this.receiveGameState(data);
 		});
+
+		this.socket.on("server.game.over", (data: any) => {
+			this.gameOver(data);
+		})
 
 		this.animate();
 
