@@ -7,6 +7,8 @@ import { PrismaService } from 'src/prisma.service';
 import { JwtModule } from '@nestjs/jwt';
 import { JwtStrategy } from './jwt.strategy';
 import { ErrorHandlingMiddleware } from './fortytwo/error-handling.middleware';
+import { AuthentificationService } from './authentification.service';
+import { JwtStrategy2FA } from './jwt-2fa.strategy';
 
 @Module({
 	imports: [
@@ -18,7 +20,7 @@ import { ErrorHandlingMiddleware } from './fortytwo/error-handling.middleware';
 		// Ajoutez d'autres modules si nécessaire
 	  ],
   controllers: [AuthentificationController],
-  providers: [FortyTwoService, PrismaService, JwtStrategy],
+  providers: [FortyTwoService, PrismaService, JwtStrategy, JwtStrategy2FA, AuthentificationService],
 })
 
 export class AuthentificationModule implements NestModule {

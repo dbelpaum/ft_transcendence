@@ -65,7 +65,7 @@ export class ChannelService {
 		}
 	}
 	
-	getUserByPseudo(pseudo: string): User | undefined {
+	getUserByPseudo(pseudo: string): UserTokenInfo | undefined {
 		const user = this.connectedUsers.find(u => u.pseudo === pseudo);
 		return user ? user : undefined;
 	}

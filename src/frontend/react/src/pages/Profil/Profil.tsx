@@ -6,6 +6,7 @@ import { useAuth } from '../../context/AuthContexte';
 import UserList from '../UserList/UserList';
 import { Link } from 'react-router-dom';
 import { User } from '../../context/AuthInteface';
+import Button2FA from '../../components/2FA/Button2FA';
 
 interface UserInfo {
   pseudo: string;
@@ -102,6 +103,7 @@ function Profil() {
 
 
 	<Link to="/UserList">Liste des joueurs</Link>
+	<Button2FA />
 
       </div>
     </main>

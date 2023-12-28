@@ -8,3 +8,9 @@ export interface User {
     lastname: string;
 	socketId?: string;
 }
+
+export interface Info2FA{
+	need2fa: boolean,
+	id: number,
+	pseudo: string
+}
