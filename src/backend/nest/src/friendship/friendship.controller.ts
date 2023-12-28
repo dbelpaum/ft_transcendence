@@ -11,6 +11,39 @@ export class FriendshipController {
         return friendships;
     }
 
+
+    @Get(':userId/friends-and-blocked')
+async getFriendsAndBlocked(@Param('userId') userId: string) {
+    const friends = await this.prisma.friendship.findMany({
+        where: {
+            OR: [
+                { requesterId: Number(userId), status: 'friend' },
+                { addresseeId: Number(userId), status: 'friend' },
+            ],
+        },
+        include: {
+            requester: true,
+            addressee: true
+        }
+    });
+
+    const blocked = await this.prisma.friendship.findMany({
+        where: {
+            requesterId: Number(userId),
+            status: 'blocked',
+        },
+        include: {
+            addressee: true
+        }
+    });
+
+    return { friends, blocked };
+}
+
+
+
+
+
     /* voir si ami ou pas */
 
     @Get(':requesterId/relation/:addresseeId')
