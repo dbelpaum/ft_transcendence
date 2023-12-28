@@ -1,10 +1,10 @@
 /* Add this CSS to your stylesheets */
 
-div {
+.lobbyDiv {
 	text-align: center;
 }
 
-h1 {
+.roomName {
 	text-decoration: underline;
 }
 
@@ -47,7 +47,7 @@ h1 {
 	height: 50px;
 }
 
-img {
+.lobbyAvatar {
 	width: 50px; /* Adjust the size of the avatar */
 	height: 50px;
 	border-radius: 50%; /* Make the avatar circular */

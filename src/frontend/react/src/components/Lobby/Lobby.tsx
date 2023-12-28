@@ -49,20 +49,20 @@ const Lobby: React.FC<LobbyProps> = ({
 	};
 
 	return (
-		<div>
-			<h1>{lobbyData.name}'s lobby</h1>
+		<div className="lobbyDiv">
+			<h1 className="roomName">{lobbyData.name}'s lobby</h1>
 			<p>
 				<span className="roomCode">Room code:</span>{" "}
 				<button onClick={copyToClipboard} className="copyButton">📋 {lobbyData.lobbyId}</button>{" "}
 			</p>
 			<div className="userContainer">
 				<p className="userColumn">
-					<img src={lobbyData.host.avatar} alt="avatar" />
+					<img src={lobbyData.host.avatar} alt="avatar" className="lobbyAvatar" />
 					<p className="pseudo">{lobbyData.host.pseudo}</p>{" "}
 					{lobbyData.playersState[lobbyData.host.socketId] ? "✅" : "❌"}
 				</p>
 				<p className="userColumn">
-					{lobbyData.guest && <><img src={lobbyData.guest.avatar} alt="avatar" />
+					{lobbyData.guest && <><img src={lobbyData.guest.avatar} alt="avatar" className="lobbyAvatar" />
 						<p className="pseudo">{lobbyData.guest.pseudo}</p>
 						{lobbyData.playersState[lobbyData.guest.socketId] ? "✅" : "❌"}</>
 					}
