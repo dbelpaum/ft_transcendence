@@ -1,4 +1,5 @@
-import { Body, Controller, Get, Param, Patch, Post } from '@nestjs/common';
+import { Body, Controller, Get, Param, Patch, Post, UseGuards } from '@nestjs/common';
+import { AuthGuard } from '@nestjs/passport';
 import { PrismaService } from 'src/prisma.service';
 
 @Controller('user')
@@ -80,6 +81,7 @@ export class UserController {
     /* -------------------------PATCH------------------------------ */
     
     @Patch(':id/pseudo')
+    @UseGuards(AuthGuard('jwt'))
     async updatePseudo(@Param('id') id: string, @Body('pseudo') pseudo: string) {
         return await this.prisma.user.update({
             where: { id42: Number(id) },
@@ -89,6 +91,7 @@ export class UserController {
 
 
     @Patch(':id/email')
+    @UseGuards(AuthGuard('jwt'))
     async updateEmail(@Param('id') id: string, @Body('email') email: string) {
         return await this.prisma.user.update({
             where: { id42: Number(id) },
@@ -97,6 +100,7 @@ export class UserController {
     }
 
     @Patch(':id/firstname')
+    @UseGuards(AuthGuard('jwt'))
     async updateFirstName(@Param('id') id : string, @Body('firstname') firstname: string) {
         return await this.prisma.user.update({
             where: { id42: Number(id) },
@@ -105,6 +109,7 @@ export class UserController {
     }
 
     @Patch(':id/lastname')
+    @UseGuards(AuthGuard('jwt'))
     async updateLastName(@Param('id') id : string, @Body('lastname') lastname: string) {
         return await this.prisma.user.update({
             where: { id42: Number(id) },
@@ -113,6 +118,7 @@ export class UserController {
     }
 
     @Patch(':id/bio')
+    @UseGuards(AuthGuard('jwt'))
     async updateBio(@Param('id') id : string, @Body('bio') bio: string) {
         return await this.prisma.user.update({
             where: { id42: Number(id) },

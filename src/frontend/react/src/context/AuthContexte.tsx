@@ -1,12 +1,12 @@
 import React, { ReactNode, createContext, useContext, useState, useEffect } from 'react';
 // import { useNavigate } from 'react-router-dom';
 import { useErrorMessage, ErrorMessageProvider } from './ErrorContexte';
-import { User } from './AuthInteface';
+import { Info2FA, User } from './AuthInteface';
 import { useLocation } from 'react-router-dom';
 import { ChannelCreate, ClientToServerEvents, Message, MpChannel, ServerToClientEvents } from '../pages/Chat/chat.interface';
 import { io, Socket } from 'socket.io-client';
 import { showNotification, showNotificationError } from '../pages/Game/Notification';
-
+import ModalCode2FA from '../components/2FA/ModalCode2FA';
 
 
 type AuthContextType = {
@@ -22,6 +22,8 @@ type AuthContextType = {
 	setMessages: React.Dispatch<React.SetStateAction<Message[]>>;
 	recharger: () => void;
 	forceReload: number;
+	info2FA:  Info2FA | null,
+	setInfo2FA: React.Dispatch<React.SetStateAction<Info2FA|null>>
   };
 
 type AuthProviderProps = {
@@ -38,6 +40,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 	const [isConnected, setIsConnected] = useState(false);
 	const [messages, setMessages] = useState<Message[]>([]);
 	const [forceReload, setForceReload] = useState<number>(0);
+	const [info2FA, setInfo2FA] = useState<Info2FA | null>(null);
+
 
 
 	const recharger = (): void => {
@@ -71,18 +75,16 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 			'Authorization': `Bearer ${authToken}`
 		  }
 		});
-		if (response.ok) {
-			const userData = await response.json();
-			if (Object.keys(userData).length !== 0) {
-				setUser(userData); // Utilisateur connecté
-			}
-			else {
-				setUser(null);
-			}
+		if (!response.ok) throw new Error('Réponse non OK du serveur');
+		const userData = await response.json();
+		if ('need2fa' in userData) {
+			setInfo2FA(userData as Info2FA)
 		}
-		else
-		{
-			setUser(null)
+		else if (Object.keys(userData).length !== 0) {
+			setUser(userData); // Utilisateur connecté
+		}
+		else {
+			setUser(null);
 		}
 		
 	  } catch (error) {
@@ -197,7 +199,9 @@ return (
 		messages, 
 		setMessages,
 		recharger,
-		forceReload
+		forceReload,
+		info2FA,
+		setInfo2FA
 		}}>
       {children}
     </AuthContext.Provider>

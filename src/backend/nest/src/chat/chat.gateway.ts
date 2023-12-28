@@ -404,11 +404,11 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		  
 		  const token = client.handshake.auth.token;
 		  // Validez le token ici
-		  const payload = jwt.verify(token, 'votre_secret_jwt');
+		  const payload = jwt.verify(token, 'votre_secret_jwt') as UserTokenInfo;
 		  client.user = {
-			  id: (payload as any).id,
-			  id42: (payload as any).id42,
-			  pseudo: (payload as any).pseudo,
+			  id: payload.id,
+			  id42: payload.id42,
+			  pseudo: payload.pseudo,
 			  socketId: client.id
 			}
 

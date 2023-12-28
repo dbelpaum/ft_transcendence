@@ -3,6 +3,8 @@ export interface User {
 	pseudo: string;
 	email?: string;
 	socketId: string
+	isTwoFactorAuthEnabled: boolean
+	twoFactorSecret: string
 }
 
 export interface Message {
@@ -67,7 +69,8 @@ export interface UserTokenInfo {
 	id: number,
 	id42: number,
 	pseudo: string,
-	socketId: string
+	socketId: string,
+
 }
 
 export interface Notif {

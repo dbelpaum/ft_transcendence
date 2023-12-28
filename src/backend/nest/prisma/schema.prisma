@@ -11,25 +11,31 @@ datasource db {
 }
 
 model User {
-  id                      Int           @id @default(autoincrement())
-  id42                    Int           @unique
-  pseudo                  String        @unique
-  firstname               String
-  lastname                String
-  email                   String        @unique
-  bio                     String?
-  imageURL                String?
-  createdAt               DateTime      @default(now())
-  friendshipsAsRequester  Friendship[]  @relation("RequesterRelation")
-  friendshipsAsAddressee  Friendship[]  @relation("AddresseeRelation")
+	id                      Int           @id @default(autoincrement())
+	id42                    Int           @unique
+	pseudo                  String        @unique
+	firstname               String
+	lastname                String
+	email                   String        @unique
+	bio                     String?
+	imageURL                String?
+	createdAt               DateTime      @default(now())
+	isTwoFactorAuthEnabled  Boolean       @default(false) // Double auth désactivée par défaut
+	twoFactorSecret         String? 	  @default("")
+	friendshipsAsRequester  Friendship[]  @relation("RequesterRelation")
+	friendshipsAsAddressee  Friendship[]  @relation("AddresseeRelation")
+//	myScores                Score[]       @relation("UserScores1")
+//	opponentScores          Score[]       @relation("UserScores2")
 
-  @@map("users")
+
+
+	@@map("users")
 }
 
 model Friendship {
   id          Int       @id @default(autoincrement())
   createdAt   DateTime  @default(now())
-  status      String    @default("friend") // peut etre friend , notFriend , blocked
+  status      String    @default("friend") // peut être friend, notFriend, blocked
   requesterId Int
   requester   User      @relation("RequesterRelation", fields: [requesterId], references: [id])
   addresseeId Int
@@ -38,4 +44,15 @@ model Friendship {
   @@unique([requesterId, addresseeId])
 }
 
+model Score {
+  id          Int       @id @default(autoincrement())
+  user1Id     String      
+  user1Score  Int
+ // user1       User      @relation("UserScores1", fields: [user1Id], references: [id])
+  user2Id     String       
+  user2Score  Int
+ // user2       User      @relation("UserScores2", fields: [user2Id], references: [id])
+  createdAt   DateTime  @default(now())
 
+  @@unique([user1Id, user2Id])
+}
