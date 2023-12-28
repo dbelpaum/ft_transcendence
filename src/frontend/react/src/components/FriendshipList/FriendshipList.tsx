@@ -1,5 +1,7 @@
 import React, { useState , useEffect} from 'react';
 import './FriendshipList.css';
+import { Link } from 'react-router-dom';
+
 
 
 interface FriendshipListProps {
@@ -30,7 +32,12 @@ const FriendshipList: React.FC<FriendshipListProps> = ({ userId }) => {
 const [showBlockedUsers, setShowBlockedUsers] = useState(false);
 
   useEffect(() => {
-    fetch(`http://localhost:4000/friendship/${userId}/friends-and-blocked`)
+    const jwtToken = localStorage.getItem('token'); 
+    fetch(`http://localhost:4000/friendship/${userId}/friends-and-blocked`,{
+        headers: {
+            'Authorization': `Bearer ${jwtToken}`,
+        },
+    })
       .then(response => response.json())
       .then(data => {
         setFriends(data.friends);
@@ -48,7 +55,9 @@ const [showBlockedUsers, setShowBlockedUsers] = useState(false);
     <ul>
       {friends.map(friendship => (
         <li key={friendship.id}>
-          {friendship.addressee.pseudo}
+          <Link to={`/users/${friendship.addressee.pseudo}`}>
+            {friendship.addressee.pseudo}
+          </Link>
         </li>
       ))}
     </ul>
@@ -61,7 +70,9 @@ const [showBlockedUsers, setShowBlockedUsers] = useState(false);
     <ul>
       {blockedUsers.map(blocked => (
         <li key={blocked.id}>
-          {blocked.addressee.pseudo}
+          <Link to={`/users/${blocked.addressee.pseudo}`}>
+            {blocked.addressee.pseudo}
+          </Link>
         </li>
       ))}
     </ul>
