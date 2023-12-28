@@ -7,6 +7,7 @@ import MessageComponent from './Message';
 import { ChannelCreate } from '../chat.interface';
 import { Channel } from '../chat.interface';
 import MessageInput from './MessageInput';
+import { useAuth } from '../../../context/AuthContexte';
 
 interface ChannelWriteProps {
 	channelUtility: ChannelUtility;
@@ -16,6 +17,8 @@ const ChannelWrite: React.FC<ChannelWriteProps> = ({ channelUtility }) => {
 
 	const [password, setPassword] = useState('');
 	const bottomRef = useRef<HTMLDivElement>(null);
+	const [blockedUserIds, setBlockedUserIds] = useState<number[]>([]);
+	const {authToken} = useAuth() 
 
 	const useQuery = () => {
 		return new URLSearchParams(useLocation().search);
@@ -23,6 +26,26 @@ const ChannelWrite: React.FC<ChannelWriteProps> = ({ channelUtility }) => {
 	const query = useQuery();
 	const channelUrl = query.get('channel'); 
 	const mpUrl = query.get('mp'); 
+
+	useEffect(() => {
+		const fetchBlockedUsers = async () => {
+		  try {
+			const response = await fetch('http://localhost:4000/friendship/blocklist',
+			{
+				credentials: 'include',
+				headers: {
+				  'Authorization': `Bearer ${authToken}`
+				}
+			});
+			const data = await response.json() as number[];
+			setBlockedUserIds(data);
+		  } catch (error) {
+			console.error('Erreur lors de la récupération des utilisateurs bloqués:', error);
+		  }
+		};
+	
+		fetchBlockedUsers();
+	  }, []);
 
 	useEffect(() => {
 		const handleScrollToBottom = () => {
@@ -34,6 +57,7 @@ const ChannelWrite: React.FC<ChannelWriteProps> = ({ channelUtility }) => {
 				}
 			  }, 1000);
 		};
+
 	  
 		// Ajouter l'écouteur d'événements
 		window.addEventListener('scrollToBottom', handleScrollToBottom);
@@ -103,7 +127,7 @@ const ChannelWrite: React.FC<ChannelWriteProps> = ({ channelUtility }) => {
 			<div className='chat-box'>
 			{(isUserInChannel || mpUrl) ? (
 				channelUtility.message.map((message, index) => (
-					<MessageComponent channelUtility={channelUtility} message={message} key={index} channelUrl={channelUrl} mpUrl={mpUrl}/>
+					<MessageComponent channelUtility={channelUtility} message={message} key={index} channelUrl={channelUrl} mpUrl={mpUrl} blockedUserIds={blockedUserIds}/>
 				))
 				) : (
 					<form onSubmit={handleJoinChannel} className="join-channel-form">

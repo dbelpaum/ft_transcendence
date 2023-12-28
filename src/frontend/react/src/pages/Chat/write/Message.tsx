@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   ChannelUtility,
 	Message,
@@ -9,9 +9,10 @@ interface MessageProps {
 	message: Message;
 	channelUrl: string|null;
 	mpUrl: string|null
+	blockedUserIds: number[]
 }
 
-const MessageComponent: React.FC<MessageProps> = ({ channelUtility, message, channelUrl, mpUrl }) => {
+const MessageComponent: React.FC<MessageProps> = ({ channelUtility, message, channelUrl, mpUrl, blockedUserIds }) => {
 
 	if (message.channelName !== channelUrl && message.channelName !== mpUrl) {
 		  return null; // Ne rien afficher si les channels ne correspondent pas
@@ -19,6 +20,9 @@ const MessageComponent: React.FC<MessageProps> = ({ channelUtility, message, cha
 
 	const isUserMessage = (message.user.id == channelUtility.me?.id)
   
+	if (blockedUserIds.includes(message.user.id)) {
+		return null; 
+	  }
 
 
   return (
