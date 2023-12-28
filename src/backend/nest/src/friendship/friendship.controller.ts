@@ -133,9 +133,96 @@ export class FriendshipController {
 
 
 
+    @Post(':requesterId/block/:addresseeId')
+    async blockUser(
+        @Param('requesterId') requesterId: string,
+        @Param('addresseeId') addresseeId: string
+    ) {
+        // Ensure that requesterId and addresseeId are not the same
+        if (requesterId === addresseeId) {
+            throw new Error('You cannot block yourself');
+        }
 
+        // Check if the friendship exists
+        const friendship = await this.prisma.friendship.findUnique({
+            where: {
+                requesterId_addresseeId: {
+                    requesterId: Number(requesterId),
+                    addresseeId: Number(addresseeId),
+                },
+            },
+        });
+
+        if (!friendship) {
+            const friendship = await this.prisma.friendship.create({
+                data: {
+                    requesterId: Number(requesterId),
+                    addresseeId: Number(addresseeId),
+                    status: 'blocked',
+                },
+            });
+        }
+
+        // Update the friendship status to blocked
+        const blockedFriendship = await this.prisma.friendship.update({
+            where: {
+                requesterId_addresseeId: {
+                    requesterId: Number(requesterId),
+                    addresseeId: Number(addresseeId),
+                },
+            },
+            data: {
+                status: 'blocked',
+            },
+        });
+
+        return blockedFriendship;
+    }
 
 
     
+    @Post(':requesterId/unblock/:addresseeId')
+    async unblockUser(
+        @Param('requesterId') requesterId: string,
+        @Param('addresseeId') addresseeId: string
+    ) {
+        // Ensure that requesterId and addresseeId are not the same
+        if (requesterId === addresseeId) {
+            throw new Error('You cannot unblock yourself');
+        }
+
+        // Check if the friendship exists
+        const friendship = await this.prisma.friendship.findUnique({
+            where: {
+                requesterId_addresseeId: {
+                    requesterId: Number(requesterId),
+                    addresseeId: Number(addresseeId),
+                },
+            },
+        });
+
+        if (!friendship) {
+            throw new Error('Friendship does not exist');
+        }
+
+        // Update the friendship status to friend
+        const unblockedFriendship = await this.prisma.friendship.delete({
+            where: {
+                requesterId_addresseeId: {
+                    requesterId: Number(requesterId),
+                    addresseeId: Number(addresseeId),
+                },
+            },
+        });
+
+        return unblockedFriendship;
+    }
+
+
+    
+
+
+
+
     
 }

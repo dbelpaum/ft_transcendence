@@ -5,7 +5,7 @@ import { ServerEvents } from "../shared/server/ServerEvents";
 import { Server } from "http";
 import { ClientMovementDto } from "../dtos";
 import { Ball, Paddle } from "./types";
-
+import { enregistrerScores } from "../score/score.controller";
 const TICK_RATE = 1000 / 60; // 60 updates per second
 const PADDLE_SPEED = 3.75;
 const BALL_SPEED_INCREMENT = 0.0003;
@@ -178,6 +178,19 @@ export class Instance {
 		if (this.scores[this.lobby.hostSocketId] >= 5 || this.scores[this.lobby.guestSocketId] >= 5) {
 			this.hasFinished = true;
 			this.stopGameRuntime();
+			
+			// lenny add
+	
+			enregistrerScores(this.lobby.hostSocketId, this.lobby.guestSocketId, this.scores[this.lobby.hostSocketId], this.scores[this.lobby.guestSocketId])
+				.then((nouveauScore) => {
+
+				console.log('New score added:', nouveauScore);
+				})
+				.catch((erreur) => {
+
+					console.error('Error during adding score in db', erreur);
+				})
+			//
 			return;
 		}
 

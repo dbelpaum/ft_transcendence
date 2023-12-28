@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { useParams } from 'react-router-dom';
 import "./UserProfil.css";
@@ -27,7 +28,7 @@ interface UserProfileProps {
 
 const UserProfile: React.FC = () => {
     const [userInfo, setUserInfo] = useState<UserInfo | null>(null);
-    const [buttonStatus, setButtonStatus] = useState<"addFriend" | "removeFriend" | "block" >('addFriend');
+    const [buttonStatus, setButtonStatus] = useState<"addFriend" | "removeFriend" | "block"  |  'unblock'>('addFriend');
 
     const [isConnected, setIsConnected] = useState<boolean>(false);
     const {authToken, user, chatSocket, recharger} = useAuth();
@@ -134,7 +135,7 @@ useEffect(() => {
             if (friendshipStatus === 'friend') {
                 setButtonStatus('removeFriend');
             } else if (friendshipStatus === 'blocked') {
-                setButtonStatus('block');
+                setButtonStatus('unblock');
                 console.log('On rentre dans le else if')
             } else {
                 
@@ -202,6 +203,43 @@ useEffect(() => {
         }
     }
 
+    const handleBlockUserClick = async () => {
+        try {
+            const response = await fetch(`http://localhost:4000/friendship/${user?.id}/block/${userInfo?.id}`, {
+                method: 'POST',
+                credentials: 'include',
+            });
+    
+            if (!response.ok) {
+                throw new Error('Failed to block user');
+            }
+    
+            setButtonStatus('unblock');
+            setFriendshipStatus('blocked');
+        } catch (error) {
+            console.error(error);
+        }
+    }
+
+    const handleUnblockUserClick = async () => {
+        try {
+            const response = await fetch(`http://localhost:4000/friendship/${user?.id}/unblock/${userInfo?.id}`, {
+                method: 'POST',
+                credentials: 'include',
+            });
+    
+            if (!response.ok) {
+                throw new Error('Failed to unblock user');
+            }
+    
+            setButtonStatus('block');
+            setFriendshipStatus('notFriend');
+        } catch (error) {
+            console.error(error);
+        }
+    }
+
+
 
 	const triggerMp = () => {
 		if (user && chatSocket)
@@ -239,7 +277,7 @@ useEffect(() => {
 			<div className="friend-action">
             {friendshipStatus === 'notFriend' && (
             <FriendshipButton
-                status={buttonStatus}
+                status={'addFriend'}
                 onButtonClick={ handleAddFriendClick}
                 color="green"
             />
@@ -250,6 +288,25 @@ useEffect(() => {
                 status={'removeFriend'}
                 onButtonClick={handleRemoveFriendClick}
                 color="red"
+                />
+            )}
+
+            {friendshipStatus !== 'blocked' && (
+            <FriendshipButton
+                status={'block'}
+                onButtonClick={handleBlockUserClick}
+                color="red"
+                />
+            )
+
+            }
+            
+
+            {friendshipStatus === 'blocked' && (
+            <FriendshipButton
+                status={'unblock'}
+                onButtonClick={handleUnblockUserClick}
+                color="green"
                 />
             )}
 
