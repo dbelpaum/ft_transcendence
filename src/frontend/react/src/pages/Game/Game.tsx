@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import "./Game.css";
-import SoloGameScene from "../../components/GameScene/SoloGameScene";
 import OnlineGameScene from "../../components/GameScene/OnlineGameScene";
 import GameModeButtons from "../../components/GameModeButtons/GameModeButtons";
 import ScorePage from "./Scores/ScorePage";
@@ -9,29 +8,8 @@ import Lobby from "../../components/Lobby/Lobby";
 import {
 	showNotificationSuccess,
 	showNotificationError,
-	showNotificationWarning,
 } from "./Notification";
 import SocketContext from "./SocketContext";
-import { User } from '../../context/AuthInteface';
-import { useAuth } from '../../context/AuthContexte';
-
-const DebugPanel: React.FC<{ variables: Record<string, any> }> = ({
-	variables,
-}) => (
-	<div
-		style={{
-			position: "fixed",
-			top: 0,
-			right: 0,
-			background: "white",
-			padding: "10px",
-			border: "1px solid #ddd",
-		}}
-	>
-		<h3>Debug Panel</h3>
-		<pre>{JSON.stringify(variables, null, 2)}</pre>
-	</div>
-);
 
 const Game: React.FC = () => {
 	const [socket, setSocket] = useState<any>(null);
@@ -40,7 +18,6 @@ const Game: React.FC = () => {
 	const [gameStarted, setGameStarted] = useState<boolean>(false);
 	const [showScoreRanking, setShowScoreRanking] = useState<boolean>(false); // Ajout d'un état pour afficher ou masquer la superposition du classement
 	const [isReady, setIsReady] = useState<boolean>(false);
-	const user = useAuth().user as User;
 
 	const toggleScoreRanking = () => {
 		setShowScoreRanking(!showScoreRanking);

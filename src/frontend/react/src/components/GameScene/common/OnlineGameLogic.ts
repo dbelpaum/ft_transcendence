@@ -140,12 +140,12 @@ export class OnlineGameLogic {
 			case "a":
 			case "q":
 				this.paddleLeftSpeed = 0;
-				this.socket.emit("client.game.move", { movingLeft: false, movingRight: (this.paddleRightSpeed != 0) });
+				this.socket.emit("client.game.move", { movingLeft: false, movingRight: (this.paddleRightSpeed !== 0) });
 				break;
 			case "ArrowRight":
 			case "d":
 				this.paddleRightSpeed = 0;
-				this.socket.emit("client.game.move", { movingLeft: (this.paddleLeftSpeed != 0), movingRight: false });
+				this.socket.emit("client.game.move", { movingLeft: (this.paddleLeftSpeed !== 0), movingRight: false });
 				break;
 			default:
 				break;

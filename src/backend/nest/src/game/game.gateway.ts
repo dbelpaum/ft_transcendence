@@ -49,7 +49,7 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 	@SubscribeMessage(ClientEvents.LobbyCreate)
 	onLobbyCreate(client: AuthenticatedSocket, data: LobbyCreateDto): WsResponse<ServerPayloads[ServerEvents.GameMessage]> {
 		console.log("Received event :" + ClientEvents.LobbyCreate + " from " + client.auth.pseudo);
-		const lobby = this.lobbyManager.createLobby(data.mode);
+		const lobby = this.lobbyManager.createLobby(data.mode, client);
 		console.log('Created %s Lobby with id %s', data.mode, lobby.id);
 		lobby.addClient(client);
 
