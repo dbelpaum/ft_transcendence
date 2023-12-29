@@ -19,12 +19,14 @@ const GameModeButtons: React.FC = () => {
 	};
 
 	const handleCreateRoom = () => {
+		if (isMatchmaking) return;
 		if (socket) {
 			socket.emit("client.lobby.create", { mode: "vanilla" });
 		}
 	};
 
 	const handleJoinRoom = () => {
+		if (isMatchmaking) return;
 		if (socket) {
 			socket.emit("client.lobby.join", {
 				mode: "vanilla",
@@ -74,7 +76,7 @@ const GameModeButtons: React.FC = () => {
 				</div>
 				<div>
 					<button
-						className="buttonStyle"
+						className={`buttonStyle ${isMatchmaking ? "darkened" : ""}`}
 						onClick={handleCreateRoom}
 					>
 						Create Room
@@ -83,7 +85,7 @@ const GameModeButtons: React.FC = () => {
 
 				<div>
 					<button
-						className="buttonStyle"
+						className={`buttonStyle ${isMatchmaking ? "darkened" : ""}`}
 						onClick={handleJoinRoom}
 					>
 						Join Room
