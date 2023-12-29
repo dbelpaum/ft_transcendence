@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { GameGateway } from './game.gateway';
 import { LobbyManager } from './lobby/lobby.manager';
+import { PrismaService } from 'src/prisma.service';
 
 @Module({
   providers: [
@@ -9,6 +10,8 @@ import { LobbyManager } from './lobby/lobby.manager';
 
     // Managers
     LobbyManager,
+
+	PrismaService
   ],
 })
 export class GameModule

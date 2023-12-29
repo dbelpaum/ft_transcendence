@@ -1,3 +1,5 @@
+import { Injectable } from '@nestjs/common';
+
 import { Server } from "socket.io";
 import { Lobby } from "./lobby";
 import { AuthenticatedSocket } from "../types";
@@ -8,8 +10,11 @@ import { LobbyMode } from "./types";
 import { ServerEvents } from "../shared/server/ServerEvents";
 import { jwtDecode } from "jwt-decode";
 
+import { PrismaService } from "src/prisma.service";
 
+@Injectable()
 export class LobbyManager {
+	constructor(private prisma: PrismaService){}
 	public server: Server;
 
 	private readonly lobbies: Map<Lobby["id"], Lobby> = new Map<
@@ -17,10 +22,19 @@ export class LobbyManager {
 		Lobby
 	>();
 
-	public initializeSocket(client: AuthenticatedSocket): void {
+	public async initializeSocket(client: AuthenticatedSocket): Promise<void> {
 		try {
 			const token = client.handshake.auth.token;
 			const payload = jwtDecode(token) as any;
+			const user = await this.prisma.user.findUnique({
+				where: { id: payload.id },
+				select: { imageURL: true }
+			  });
+			
+			  if (!user) {
+				throw new Error("User not found");
+			  }
+			const imageURL =  (user && user.imageURL) ? user.imageURL : "https://upload.wikimedia.org/wikipedia/commons/thumb/0/08/MCM_London_May_15_-_Stormtrooper_%2818246218651%29.jpg/1280px-MCM_London_May_15_-_Stormtrooper_%2818246218651%29.jpg"
 			client.auth = {
 				id: payload.id,
 				id42: payload.id42,
@@ -28,7 +42,7 @@ export class LobbyManager {
 				jwt: token,
 				iat: payload.iat,
 				exp: payload.exp,
-				avatar: "https://t4.ftcdn.net/jpg/05/49/98/39/360_F_549983970_bRCkYfk0P6PP5fKbMhZMIb07mCJ6esXL.jpg"	// A changer avec une requête bdd ou autre
+				avatar: imageURL	// A changer avec une requête bdd ou autre
 			}
 			// console.log(client);
 		} catch (e) {
