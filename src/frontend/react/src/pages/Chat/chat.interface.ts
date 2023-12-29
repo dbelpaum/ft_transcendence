@@ -42,6 +42,7 @@ export interface Message {
     message: string;
 	channelName: string;
 	type: "channel" | "mp";
+	link?: string;
 }
   
 export interface ChannelUtility {

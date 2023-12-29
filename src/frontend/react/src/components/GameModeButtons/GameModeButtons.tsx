@@ -1,16 +1,37 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useState, useEffect } from "react";
 import "./GameModeButtons.css";
 import { SocketContext } from "../../pages/Game/SocketContext";
 import { Socket } from "socket.io-client";
 import { showNotificationSuccess, showNotificationWarning } from "../../pages/Game/Notification";
 import { PulseLoader } from "react-spinners";
 import ScorePage from "../../pages/Game/Scores/ScorePage";
+import { useLocation } from 'react-router-dom';
 
 const GameModeButtons: React.FC = () => {
 	const socket = useContext(SocketContext) as unknown as Socket;
 	const [roomCode, setRoomCode] = useState<string>("");
 	const [isMatchmaking, setIsMatchmaking] = useState<boolean>(false);
 	const [showScoreRanking, setShowScoreRanking] = useState<boolean>(false); // Ajout d'un état pour afficher ou masquer la superposition du classement
+
+	const useQuery = () => {
+		return new URLSearchParams(useLocation().search);
+	};
+	const query = useQuery();
+	const roomUrl = query.get('room');
+	const createUrl = query.get('create');
+	const idOther = query.get('id');
+	const mp = query.get('mp');
+
+	useEffect(() => {
+
+		if (roomUrl && socket)
+		{
+			socket.emit("client.lobby.join", {
+				mode: "vanilla",
+				lobbyId: roomUrl,
+			});
+		}
+	}, []);
 
 	const handleRoomCodeChange = (
 		event: React.ChangeEvent<HTMLInputElement>

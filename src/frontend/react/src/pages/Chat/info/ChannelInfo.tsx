@@ -7,6 +7,7 @@ import UserInfo from './UserInfo';
 import { User } from '../../../context/AuthInteface';
 import InviteChannel from './InviteChannel';
 import ModifyChannel from './ModifyChannel';
+import InfoMp from './InfoMp';
 
 
 interface ChannelWriteProps {
@@ -26,9 +27,15 @@ const ChannelInfo: React.FC<ChannelWriteProps> = ({ channelUtility }) => {
 	};
 	const query = useQuery();
 	const channelUrl = query.get('channel'); 
-	  if (!channelUrl) {
-		return null;
-	  }
+	const mpChannel = query.get('mp'); 
+	if (!channelUrl) {
+
+		if (!mpChannel) return null;
+		return (
+			<InfoMp channelUtility={channelUtility} mpChannel={mpChannel}/>
+			
+		)
+	}
 	
 	  const currentChannel = channelUtility.channels.find(channel => channel.name === channelUrl);
 	  if (!currentChannel)	return null;
@@ -58,11 +65,15 @@ const ChannelInfo: React.FC<ChannelWriteProps> = ({ channelUtility }) => {
 	const iAmAdmin : boolean = isAdmin(channelUtility.me, currentChannel.host)
   
 		
-	  const userAndAdmin : UserAndAdmin[] = uniqueUsers.map(u => ({
-			user: u,
-			isAdmin: isAdmin(u, currentChannel.host),
-			isOwner: isOwner(u, currentChannel.owner)
-		}))
+	const userAndAdmin : UserAndAdmin[] = uniqueUsers.map(u => ({
+		user: u,
+		isAdmin: isAdmin(u, currentChannel.host),
+		isOwner: isOwner(u, currentChannel.owner)
+	}))
+
+
+
+
 	return (
 		<div className='channel-info'>
 			<h3>Info : {currentChannel.name}</h3>
