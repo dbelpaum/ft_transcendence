@@ -11,7 +11,7 @@ import {
     Res,
     Response,
   } from '@nestjs/common';
-  import {express} from 'express';
+  import {Express} from 'express';
 import { AuthGuard } from '@nestjs/passport';
 import { PrismaService } from 'src/prisma.service';
 import { FileInterceptor } from '@nestjs/platform-express';
