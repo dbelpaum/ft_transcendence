@@ -34,13 +34,23 @@ const DebugPanel: React.FC<{ variables: Record<string, any> }> = ({
 );
 
 const Game: React.FC = () => {
-	const [socket, setSocket] = useState<any>(null);
-	const [inLobby, setInLobby] = useState<boolean>(false);
-	const [lobbyData, setLobbyData] = useState<any>(null);
-	const [gameStarted, setGameStarted] = useState<boolean>(false);
-	const [showScoreRanking, setShowScoreRanking] = useState<boolean>(false); // Ajout d'un état pour afficher ou masquer la superposition du classement
-	const [isReady, setIsReady] = useState<boolean>(false);
-	const user = useAuth().user as User;
+	
+	const {
+		authToken,
+		socket,
+		setSocket,
+		user,
+		inLobby,
+		setInLobby,
+		lobbyData,
+		setLobbyData,
+		gameStarted,
+		setGameStarted,
+		showScoreRanking,
+		setShowScoreRanking,
+		isReady,
+		setIsReady,
+	} = useAuth();
 
 	const toggleScoreRanking = () => {
 		setShowScoreRanking(!showScoreRanking);
@@ -56,15 +66,6 @@ const Game: React.FC = () => {
 	};
 
 	useEffect(() => {
-		const socket = io("http://localhost:4000/game",
-			{
-				auth: {
-					token: localStorage.getItem('token')
-				}
-			});
-
-		socket.connect();
-		setSocket(socket);
 
 		socket.on("exception", (data: any) => {
 			showNotificationError("Error", data.message);
@@ -89,14 +90,6 @@ const Game: React.FC = () => {
 		socket.on("server.game.start", (data: any) => {
 			if (!gameStarted) setGameStarted(true);
 		});
-
-		return () => {
-			// changer la dépendance gameStarted pour arreter de deco quand le jeu se lance
-			if (socket) {
-				socket.disconnect();
-				setSocket(null); // Set socket to null after disconnecting
-			}
-		};
 	}, []);
 
 	const handleLeaveLobby = () => {
