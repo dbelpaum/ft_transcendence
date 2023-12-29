@@ -174,7 +174,16 @@ export class OnlineGameLogic {
 		for (const [key, value] of Object.entries(this.scores)) {
 			const divScore = document.getElementById("gameScore" + i++);
 			if (divScore) {
-				divScore.innerText = key.toString() + " " + value.toString();
+				const keyElement = document.createElement("div");
+				keyElement.textContent = key.toString();
+
+				const valueElement = document.createElement("div");
+				valueElement.textContent = value.toString();
+
+				// Append elements to the target divScore
+				divScore.innerHTML = ''; // Clear existing content
+				divScore.appendChild(keyElement);
+				divScore.appendChild(valueElement);
 			}
 		}
 	}
