@@ -9,14 +9,10 @@ import {
 	showNotificationError,
 } from "./Notification";
 import SocketContext from "./SocketContext";
+import { useAuth } from "../../context/AuthContexte";
 
 const Game: React.FC = () => {
-	const [socket, setSocket] = useState<any>(null);
-	const [inLobby, setInLobby] = useState<boolean>(false);
-	const [lobbyData, setLobbyData] = useState<any>(null);
-	const [gameStarted, setGameStarted] = useState<boolean>(false);
-	const [isReady, setIsReady] = useState<boolean>(false);
-	
+
 	const {
 		authToken,
 		socket,
