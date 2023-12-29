@@ -6,6 +6,9 @@ import { Server } from "http";
 import { ClientMovementDto } from "../dtos";
 import { Ball, Paddle } from "./types";
 import { enregistrerScores } from "../score/score.controller";
+import { SocketExceptions } from "../shared/server/SocketExceptions";
+import { ServerException } from "../ServerExceptions";
+import { AuthenticatedSocket } from "../types";
 const TICK_RATE = 1000 / 60; // 60 updates per second
 const PADDLE_SPEED = 3.75;
 const BALL_SPEED_INCREMENT = 0.0003;
@@ -163,23 +166,40 @@ export class Instance {
 	private gameOver(): void {
 		this.hasFinished = true;
 		this.lobby.dispatchToLobby(ServerEvents.GameOver, {
-			winner: this.scores[this.hostPseudo] >= 5 ? this.hostPseudo : this.guestPseudo,
-			loser: this.scores[this.hostPseudo] >= 5 ? this.guestPseudo : this.hostPseudo,
+			winner: this.scores[this.hostPseudo] >= this.scores[this.guestPseudo] ? this.hostPseudo : this.guestPseudo,
+			loser: this.scores[this.hostPseudo] >= this.scores[this.guestPseudo] ? this.guestPseudo : this.hostPseudo,
 			scores: {
 				[this.hostPseudo]: this.scores[this.hostPseudo],
 				[this.guestPseudo]: this.scores[this.guestPseudo],
 			}
 		});
 		this.stopGameRuntime();
-    enregistrerScores(this.lobby.hostSocketId, this.lobby.guestSocketId, this.scores[this.lobby.hostSocketId], this.scores[this.lobby.guestSocketId])
-    .then((nouveauScore) => {
+		// enregistrerScores(this.lobby.hostSocketId, this.lobby.guestSocketId, this.scores[this.lobby.hostSocketId], this.scores[this.lobby.guestSocketId])
+		// 	.then((nouveauScore) => {
+		// 		console.log('New score added:', nouveauScore);
+		// 	})
+		// 	.catch((erreur) => {
 
-      console.log('New score added:', nouveauScore);
-      })
-    .catch((erreur) => {
+		// 		console.error('Error during adding score in db', erreur);
+		// 	})
+	}
 
-      console.error('Error during adding score in db', erreur);
-    })
+	public gameAbort(leaver: AuthenticatedSocket): void {
+		const winner = leaver.id === this.lobby.hostSocketId ? this.lobby.guest : this.lobby.host;
+		this.lobby.sendToUser(winner.id, ServerEvents.GameError, {
+			message: 'Your opponent disconnected',
+		});
+		this.hasFinished = true;
+		this.lobby.dispatchToLobby(ServerEvents.GameOver, {
+			winner: winner.auth.pseudo,
+			loser: leaver.auth.pseudo,
+			scores: {
+				[this.hostPseudo]: this.scores[this.hostPseudo],
+				[this.guestPseudo]: this.scores[this.guestPseudo],
+			}
+		});
+		this.stopGameRuntime();
+		// Faire la requête, attention il ne faut pas prendre en compte le score pour le gagnant ici
 	}
 
 	private gameRuntime(): void {

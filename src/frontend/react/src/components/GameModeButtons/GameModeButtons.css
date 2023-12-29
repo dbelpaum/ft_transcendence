@@ -26,6 +26,10 @@
 	height: 55px;;
 }
 
+.buttonStyle.darkened {
+	background-color: #333;
+}
+
 .inputBar {
 	padding: 10px;
 	border-radius: 8px;

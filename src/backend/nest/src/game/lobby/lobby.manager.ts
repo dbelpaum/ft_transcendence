@@ -40,6 +40,9 @@ export class LobbyManager {
 	}
 
 	public terminateSocket(client: AuthenticatedSocket): void {
+		if (client.data.lobby?.instance.hasStarted && !client.data.lobby.instance.hasFinished) {
+			client.data.lobby?.instance.gameAbort(client);
+		}
 		client.data.lobby?.removeClient(client);
 		console.log("Client %s disconnected", client.id);
 	}
@@ -52,7 +55,22 @@ export class LobbyManager {
 		return code;
 	}
 
-	public createLobby(mode: LobbyMode): Lobby {
+	private isUserInAnyLobby(client: AuthenticatedSocket): boolean {
+		for (const lobby of this.lobbies.values()) {
+			for (const lobbyClient of lobby.clients.values()) {
+				if (lobbyClient.auth.pseudo === client.auth.pseudo) return true;
+			}
+		}
+		return false;
+	}
+
+	public createLobby(mode: LobbyMode, client: AuthenticatedSocket): Lobby {
+		if (this.isUserInAnyLobby(client)) {
+			throw new ServerException(
+				SocketExceptions.LobbyError,
+				"Already in a lobby"
+			);
+		}
 		const lobby = new Lobby(this.server, mode, this.getUniqueCode(), this);
 		this.lobbies.set(lobby.id, lobby);
 		console.log("Created lobby %s", lobby.id);
@@ -71,6 +89,13 @@ export class LobbyManager {
 			throw new ServerException(
 				SocketExceptions.LobbyError,
 				"Lobby not found"
+			);
+		}
+
+		if (this.isUserInAnyLobby(client)) {
+			throw new ServerException(
+				SocketExceptions.LobbyError,
+				"Already in a lobby"
 			);
 		}
 
@@ -95,6 +120,12 @@ export class LobbyManager {
 
 	public joinMatchmaking(client: AuthenticatedSocket): void {
 		// Check if there is an existing public lobby with available slots
+		if (this.isUserInAnyLobby(client)) {
+			throw new ServerException(
+				SocketExceptions.LobbyError,
+				"Already in a lobby"
+			);
+		}
 		const publicLobby = Array.from(this.lobbies.values()).find(
 			(lobby) => lobby.lobbyType === "public" && lobby.clients.size < lobby.maxClients
 		);
@@ -105,7 +136,7 @@ export class LobbyManager {
 			console.log("Joined existing public lobby %s", publicLobby.id)
 		} else {
 			// Create a new public lobby if none is available
-			const newPublicLobby = this.createLobby("vanilla");
+			const newPublicLobby = this.createLobby("vanilla", client);
 			newPublicLobby.lobbyType = "public";
 			this.joinLobby(newPublicLobby.id, client);
 			console.log("Created new public lobby %s", newPublicLobby.id)

@@ -2,16 +2,16 @@ import React, { useContext, useState, useEffect } from "react";
 import "./GameModeButtons.css";
 import { SocketContext } from "../../pages/Game/SocketContext";
 import { Socket } from "socket.io-client";
-import SoloGameScene from "../GameScene/SoloGameScene";
 import { showNotificationSuccess, showNotificationWarning } from "../../pages/Game/Notification";
 import { PulseLoader } from "react-spinners";
+import ScorePage from "../../pages/Game/Scores/ScorePage";
 import { useLocation } from 'react-router-dom';
 
 const GameModeButtons: React.FC = () => {
 	const socket = useContext(SocketContext) as unknown as Socket;
 	const [roomCode, setRoomCode] = useState<string>("");
-	const [showSoloGame, setShowSoloGame] = React.useState<boolean>(false);
 	const [isMatchmaking, setIsMatchmaking] = useState<boolean>(false);
+	const [showScoreRanking, setShowScoreRanking] = useState<boolean>(false); // Ajout d'un état pour afficher ou masquer la superposition du classement
 
 	const useQuery = () => {
 		return new URLSearchParams(useLocation().search);
@@ -33,11 +33,6 @@ const GameModeButtons: React.FC = () => {
 		}
 	}, []);
 
-
-	const handleSelectSoloMode = () => {
-		setShowSoloGame(true);
-	};
-
 	const handleRoomCodeChange = (
 		event: React.ChangeEvent<HTMLInputElement>
 	) => {
@@ -45,12 +40,14 @@ const GameModeButtons: React.FC = () => {
 	};
 
 	const handleCreateRoom = () => {
+		if (isMatchmaking) return;
 		if (socket) {
 			socket.emit("client.lobby.create", { mode: "vanilla" });
 		}
 	};
 
 	const handleJoinRoom = () => {
+		if (isMatchmaking) return;
 		if (socket) {
 			socket.emit("client.lobby.join", {
 				mode: "vanilla",
@@ -81,69 +78,64 @@ const GameModeButtons: React.FC = () => {
 		}
 	};
 
-	const handlePing = () => {
-		if (socket) {
-			console.log("Sending client.ping...");
-			socket.emit("client.ping", {});
-
-			socket.once("server.pong", (data: any) => {
-				showNotificationSuccess("Pong !", data.message);
-			});
-		}
-	};
-
 	const handleKeyDown = (e: React.KeyboardEvent) => {
 		if (e.key === "Enter") handleJoinRoom();
 	};
 
+	const toggleScoreRanking = () => {
+		setShowScoreRanking(!showScoreRanking);
+	};
+
+
 	return (
 		<div className="buttonContainer">
-			{showSoloGame ? (
-				<SoloGameScene width={800} height={600} />
-			) : (
-				<>
-					<div>
-						<button
-							className="buttonStyle"
-							onClick={handleSelectSoloMode}
-						>
-							Solo
-						</button>
-					</div>
+			<div className="buttonColumn">
+				<div>
+					<button className="buttonStyle" onClick={handleMatchmaking}>
+						Matchmaking {isMatchmaking && <PulseLoader size={10} color={"#ffffff"} />}
+					</button>
+				</div>
+				<div>
+					<button
+						className={`buttonStyle ${isMatchmaking ? "darkened" : ""}`}
+						onClick={handleCreateRoom}
+					>
+						Create Room
+					</button>
+				</div>
 
-					<div className="buttonColumn">
-						<div>
-							<button
-								className="buttonStyle"
-								onClick={handleCreateRoom}
-							>
-								Create Room
-							</button>
-						</div>
-
-						<div>
-							<button
-								className="buttonStyle"
-								onClick={handleJoinRoom}
-							>
-								Join Room
-							</button>
-						</div>
-						<input
-							placeholder="Room Code"
-							onKeyDown={handleKeyDown}
-							className="inputBar"
-							value={roomCode}
-							onChange={handleRoomCodeChange}
-						></input>
+				<div>
+					<button
+						className={`buttonStyle ${isMatchmaking ? "darkened" : ""}`}
+						onClick={handleJoinRoom}
+					>
+						Join Room
+					</button>
+				</div>
+				<input
+					placeholder="Room Code"
+					onKeyDown={handleKeyDown}
+					className="inputBar"
+					value={roomCode}
+					onChange={handleRoomCodeChange}
+				></input>
+				{/* Bouton pour ouvrir/fermer la superposition du classement */}
+				<button onClick={toggleScoreRanking}>Voir le classement</button>
+				{/* Superposition modale du classement des scores */}
+				<div
+					className={`scoreRankingOverlay ${showScoreRanking ? "active" : ""
+						}`}
+				>
+					<div
+						className={`scoreRankingModal ${showScoreRanking ? "active" : ""
+							}`}
+					>
+						<button onClick={toggleScoreRanking}>Fermer</button>
+						{/* Affichage du classement des scores */}
+						<ScorePage />
 					</div>
-
-					<div>
-						<button className="buttonStyle" onClick={handleMatchmaking}>Matchmaking {isMatchmaking && <PulseLoader size={10} color={"#ffffff"} />}</button>
-					</div>
-					<button onClick={handlePing}>Ping</button>
-				</>
-			)}
+				</div>
+			</div>
 		</div>
 	);
 };

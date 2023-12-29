@@ -29,6 +29,10 @@ export type ServerPayloads = {
 		message: string;
 	};
 
+	[ServerEvents.GameError]: {
+		message: string;
+	};
+
 	[ServerEvents.GameState]: {
 		ballPosition: {
 			x: number;

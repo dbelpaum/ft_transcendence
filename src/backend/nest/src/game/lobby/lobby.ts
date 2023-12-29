@@ -63,6 +63,7 @@ export class Lobby {
 		// Si l'hôte leave, alors le guest devient hôte
 		if (client.id === this.hostSocketId) {
 			this.hostSocketId = this.guestSocketId ? this.guestSocketId : null;
+			this.host = this.guest ? this.guest : null;
 			this.guest = null;
 		} else this.guest = null;
 		client.leave(this.id);

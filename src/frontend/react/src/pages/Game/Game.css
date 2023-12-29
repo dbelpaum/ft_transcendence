@@ -21,7 +21,19 @@
 .gameScore1,
 .gameScore2 {
 	margin: 0px 100px; /* Adjust the top and bottom margins and horizontal spacing */
+	font-size: 20px;
+	border:#ffffff 3px solid;
+	/* background: #2d3fa6; */
+	padding: 10px;
+	border-radius: 30px;
+	text-align: center;
+	color: white;
 	/* Add styling for game scores as needed */
+}
+
+.gameScore1 > div,
+.gameScore2 > div {
+  margin-top: 15px; /* Adjust the vertical padding as needed */
 }
 
 .OnlineGameScene {

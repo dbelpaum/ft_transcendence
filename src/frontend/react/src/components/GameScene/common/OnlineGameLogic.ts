@@ -140,12 +140,12 @@ export class OnlineGameLogic {
 			case "a":
 			case "q":
 				this.paddleLeftSpeed = 0;
-				this.socket.emit("client.game.move", { movingLeft: false, movingRight: (this.paddleRightSpeed != 0) });
+				this.socket.emit("client.game.move", { movingLeft: false, movingRight: (this.paddleRightSpeed !== 0) });
 				break;
 			case "ArrowRight":
 			case "d":
 				this.paddleRightSpeed = 0;
-				this.socket.emit("client.game.move", { movingLeft: (this.paddleLeftSpeed != 0), movingRight: false });
+				this.socket.emit("client.game.move", { movingLeft: (this.paddleLeftSpeed !== 0), movingRight: false });
 				break;
 			default:
 				break;
@@ -174,7 +174,16 @@ export class OnlineGameLogic {
 		for (const [key, value] of Object.entries(this.scores)) {
 			const divScore = document.getElementById("gameScore" + i++);
 			if (divScore) {
-				divScore.innerText = key.toString() + " " + value.toString();
+				const keyElement = document.createElement("div");
+				keyElement.textContent = key.toString();
+
+				const valueElement = document.createElement("div");
+				valueElement.textContent = value.toString();
+
+				// Append elements to the target divScore
+				divScore.innerHTML = ''; // Clear existing content
+				divScore.appendChild(keyElement);
+				divScore.appendChild(valueElement);
 			}
 		}
 	}
