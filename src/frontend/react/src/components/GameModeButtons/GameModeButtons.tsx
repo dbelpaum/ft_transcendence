@@ -4,11 +4,13 @@ import { SocketContext } from "../../pages/Game/SocketContext";
 import { Socket } from "socket.io-client";
 import { showNotificationSuccess, showNotificationWarning } from "../../pages/Game/Notification";
 import { PulseLoader } from "react-spinners";
+import ScorePage from "../../pages/Game/Scores/ScorePage";
 
 const GameModeButtons: React.FC = () => {
 	const socket = useContext(SocketContext) as unknown as Socket;
 	const [roomCode, setRoomCode] = useState<string>("");
 	const [isMatchmaking, setIsMatchmaking] = useState<boolean>(false);
+	const [showScoreRanking, setShowScoreRanking] = useState<boolean>(false); // Ajout d'un état pour afficher ou masquer la superposition du classement
 
 	const handleRoomCodeChange = (
 		event: React.ChangeEvent<HTMLInputElement>
@@ -57,9 +59,19 @@ const GameModeButtons: React.FC = () => {
 		if (e.key === "Enter") handleJoinRoom();
 	};
 
+	const toggleScoreRanking = () => {
+		setShowScoreRanking(!showScoreRanking);
+	};
+
+
 	return (
 		<div className="buttonContainer">
 			<div className="buttonColumn">
+				<div>
+					<button className="buttonStyle" onClick={handleMatchmaking}>
+						Matchmaking {isMatchmaking && <PulseLoader size={10} color={"#ffffff"} />}
+					</button>
+				</div>
 				<div>
 					<button
 						className="buttonStyle"
@@ -84,10 +96,22 @@ const GameModeButtons: React.FC = () => {
 					value={roomCode}
 					onChange={handleRoomCodeChange}
 				></input>
-			</div>
-
-			<div>
-				<button className="buttonStyle" onClick={handleMatchmaking}>Matchmaking {isMatchmaking && <PulseLoader size={10} color={"#ffffff"} />}</button>
+				{/* Bouton pour ouvrir/fermer la superposition du classement */}
+				<button onClick={toggleScoreRanking}>Voir le classement</button>
+				{/* Superposition modale du classement des scores */}
+				<div
+					className={`scoreRankingOverlay ${showScoreRanking ? "active" : ""
+						}`}
+				>
+					<div
+						className={`scoreRankingModal ${showScoreRanking ? "active" : ""
+							}`}
+					>
+						<button onClick={toggleScoreRanking}>Fermer</button>
+						{/* Affichage du classement des scores */}
+						<ScorePage />
+					</div>
+				</div>
 			</div>
 		</div>
 	);

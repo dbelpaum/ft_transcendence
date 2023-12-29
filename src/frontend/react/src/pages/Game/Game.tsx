@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 import "./Game.css";
 import OnlineGameScene from "../../components/GameScene/OnlineGameScene";
 import GameModeButtons from "../../components/GameModeButtons/GameModeButtons";
-import ScorePage from "./Scores/ScorePage";
 import io from "socket.io-client";
 import Lobby from "../../components/Lobby/Lobby";
 import {
@@ -16,12 +15,8 @@ const Game: React.FC = () => {
 	const [inLobby, setInLobby] = useState<boolean>(false);
 	const [lobbyData, setLobbyData] = useState<any>(null);
 	const [gameStarted, setGameStarted] = useState<boolean>(false);
-	const [showScoreRanking, setShowScoreRanking] = useState<boolean>(false); // Ajout d'un état pour afficher ou masquer la superposition du classement
 	const [isReady, setIsReady] = useState<boolean>(false);
 
-	const toggleScoreRanking = () => {
-		setShowScoreRanking(!showScoreRanking);
-	};
 
 	const handleReadyToggle = () => {
 		if (socket && !isReady) {
@@ -122,23 +117,6 @@ const Game: React.FC = () => {
 						<div className="gameScore2" id="gameScore2"></div>
 					</div>
 				)}
-
-				{/* Bouton pour ouvrir/fermer la superposition du classement */}
-				<button onClick={toggleScoreRanking}>Voir le classement</button>
-				{/* Superposition modale du classement des scores */}
-				<div
-					className={`scoreRankingOverlay ${showScoreRanking ? "active" : ""
-						}`}
-				>
-					<div
-						className={`scoreRankingModal ${showScoreRanking ? "active" : ""
-							}`}
-					>
-						<button onClick={toggleScoreRanking}>Fermer</button>
-						{/* Affichage du classement des scores */}
-						<ScorePage />
-					</div>
-				</div>
 			</div>
 		</SocketContext.Provider>
 	);

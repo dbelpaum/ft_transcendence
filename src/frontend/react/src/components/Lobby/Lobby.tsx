@@ -50,7 +50,7 @@ const Lobby: React.FC<LobbyProps> = ({
 
 	return (
 		<div className="lobbyDiv">
-			<h1 className="roomName">{lobbyData.name}'s lobby</h1>
+			<h1 className="roomName">{lobbyData.name}'s room</h1>
 			<p>
 				<span className="roomCode">Room code:</span>{" "}
 				<button onClick={copyToClipboard} className="copyButton">📋 {lobbyData.lobbyId}</button>{" "}
