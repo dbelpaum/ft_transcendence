@@ -19,13 +19,13 @@ const ProfilePictureUploader: React.FC<ProfilePictureUploaderProps> = ({ id42, o
             alert("Veuillez sélectionner une image.");
             return;
         }
-
+    const uploadUrl = `http://localhost:4000/user/${id42}/image`;
         const formData = new FormData();
         formData.append('image', file);
         formData.append('id42', id42.toString()); // Ajout de l'identifiant de l'utilisateur
 
         try {
-            const response = await fetch('URL_DU_SERVEUR/upload', {
+            const response = await fetch(uploadUrl, {
                 method: 'POST',
                 body: formData,
             });

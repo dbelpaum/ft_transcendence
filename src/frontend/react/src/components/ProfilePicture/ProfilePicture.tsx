@@ -14,20 +14,20 @@ const ProfilePicture: React.FC<ProfilePictureProps> = ({ id42 }) => {
             fetch(`http://localhost:4000/user/${id42}/image`)
                 .then(response => {
                     if (!response.ok) {
-                        throw new Error('Réponse réseau non OK');
+                        throw new Error(`Erreur réseau: ${response.status}`);
                     }
-                    return response.json();
+                    return response.text(); // Utiliser text() au lieu de json()
                 })
-                .then(data => {
-                    if (data && data.imageURL) {
-                        setProfilePicUrl(data.imageURL);
-                    }
+                .then(imageUrl => {
+                    setProfilePicUrl(imageUrl);
                 })
                 .catch(error => {
                     console.error('Erreur lors de la récupération de l\'image:', error);
                 });
         }
     }, [id42]);
+    
+    console.log('Profil url:' + profilePicUrl);
 
     const handleUploadSuccess = (newImageUrl: string) => {
         setProfilePicUrl(newImageUrl);
@@ -38,7 +38,6 @@ const ProfilePicture: React.FC<ProfilePictureProps> = ({ id42 }) => {
         setUploaderVisible(true);
     };
 
-    console.log('ProfilePicture url est:', profilePicUrl);
 
     return (
         <div>

@@ -1,4 +1,17 @@
-import { Body, Controller, Get, Param, Patch, Post, UseGuards , UploadedFile, UseInterceptors} from '@nestjs/common';
+import {
+    Body,
+    Controller,
+    Get,
+    Param,
+    Patch,
+    Post,
+    UseGuards,
+    UploadedFile,
+    UseInterceptors,
+    Res,
+    Response,
+  } from '@nestjs/common';
+  import {express} from 'express';
 import { AuthGuard } from '@nestjs/passport';
 import { PrismaService } from 'src/prisma.service';
 import { FileInterceptor } from '@nestjs/platform-express';
@@ -128,6 +141,26 @@ export class UserController {
             where: { id42: Number(id) },
             data: { bio },
         });
+    }
+
+
+    @Post(':id/image')
+    // @UseGuards(AuthGuard('jwt'))
+    @UseInterceptors(FileInterceptor('image', {
+      storage: diskStorage({
+        destination: './uploads/profilepics',
+        filename: (req, file, cb) => {
+          const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+          cb(null, file.fieldname + '-' + uniqueSuffix + '.' + file.mimetype.split('/')[1]);
+        },
+      }),
+    }))
+    async uploadProfilePic(@Param('id') id: string, @UploadedFile() file: Express.Multer.File) {
+      const imagePath = `http://localhost:4000/uploads/profilepics/${file.filename}`;
+      return await this.prisma.user.update({
+        where: { id42: Number(id) },
+        data: { imageURL: imagePath },
+      });
     }
 
 }
