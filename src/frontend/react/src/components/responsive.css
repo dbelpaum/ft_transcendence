@@ -1,16 +1,117 @@
+*{
+	box-sizing: border-box;
+}
+nav .menu{
+	z-index: 2;
+}
 @media screen AND (max-width: 1200px) {
 	
 }
 
 @media screen AND (max-width: 960px) {
 	
+	.chat-title
+	{
+		padding-top: 60px;
+	}
 
+	.container
+	{
+		display: flex;
+		flex-direction: column;
+		align-items: stretch;
+	}
+
+	.container>div{
+		width: 100%;
+		box-sizing: border-box;
+	}
+
+	.container>div h2{
+		text-align: center;
+	}
+
+	.channels li
+	{
+		display: flex;
+		justify-content: center;
+	}
+
+	.channels li .channel_name
+	{
+		margin-right: 15px;
+
+	}
+
+	.write-chat
+	{
+		box-sizing: border-box;
+		padding: 0 10%;
+  		min-height: 70vh;
+		margin:0 auto;
+		order:3;
+	}
+
+	.userChannel
+	{
+		display: flex;
+  		justify-content: center;
+		
+	}
+
+	.container_button
+	{
+		flex-grow: 0;
+	}
+
+	.create-channel-button
+	{
+		margin-bottom: 50px;
+	}
+
+	.input-chat-form
+	{
+		margin: 0;
+		position: static;
+	}
+
+	.input-box
+	{
+		display: flex;
+  		justify-content: center;
+	}
+
+	.input-chat-form{
+		display: flex;
+  		justify-content: center;
+	}
 }
 
 @media screen AND (max-width: 700px) {
+	main.profil-container
+	{
+		width: 90%;
+  		margin-top: 50px;
+	}
 	.container-2fa .modal-content {
 		width: 90%;
 	}
+
+	.profil-container .decoBut
+	{
+		display: flex;
+  		justify-content: center;
+	}
+
+	.profil-container .editable-text-field
+	{
+		display: flex;
+  		justify-content: center;
+	}
+
+	.profil-container .profil-image-container {
+		margin-top: 40px;
+	  }
 }
 
 @media screen AND (max-width: 570px) {

@@ -109,14 +109,11 @@ function Profil() {
 
         )}
 
-<button onClick={() => setShowFriendshipList(!showFriendshipList)}>
-        Afficher la liste d'amis et d'utilisateurs bloqués
-      </button>
-      {showFriendshipList && user?.id && <FriendshipList userId={user?.id} />}
-
-
-	<Link to="/UserList">Liste des joueurs</Link>
 	<Button2FA />
+	<div className="button-action">
+		{user?.id && <FriendshipList userId={user?.id} />}
+		<Link to="/UserList">Liste des joueurs</Link>
+	</div>
 
       </div>
     </main>

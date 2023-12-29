@@ -51,23 +51,23 @@ const Lobby: React.FC<LobbyProps> = ({
 	return (
 		<div className="lobbyDiv">
 			<h1 className="roomName">{lobbyData.name}'s room</h1>
-			<p>
+			<div>
 				<span className="roomCode">Room code:</span>{" "}
 				<button onClick={copyToClipboard} className="copyButton">📋 {lobbyData.lobbyId}</button>{" "}
-			</p>
+			</div>
 			<div className="userContainer">
-				<p className="userColumn">
+				<div className="userColumn">
 					<img src={lobbyData.host.avatar} alt="avatar" className="lobbyAvatar" />
 					<p className="pseudo">{lobbyData.host.pseudo}</p>{" "}
 					{lobbyData.playersState[lobbyData.host.socketId] ? "✅" : "❌"}
-				</p>
-				<p className="userColumn">
+				</div>
+				<div className="userColumn">
 					{lobbyData.guest && <><img src={lobbyData.guest.avatar} alt="avatar" className="lobbyAvatar" />
 						<p className="pseudo">{lobbyData.guest.pseudo}</p>
 						{lobbyData.playersState[lobbyData.guest.socketId] ? "✅" : "❌"}</>
 					}
 					{!lobbyData.guest && <p>Waiting for opponent</p>}
-				</p>
+				</div>
 			</div>
 			<button onClick={handleReadyToggle} className={isReady ? "unreadyButton" : "readyButton"}>
 				{isReady ? "Unready" : "Ready"}
