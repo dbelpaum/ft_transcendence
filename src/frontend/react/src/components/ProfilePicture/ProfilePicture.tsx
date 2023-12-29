@@ -1,13 +1,33 @@
-import React, { useState } from 'react';
+import React, { useState , useEffect} from 'react';
 import ProfilePictureUploader from '../ProfilePictureUploader/ProfilePictureUploader';
 
 interface ProfilePictureProps {
-    id42: string; // Identifiant du utilisateur
+    id42: number; // Identifiant du utilisateur
 }
 
 const ProfilePicture: React.FC<ProfilePictureProps> = ({ id42 }) => {
     const [isUploaderVisible, setUploaderVisible] = useState(false);
-    const [profilePicUrl, setProfilePicUrl] = useState('URL_IMAGE_PAR_DEFAUT'); // URL de l'image de profil actuelle
+    const [profilePicUrl, setProfilePicUrl] = useState('default-profile.png');
+    // URL de l'image de profil actuelle
+    useEffect(() => {
+        if (id42) {
+            fetch(`http://localhost:4000/user/${id42}/image`)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Réponse réseau non OK');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    if (data && data.imageURL) {
+                        setProfilePicUrl(data.imageURL);
+                    }
+                })
+                .catch(error => {
+                    console.error('Erreur lors de la récupération de l\'image:', error);
+                });
+        }
+    }, [id42]);
 
     const handleUploadSuccess = (newImageUrl: string) => {
         setProfilePicUrl(newImageUrl);
@@ -18,10 +38,12 @@ const ProfilePicture: React.FC<ProfilePictureProps> = ({ id42 }) => {
         setUploaderVisible(true);
     };
 
+    console.log('ProfilePicture url est:', profilePicUrl);
+
     return (
         <div>
             <img
-                src={profilePicUrl}
+                src={profilePicUrl || 'default-profile.png'}
                 alt="Profile"
                 style={{ cursor: 'pointer', width: '100px', height: '100px' }}
                 onClick={handleClick}

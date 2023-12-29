@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 
 interface ProfilePictureUploaderProps {
-    id42: string; // Identifiant de l'utilisateur
+    id42: number; // Identifiant de l'utilisateur
     onUploadSuccess: (imageUrl: string) => void; // Callback pour la mise à jour de l'image
 }
 
@@ -22,7 +22,7 @@ const ProfilePictureUploader: React.FC<ProfilePictureUploaderProps> = ({ id42, o
 
         const formData = new FormData();
         formData.append('image', file);
-        formData.append('id42', id42); // Ajout de l'identifiant de l'utilisateur
+        formData.append('id42', id42.toString()); // Ajout de l'identifiant de l'utilisateur
 
         try {
             const response = await fetch('URL_DU_SERVEUR/upload', {

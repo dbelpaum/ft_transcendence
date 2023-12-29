@@ -78,6 +78,7 @@ export class UserController {
             where: { id42: Number(id) },
             select: { imageURL: true },
         });
+        console.log("Requete bien recue : " + user.imageURL)
         return user ? user.imageURL : null;
     }
 
