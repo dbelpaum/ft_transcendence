@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
 
 interface ProfilePictureUploaderProps {
-    onUploadSuccess: (imageUrl: string) => void; // Callback pour gérer la mise à jour de l'image de profil
+    id42: string; // Identifiant de l'utilisateur
+    onUploadSuccess: (imageUrl: string) => void; // Callback pour la mise à jour de l'image
 }
 
-const ProfilePictureUploader: React.FC<ProfilePictureUploaderProps> = ({ onUploadSuccess }) => {
+const ProfilePictureUploader: React.FC<ProfilePictureUploaderProps> = ({ id42, onUploadSuccess }) => {
     const [file, setFile] = useState<File | null>(null);
 
     const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -21,6 +22,7 @@ const ProfilePictureUploader: React.FC<ProfilePictureUploaderProps> = ({ onUploa
 
         const formData = new FormData();
         formData.append('image', file);
+        formData.append('id42', id42); // Ajout de l'identifiant de l'utilisateur
 
         try {
             const response = await fetch('URL_DU_SERVEUR/upload', {
