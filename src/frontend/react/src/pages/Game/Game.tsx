@@ -46,6 +46,10 @@ const Game: React.FC = () => {
 			showNotificationSuccess("", data.message);
 		});
 
+		socket.on("server.game.error", (data: any) => {
+			showNotificationError("Error", data.message);
+		});
+
 		socket.on("server.lobby.state", (data: any) => {
 			console.log("Received Lobby State:", data);
 			setInLobby(true);

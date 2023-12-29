@@ -4,6 +4,7 @@ export enum ServerEvents {
 	GameStart = "server.game.start",
 	GameMessage = "server.game.message",
 	GameState = "server.game.state",
+	GameError = "server.game.error",
 	GameOver = "server.game.over",
 	GameGuestPosition = "server.game.guestposition",
 	MatchmakingStatus = "server.matchmaking.status",

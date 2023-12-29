@@ -40,6 +40,9 @@ export class LobbyManager {
 	}
 
 	public terminateSocket(client: AuthenticatedSocket): void {
+		if (client.data.lobby?.instance.hasStarted && !client.data.lobby.instance.hasFinished) {
+			client.data.lobby?.instance.gameAbort(client);
+		}
 		client.data.lobby?.removeClient(client);
 		console.log("Client %s disconnected", client.id);
 	}
