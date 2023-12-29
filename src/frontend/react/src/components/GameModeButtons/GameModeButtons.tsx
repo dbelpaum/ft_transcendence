@@ -21,17 +21,18 @@ const GameModeButtons: React.FC = () => {
 	const createUrl = query.get('create');
 	const idOther = query.get('id');
 	const mp = query.get('mp');
-	if (roomUrl && socket)
-	{
-		socket.emit("client.lobby.join", {
-			mode: "vanilla",
-			lobbyId: roomUrl,
-		});
-	}
-	if (createUrl && idOther && mp && socket)
-	{
-		socket.emit("client.lobby.create", { mode: "vanilla" });
-	}
+
+	useEffect(() => {
+
+		if (roomUrl && socket)
+		{
+			socket.emit("client.lobby.join", {
+				mode: "vanilla",
+				lobbyId: roomUrl,
+			});
+		}
+	}, []);
+
 
 	const handleSelectSoloMode = () => {
 		setShowSoloGame(true);

@@ -8,13 +8,14 @@ export interface User {
 }
 
 export interface Message {
-	user: User;
-	timeSent: string;
-	message: string;
+	id:string;
+    user: User;
+    timeSent?: string;
+    message: string;
 	channelName: string;
 	type: "channel" | "mp";
+	link?: string;
 }
-
 export interface ServerToClientEvents {
 	chat: (e: Message) => void
 }

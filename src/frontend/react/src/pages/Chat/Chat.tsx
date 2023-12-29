@@ -65,8 +65,8 @@ function Chat(){
 			<div className='chat'>
 				<ChatContainer username={user?.pseudo} messages={messages} setMessages={setMessages} socket={chatSocket}/>
 			</div>
-	  </div>
-	  )}
+	  	</div>
+)}
 
 
 

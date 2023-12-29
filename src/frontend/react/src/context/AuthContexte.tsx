@@ -24,6 +24,18 @@ type AuthContextType = {
 	forceReload: number;
 	info2FA:  Info2FA | null,
 	setInfo2FA: React.Dispatch<React.SetStateAction<Info2FA|null>>
+	socket: any,
+	setSocket: React.Dispatch<React.SetStateAction<any>>,
+	inLobby: boolean
+	setInLobby: React.Dispatch<React.SetStateAction<boolean>>
+	lobbyData: any
+	setLobbyData: any
+	gameStarted: boolean
+	setGameStarted: React.Dispatch<React.SetStateAction<boolean>>
+	showScoreRanking: any
+	setShowScoreRanking: any
+	isReady: boolean
+	setIsReady: React.Dispatch<React.SetStateAction<boolean>>
   };
 
 type AuthProviderProps = {
@@ -41,6 +53,14 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 	const [messages, setMessages] = useState<Message[]>([]);
 	const [forceReload, setForceReload] = useState<number>(0);
 	const [info2FA, setInfo2FA] = useState<Info2FA | null>(null);
+	const [socket, setSocket] = useState<any>(null);
+
+
+	const [inLobby, setInLobby] = useState<boolean>(false);
+	const [lobbyData, setLobbyData] = useState<any>(null);
+	const [gameStarted, setGameStarted] = useState<boolean>(false);
+	const [showScoreRanking, setShowScoreRanking] = useState<boolean>(false); // Ajout d'un état pour afficher ou masquer la superposition du classement
+	const [isReady, setIsReady] = useState<boolean>(false);
 
 
 
@@ -117,13 +137,21 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 		autoConnect: false,
 		auth: { token: token }
 		});
+	const socket = io("http://localhost:4000/game",
+	{
+		auth: {
+			token: token
+		}
+	});
 	setChatSocket(newChatSocket);
+	setSocket(socket)
   };
 
 
 
   const logout = () => {
 	if (chatSocket)	chatSocket.disconnect()
+	if (socket)	socket.disconnect()
 	localStorage.clear()
 	setAuthToken(null);
 	setUser(null)
@@ -133,6 +161,7 @@ useEffect(() => {
 	if (!user || !chatSocket) return
 		console.log("is connected + " + isConnected)
 		chatSocket.connect();
+		socket.connect();
 		chatSocket.on('connect', () => {
 
 			setIsConnected(true);
@@ -201,7 +230,19 @@ return (
 		recharger,
 		forceReload,
 		info2FA,
-		setInfo2FA
+		setInfo2FA,
+		socket,
+		setSocket,
+		inLobby,
+		setInLobby,
+		lobbyData,
+		setLobbyData,
+		gameStarted,
+		setGameStarted,
+		showScoreRanking,
+		setShowScoreRanking,
+		isReady,
+		setIsReady,
 		}}>
       {children}
     </AuthContext.Provider>

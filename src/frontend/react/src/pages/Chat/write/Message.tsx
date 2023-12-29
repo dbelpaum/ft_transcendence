@@ -28,9 +28,18 @@ const MessageComponent: React.FC<MessageProps> = ({ channelUtility, message, cha
   return (
     !isUserMessage ? 
       (
-        <div className='messages'>
+		(message && message.link) 
+			? 
+				(
+					<a className='messages' href={message.link}>
+						<span>{message.user.pseudo} : {message.message}</span>
+			  		</a>
+				) 
+			
+			:
+        (<div className='messages'>
           <span><a href={`http://localhost:3000/users/${message.user.pseudo}`} target="_blank" rel="noopener noreferrer">{message.user.pseudo}</a> : {message.message}</span>
-        </div>
+        </div>)
       ) 
       : 
       (
