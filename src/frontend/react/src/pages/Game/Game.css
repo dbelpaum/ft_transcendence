@@ -112,3 +112,9 @@
 	color: black;
 	z-index: 999; /* Ensure the overlay is on top of everything */
 }
+
+.buttonContainer.lobby
+{
+	justify-content: center;
+	padding-bottom: 80px;
+}

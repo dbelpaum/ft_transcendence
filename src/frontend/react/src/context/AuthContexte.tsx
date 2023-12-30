@@ -202,6 +202,7 @@ useEffect(() => {
 		});
 		
 		chatSocket.on('notif', (e) => {
+			if (e.message)
 			showNotification("Chat", e.message, e.type)
 			recharger()
 		})

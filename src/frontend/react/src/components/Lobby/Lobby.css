@@ -19,7 +19,7 @@
 	display: flex;
 	flex-direction: column;
 	align-items: center;
-	margin: 0 10px;
+	margin: 0 45px;
 }
 
 .pseudo {
@@ -97,6 +97,12 @@
 	cursor: pointer;
 	margin: 10px;
 	height: 55px;
+}
+
+.buttonLobby
+{
+	display: flex;
+	justify-content: center;
 }
 
 /* Add more styles as needed */
