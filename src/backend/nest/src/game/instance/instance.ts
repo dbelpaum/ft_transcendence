@@ -13,6 +13,7 @@ const TICK_RATE = 1000 / 60; // 60 updates per second
 const PADDLE_SPEED = 3.75;
 const BALL_SPEED_INCREMENT = 0.0003;
 const BALL_DEFAULT_SPEED = 2;
+const MAX_SCORE = 5;
 const WIDTH = 600;
 const HEIGHT = 800;
 
@@ -173,6 +174,7 @@ export class Instance {
 				[this.guestPseudo]: this.scores[this.guestPseudo],
 			}
 		});
+		this.lobby.lobbyManager.deleteLobby(this.lobby.id);
 		this.stopGameRuntime();
 		// enregistrerScores(this.lobby.hostSocketId, this.lobby.guestSocketId, this.scores[this.lobby.hostSocketId], this.scores[this.lobby.guestSocketId])
 		// 	.then((nouveauScore) => {
@@ -198,6 +200,7 @@ export class Instance {
 				[this.guestPseudo]: this.scores[this.guestPseudo],
 			}
 		});
+		this.lobby.lobbyManager.deleteLobby(this.lobby.id);
 		this.stopGameRuntime();
 		// Faire la requête, attention il ne faut pas prendre en compte le score pour le gagnant ici
 	}
@@ -222,7 +225,7 @@ export class Instance {
 		this.sendGameState();
 
 		// Check for game end conditions and stop the game if necessary
-		if (this.scores[this.hostPseudo] >= 5 || this.scores[this.guestPseudo] >= 5) {
+		if (this.scores[this.hostPseudo] >= MAX_SCORE || this.scores[this.guestPseudo] >= MAX_SCORE) {
 			this.gameOver();
 			return;
 		}

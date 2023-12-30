@@ -10,20 +10,20 @@ import ModalCode2FA from '../components/2FA/ModalCode2FA';
 
 
 type AuthContextType = {
-    user: User | null;
-    setUser: React.Dispatch<React.SetStateAction<User | null>>;
-    isLoading: boolean;
-    logout: () => void;
-    login: (token:string) => void;
+	user: User | null;
+	setUser: React.Dispatch<React.SetStateAction<User | null>>;
+	isLoading: boolean;
+	logout: () => void;
+	login: (token: string) => void;
 	authToken: string | null;
 	setAuthToken: React.Dispatch<React.SetStateAction<string | null>>;
-	chatSocket: Socket<ServerToClientEvents, ClientToServerEvents> | null;
+	chatSocket: Socket<ServerToClientEvents, ClientToServerEvents> | null;
 	messages: Message[];
 	setMessages: React.Dispatch<React.SetStateAction<Message[]>>;
 	recharger: () => void;
 	forceReload: number;
-	info2FA:  Info2FA | null,
-	setInfo2FA: React.Dispatch<React.SetStateAction<Info2FA|null>>
+	info2FA: Info2FA | null,
+	setInfo2FA: React.Dispatch<React.SetStateAction<Info2FA | null>>
 	socket: any,
 	setSocket: React.Dispatch<React.SetStateAction<any>>,
 	inLobby: boolean
@@ -36,10 +36,10 @@ type AuthContextType = {
 	setShowScoreRanking: any
 	isReady: boolean
 	setIsReady: React.Dispatch<React.SetStateAction<boolean>>
-  };
+};
 
 type AuthProviderProps = {
-  children: ReactNode;
+	children: ReactNode;
 };
 
 const AuthContext = createContext<AuthContextType | null>(null);
@@ -79,131 +79,124 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 	const token = localStorage.getItem('token');
 
 
-  // Chargez le token JWT depuis localStorage lors du démarrage
-  useEffect(() => {
-	if (error === "errorAuthentification")
-	{
-		showNotificationError("Athentification error", "Erreur lors de la requete a l'api 42. Recommencez, ça devrait marcher")
-	}
-	const getUserData = async (authToken:string) => {
-	  try {
-		setIsLoading(true);
-		console.log("token " + authToken);
-		const response = await fetch(process.env.REACT_APP_URL_SERVER + 'authentification/42/profil', {
-		  credentials: 'include',
-		  headers: {
-			'Authorization': `Bearer ${authToken}`
-		  }
+	// Chargez le token JWT depuis localStorage lors du démarrage
+	useEffect(() => {
+		if (error === "errorAuthentification") {
+			showNotificationError("Athentification error", "Erreur lors de la requete a l'api 42. Recommencez, ça devrait marcher")
+		}
+		const getUserData = async (authToken: string) => {
+			try {
+				setIsLoading(true);
+				const response = await fetch(process.env.REACT_APP_URL_SERVER + 'authentification/42/profil', {
+					credentials: 'include',
+					headers: {
+						'Authorization': `Bearer ${authToken}`
+					}
+				});
+				if (!response.ok) throw new Error('Réponse non OK du serveur');
+				const userData = await response.json();
+				if ('need2fa' in userData) {
+					setInfo2FA(userData as Info2FA)
+				}
+				else if (Object.keys(userData).length !== 0) {
+					setUser(userData); // Utilisateur connecté
+				}
+				else {
+					setUser(null);
+				}
+
+			} catch (error) {
+				setUser(null)
+			} finally {
+				setIsLoading(false);
+			}
+		};
+
+		const authentificate = async () => {
+			if (user) return
+			if (authToken) return
+			const tokenSession = tokenUrl || localStorage.getItem('token');
+			if (tokenSession) {
+				await getUserData(tokenSession);
+				await login(tokenSession);
+			}
+			setIsLoading(false);
+		};
+
+		authentificate();
+	}, []);
+
+
+	const login = async (token: string) => {
+		localStorage.removeItem('token');
+		localStorage.setItem('token', token);
+		setAuthToken(token);
+		const newChatSocket = io("http://localhost:4000", {
+			autoConnect: false,
+			auth: { token: token }
 		});
-		if (!response.ok) throw new Error('Réponse non OK du serveur');
-		const userData = await response.json();
-		if ('need2fa' in userData) {
-			setInfo2FA(userData as Info2FA)
-		}
-		else if (Object.keys(userData).length !== 0) {
-			setUser(userData); // Utilisateur connecté
-		}
-		else {
-			setUser(null);
-		}
-		
-	  } catch (error) {
+		const socket = io("http://localhost:4000/game",
+			{
+				auth: {
+					token: token
+				}
+			});
+		setChatSocket(newChatSocket);
+		setSocket(socket)
+	};
+
+
+
+	const logout = () => {
+		if (chatSocket) chatSocket.disconnect()
+		if (socket) socket.disconnect()
+		localStorage.clear()
+		setAuthToken(null);
 		setUser(null)
-	  } finally {
-		setIsLoading(false);
-	  }
 	};
-  
-	const authentificate = async () => {
-		if (user) return
-		if (authToken) return
-		const tokenSession = tokenUrl || localStorage.getItem('token');
-		if (tokenSession) {
-			await getUserData(tokenSession);
-			await login(tokenSession);
-		}
-		setIsLoading(false);
-	};
-  
-	authentificate();
-  }, []);
 
-
-  const login = async (token:string) => {
-	localStorage.removeItem('token');
-    localStorage.setItem('token', token);
-    setAuthToken(token);
-	const newChatSocket = io("http://localhost:4000", {
-		autoConnect: false,
-		auth: { token: token }
-		});
-	const socket = io("http://localhost:4000/game",
-	{
-		auth: {
-			token: token
-		}
-	});
-	setChatSocket(newChatSocket);
-	setSocket(socket)
-  };
-
-
-
-  const logout = () => {
-	if (chatSocket)	chatSocket.disconnect()
-	if (socket)	socket.disconnect()
-	localStorage.clear()
-	setAuthToken(null);
-	setUser(null)
-};
-
-useEffect(() => {
-	if (!user || !chatSocket) return
-		console.log("is connected + " + isConnected)
+	useEffect(() => {
+		if (!user || !chatSocket) return
 		chatSocket.connect();
 		socket.connect();
 		chatSocket.on('connect', () => {
 
 			setIsConnected(true);
 			const updatedUser = { ...user, socketId: chatSocket.id };
-			setUser(updatedUser); 
-			try{
+			setUser(updatedUser);
+			try {
 				const savedChannels: ChannelCreate[] = JSON.parse(localStorage.getItem('channels') || '[]');
 				const updatedChannels = savedChannels.map(channel => {
 					return {
-						...channel, 
+						...channel,
 						user: updatedUser
 					};
 				});
-				if (updatedChannels && updatedUser)
-				{
-				updatedChannels.forEach((channel) => {
-					chatSocket.emit('join_channel', channel);
-				});
-			}
-			}catch (error) {
+				if (updatedChannels && updatedUser) {
+					updatedChannels.forEach((channel) => {
+						chatSocket.emit('join_channel', channel);
+					});
+				}
+			} catch (error) {
 				console.error('Error parsing JSON from localStorage:', error);
 				console.error('Data that caused the error:', localStorage.getItem('channels'));
 				// Gérez l'erreur ou initialisez savedChannels à une valeur par défaut
 			}
-			
+
 
 		});
-	
+
 		chatSocket.on('disconnect', () => {
 			setIsConnected(false);
-			console.log("je me deco")
 		});
-	
+
 		chatSocket.on('chat', (e) => {
 			setMessages((messages) => [...messages, e]);
-			console.log("nouveau message")
-			console.log(e)
 		});
-		
+
 		chatSocket.on('notif', (e) => {
 			if (e.message)
-			showNotification("Chat", e.message, e.type)
+				showNotification("Chat", e.message, e.type)
 			recharger()
 		})
 
@@ -212,42 +205,42 @@ useEffect(() => {
 			chatSocket.off('disconnect');
 			chatSocket.off('chat');
 		};
-}, [chatSocket]);
+	}, [chatSocket]);
 
 
 
-return (
-    <AuthContext.Provider value={{ 
-		user, 
-		setUser, 
-		isLoading, 
-		login, 
-		logout, 
-		authToken, 
-		setAuthToken, 
-		chatSocket, 
-		messages, 
-		setMessages,
-		recharger,
-		forceReload,
-		info2FA,
-		setInfo2FA,
-		socket,
-		setSocket,
-		inLobby,
-		setInLobby,
-		lobbyData,
-		setLobbyData,
-		gameStarted,
-		setGameStarted,
-		showScoreRanking,
-		setShowScoreRanking,
-		isReady,
-		setIsReady,
+	return (
+		<AuthContext.Provider value={{
+			user,
+			setUser,
+			isLoading,
+			login,
+			logout,
+			authToken,
+			setAuthToken,
+			chatSocket,
+			messages,
+			setMessages,
+			recharger,
+			forceReload,
+			info2FA,
+			setInfo2FA,
+			socket,
+			setSocket,
+			inLobby,
+			setInLobby,
+			lobbyData,
+			setLobbyData,
+			gameStarted,
+			setGameStarted,
+			showScoreRanking,
+			setShowScoreRanking,
+			isReady,
+			setIsReady,
 		}}>
-      {children}
-    </AuthContext.Provider>
-  );
+			{children}
+		</AuthContext.Provider>
+	);
 };
 
 /**
@@ -257,9 +250,9 @@ return (
  * @throws Error if used outside of an AuthProvider.
  */
 export const useAuth = (): AuthContextType => {
-    const context = useContext(AuthContext);
-    if (!context) {
-      throw new Error('useAuth doit être utilisé au sein d’un AuthProvider');
-    }
-    return context;
+	const context = useContext(AuthContext);
+	if (!context) {
+		throw new Error('useAuth doit être utilisé au sein d’un AuthProvider');
+	}
+	return context;
 };
