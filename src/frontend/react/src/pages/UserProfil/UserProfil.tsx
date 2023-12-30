@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from "react";
 import { useParams } from 'react-router-dom';
 import "./UserProfil.css";
+import DefaultProfilePic from "../../assets/default-profile.png";
 import { useAuth } from "../../context/AuthContexte";
 import { Link } from "react-router-dom";
 import FriendshipButton from "../../components/FriendshipButton/FriendshipButton";
@@ -259,7 +260,7 @@ useEffect(() => {
     return (
 		<main className="user-profile-container">
 			<div className="profile-header">
-				<img src={userInfo.imageURL} alt={userInfo.pseudo} className="profile-pic"/>
+				<img src={userInfo.imageURL || DefaultProfilePic} alt={userInfo.pseudo} className="profile-pic"/>
 				<h1>{userInfo.firstname} {userInfo.lastname}
 					<span className='channel_status'>
 						<div className={isConnected ? "status_indicator connected" : "status_indicator"}></div>
@@ -275,7 +276,7 @@ useEffect(() => {
 				
 			</div>
 			<div className="friend-action">
-            {friendshipStatus === 'notFriend' && (
+            {friendshipStatus === 'notFriend' && user?.id !== userInfo?.id &&  (
             <FriendshipButton
                 status={'addFriend'}
                 onButtonClick={ handleAddFriendClick}
@@ -291,7 +292,7 @@ useEffect(() => {
                 />
             )}
 
-            {friendshipStatus !== 'blocked' && (
+            {friendshipStatus !== 'blocked' && user?.id !== userInfo?.id && (
             <FriendshipButton
                 status={'block'}
                 onButtonClick={handleBlockUserClick}
@@ -312,8 +313,11 @@ useEffect(() => {
 
 
 			</div>
-			<div className="mp">
+			<div className="mp">{
+                user?.id !== userInfo?.id && (
 				<button onClick={triggerMp}>Envoyer un mp</button>
+                )
+            }
 			</div>
 		</main>
   );
