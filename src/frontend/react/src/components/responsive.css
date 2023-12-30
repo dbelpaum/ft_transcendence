@@ -128,6 +128,11 @@ nav .menu{
 		margin-top: 40px;
 	  }
 
+	.buttonContainer.lobby
+	{
+		justify-content: flex-start;
+	}
+
 }
 
 @media screen AND (max-width: 570px) {
@@ -149,6 +154,10 @@ nav .menu{
 	{
 		margin: 0px;
 		margin-bottom: 14px;
+	}
+
+	.buttonContainer.lobby{
+		margin-top: 218px;
 	}
 	
 }

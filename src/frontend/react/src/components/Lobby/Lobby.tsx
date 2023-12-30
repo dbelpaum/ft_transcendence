@@ -3,6 +3,7 @@ import { SocketContext } from "../../pages/Game/SocketContext";
 import { Socket } from "socket.io-client";
 import "./Lobby.css";
 import { showNotificationSuccess } from "../../pages/Game/Notification";
+import { PulseLoader } from "react-spinners";
 
 interface LobbyProps {
 	lobbyData: {
@@ -49,7 +50,13 @@ const Lobby: React.FC<LobbyProps> = ({
 	};
 
 	return (
-		<div className="lobbyDiv">
+		<div className="buttonContainer lobby">
+			<div className="video-background">
+				<video autoPlay loop muted style={{ width: '100%', height: '100%', objectFit: 'cover' }}>
+					{/* Utilisez un lien ou un fichier local */}
+					<source src={'./pong_example.mp4'} type="video/mp4" />
+				</video>
+        	</div>
 			<h1 className="roomName">{lobbyData.name}'s room</h1>
 			<div>
 				<span className="roomCode">Room code:</span>{" "}
@@ -66,13 +73,16 @@ const Lobby: React.FC<LobbyProps> = ({
 						<p className="pseudo">{lobbyData.guest.pseudo}</p>
 						{lobbyData.playersState[lobbyData.guest.socketId] ? "✅" : "❌"}</>
 					}
-					{!lobbyData.guest && <p>Waiting for opponent</p>}
+					{!lobbyData.guest && <PulseLoader size={10} color={"#ffffff"} />}
 				</div>
 			</div>
-			<button onClick={handleReadyToggle} className={isReady ? "unreadyButton" : "readyButton"}>
-				{isReady ? "Unready" : "Ready"}
-			</button>
-			<button onClick={handleLeaveLobby} className="leaveLobbyButton">Leave Lobby</button>
+			<div className="buttonLobby">
+				<button onClick={handleReadyToggle} className={isReady ? "unreadyButton" : "readyButton"}>
+					{isReady ? "Unready" : "Ready"}
+				</button>
+				<button onClick={handleLeaveLobby} className="leaveLobbyButton">Leave Lobby</button>
+
+			</div>
 		</div>
 	);
 };
