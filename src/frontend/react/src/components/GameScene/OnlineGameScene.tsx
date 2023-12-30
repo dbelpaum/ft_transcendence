@@ -44,13 +44,12 @@ const OnlineGameScene: React.FC<OnlineGameSceneProps> = ({
 		}
 	}, [width, height, isHost, socket]);
 
-	const label = { inputProps: { 'aria-label': 'WWWWWWWW' } };
+	const label = { inputProps: { 'aria-label': '' } };
 	const handleCameraSwitch = () => {
-		setIs3DCamera((prev) => !prev); // Toggle the camera mode
+		setIs3DCamera((prev) => !prev);
 		if (onlineGame) {
 			onlineGame.switchCamera();
 		}
-		console.log(is3DCamera);
 	};
 
 	return (

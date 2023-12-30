@@ -54,7 +54,6 @@ const Game: React.FC = () => {
 		});
 
 		socket.on("server.lobby.state", (data: any) => {
-			console.log("Received Lobby State:", data);
 			setInLobby(true);
 			setLobbyData(data);
 		});
