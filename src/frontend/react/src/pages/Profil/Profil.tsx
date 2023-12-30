@@ -8,7 +8,7 @@ import { Link } from 'react-router-dom';
 import { User } from '../../context/AuthInteface';
 import FriendshipList from '../../components/FriendshipList/FriendshipList';
 import Button2FA from '../../components/2FA/Button2FA';
-
+import ProfilePicture from '../../components/ProfilePicture/ProfilePicture';
 
 interface UserInfo {
   pseudo: string;
@@ -72,7 +72,7 @@ function Profil() {
         {userInfo && (
           <>
             <div className="profil-image-container">
-              <img src={userInfo.imageURL || 'default-profile.png'} alt="Profil" />
+            {userId && <ProfilePicture id42={userId} />}
             </div>
             
             <EditableTextField
