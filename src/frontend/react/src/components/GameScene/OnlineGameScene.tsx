@@ -54,9 +54,23 @@ const OnlineGameScene: React.FC<OnlineGameSceneProps> = ({
 	};
 
 	return (
-		<div>
-			<canvas ref={canvasRef} width={width} height={height} tabIndex={0} />
-			<Switch {...label} checked={is3DCamera} onChange={handleCameraSwitch} />
+		<div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+			<div style={{ marginBottom: '10px' }}>
+				<canvas ref={canvasRef} width={width} height={height} tabIndex={0} />
+			</div>
+			<div style={{ display: 'flex', alignItems: 'center', border: '1px solid white', padding: '10px', borderRadius: '5px', background: '#666666' }}>
+				<div style={{ marginRight: '10px', fontSize: '18px', color: 'white' }}>
+					2D
+				</div>
+				<Switch
+					{...label}
+					checked={is3DCamera}
+					onChange={handleCameraSwitch}
+				/>
+				<div style={{ marginLeft: '10px', fontSize: '18px', color: 'white' }}>
+					3D
+				</div>
+			</div>
 		</div>
 	);
 };
