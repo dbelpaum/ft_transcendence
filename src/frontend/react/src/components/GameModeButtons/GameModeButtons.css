@@ -2,13 +2,24 @@
 	display: flex;
 	justify-content: space-between;
 	align-items: center;
-	width: 300px;
+	max-width: 960px;
+	width: 70%;
+	position: relative;
+	overflow: hidden;
+	flex-direction: column;
 }
 
 .buttonColumn {
 	display: flex;
-	flex-direction: column;
 	align-items: center;
+	justify-content: space-around;
+	min-height: 70vh;
+}
+
+.buttonColumn .join
+{
+	display: flex;
+	flex-direction: column;
 }
 
 .buttonStyle {
@@ -35,4 +46,105 @@
 	border-radius: 8px;
 	border: 1px solid #ccc;
 	margin: 10px;
+}
+
+.video-background {
+    position: absolute; 
+    top: 0;
+    left: 0;
+    min-width: 100%;
+    min-height: 100%;
+    z-index: -1; /* Pour placer la vidéo derrière tout le contenu */
+	filter: blur(5px)  brightness(120%) contrast(100%);
+	object-fit: cover; /* Assure que la vidéo couvre toute la zone */
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+
+.button-card {
+    position: relative;
+    width: 200px;
+    height: 60px;
+    overflow: hidden;
+    margin: 20px;
+    border-radius: 10px;
+    transition: 0.3s ease;
+
+}
+
+.button-card-content {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 100%;
+    height: 100%;
+    text-align: center;
+	transition: 1s ease;
+}
+
+.button-card button {
+    width: 100%;
+    height: 100%;
+    border: none;
+    background-color: #007bff;
+    color: white;
+	font-size: 20px;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+	transition: 1s ease;
+
+}
+
+.button-card:hover {
+    transform: scale(1.2);
+}
+
+.button-card .hover-text {
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    margin-top: 70px; /* Position initiale du texte caché */
+    color: white;
+}
+
+.button-card:hover .hover-text {
+    opacity: 1;
+}
+
+.button-card:hover button {
+    background-color: #0056b3; /* Changement de couleur au survol */
+}
+
+.button-card .create-room
+{
+	background-color: #111;
+}
+
+.button-card .create-room:hover
+{
+	background-color: #000;
+}
+
+.joinButton
+{
+	transition: 0.3s ease;
+}
+
+.joinButton:hover
+{
+	transform: scale(1.2) !important;
+}
+
+.join button
+{
+	background-color: #4fa34f;
+}
+
+.join:hover button
+{
+	background-color: #316b31;
+
 }

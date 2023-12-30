@@ -5,7 +5,9 @@ nav .menu{
 	z-index: 2;
 }
 @media screen AND (max-width: 1200px) {
-	
+	.buttonContainer{
+		width: 90%;
+	}
 }
 
 @media screen AND (max-width: 960px) {
@@ -85,6 +87,19 @@ nav .menu{
 		display: flex;
   		justify-content: center;
 	}
+
+	.buttonContainer
+	{
+		flex-direction: column;
+		justify-content: flex-start;
+		margin-top: 50px;
+	}
+
+	.buttonColumn{
+		flex-direction: column;
+		justify-content: start;
+		padding-top: 40px;
+	}
 }
 
 @media screen AND (max-width: 700px) {
@@ -112,6 +127,7 @@ nav .menu{
 	.profil-container .profil-image-container {
 		margin-top: 40px;
 	  }
+
 }
 
 @media screen AND (max-width: 570px) {
@@ -127,6 +143,12 @@ nav .menu{
 	.modal-code-2fa h2{
 		word-break: break-word;
 		font-size: 26px;
+	}
+
+	.button-card
+	{
+		margin: 0px;
+		margin-bottom: 14px;
 	}
 	
 }

@@ -6,6 +6,9 @@ import { showNotificationSuccess, showNotificationWarning } from "../../pages/Ga
 import { PulseLoader } from "react-spinners";
 import ScorePage from "../../pages/Game/Scores/ScorePage";
 import { useLocation } from 'react-router-dom';
+import MatchMackingButton from "./MatchMakingButton";
+import CreateRoomButton from "./CreateRoomButton";
+import JoinRoomButton from "./JoinRoomButton";
 
 const GameModeButtons: React.FC = () => {
 	const socket = useContext(SocketContext) as unknown as Socket;
@@ -89,37 +92,19 @@ const GameModeButtons: React.FC = () => {
 
 	return (
 		<div className="buttonContainer">
+			<div className="video-background">
+				<video autoPlay loop muted style={{ width: '100%', height: '100%', objectFit: 'cover' }}>
+					{/* Utilisez un lien ou un fichier local */}
+					<source src={'./pong_example.mp4'} type="video/mp4" />
+				</video>
+        	</div>
 			<div className="buttonColumn">
-				<div>
-					<button className="buttonStyle" onClick={handleMatchmaking}>
-						Matchmaking {isMatchmaking && <PulseLoader size={10} color={"#ffffff"} />}
-					</button>
-				</div>
-				<div>
-					<button
-						className={`buttonStyle ${isMatchmaking ? "darkened" : ""}`}
-						onClick={handleCreateRoom}
-					>
-						Create Room
-					</button>
-				</div>
-
-				<div>
-					<button
-						className={`buttonStyle ${isMatchmaking ? "darkened" : ""}`}
-						onClick={handleJoinRoom}
-					>
-						Join Room
-					</button>
-				</div>
-				<input
-					placeholder="Room Code"
-					onKeyDown={handleKeyDown}
-					className="inputBar"
-					value={roomCode}
-					onChange={handleRoomCodeChange}
-				></input>
+				<MatchMackingButton isMatchmaking={isMatchmaking} handleMatchmaking={handleMatchmaking}/>
+				<CreateRoomButton isMatchmaking={isMatchmaking} handleCreateRoom={handleCreateRoom}/>
+				<JoinRoomButton isMatchmaking={isMatchmaking} handleJoinRoom={handleJoinRoom} handleKeyDown={handleKeyDown} roomCode={roomCode} handleRoomCodeChange={handleRoomCodeChange}/>
 				{/* Bouton pour ouvrir/fermer la superposition du classement */}
+			</div>
+			<div>
 				<button onClick={toggleScoreRanking}>Voir le classement</button>
 				{/* Superposition modale du classement des scores */}
 				<div
