@@ -173,6 +173,7 @@ export class Instance {
 				[this.guestPseudo]: this.scores[this.guestPseudo],
 			}
 		});
+		this.lobby.lobbyManager.deleteLobby(this.lobby.id);
 		this.stopGameRuntime();
 		// enregistrerScores(this.lobby.hostSocketId, this.lobby.guestSocketId, this.scores[this.lobby.hostSocketId], this.scores[this.lobby.guestSocketId])
 		// 	.then((nouveauScore) => {

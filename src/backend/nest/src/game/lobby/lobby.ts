@@ -29,7 +29,7 @@ export class Lobby {
 		private readonly server: Server,
 		public readonly mode: string,
 		public readonly id: string,
-		private readonly lobbyManager: LobbyManager
+		public readonly lobbyManager: LobbyManager
 	) { }
 
 	public addClient(client: AuthenticatedSocket): void {
