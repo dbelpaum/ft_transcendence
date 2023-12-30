@@ -96,7 +96,6 @@ export class UserController {
             where: { id42: Number(id) },
             select: { imageURL: true },
         });
-        console.log("Requete bien recue : " + user.imageURL)
         return user ? user.imageURL : null;
     }
 
@@ -159,8 +158,24 @@ export class UserController {
         },
       }),
     }))
+    
+
     async uploadProfilePic(@Param('id') id: string, @UploadedFile() file: Express.Multer.File) {
-      const imagePath = `http://localhost:4000/uploads/profilepics/${file.filename}`;
+        const user = await this.prisma.user.findUnique({
+            where: { id42: Number(id) },
+            select: { imageURL: true },
+          });
+    
+          if (user && user.imageURL) {
+            try {
+              const filePath = './uploads/profilepics/' + user.imageURL.split('/').pop();
+              await unlinkAsync(filePath);
+            } catch (error) {
+              console.error('Erreur lors de la suppression de l\'image:', error);
+            }
+          }
+      
+        const imagePath = `http://localhost:4000/uploads/profilepics/${file.filename}`;
       return await this.prisma.user.update({
         where: { id42: Number(id) },
         data: { imageURL: imagePath },
@@ -187,7 +202,7 @@ export class UserController {
 
       return await this.prisma.user.update({
         where: { id42: Number(id) },
-        data: { imageURL: "http://localhost:4000/assets/default-profile.png" },
+        data: { imageURL: null },
       });
     }
 }

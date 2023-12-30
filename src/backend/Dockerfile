@@ -2,7 +2,6 @@ FROM node:21
 WORKDIR /app
 RUN npm i -g @nestjs/cli
 
-COPY ./default-profile.png  /app/assets/
 
 COPY ./conf/nest_cert.pem /var/nest_cert.pem
 COPY ./conf/nest_key.pem /var/nest_key.pem

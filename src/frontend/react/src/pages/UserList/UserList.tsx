@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import './UserList.css';
+import DefaultProfilPicture from '../../assets/default-profile.png';
 import UserProfile from '../UserProfil/UserProfil';
 import { User } from '../../context/AuthInteface';
 
@@ -19,7 +20,7 @@ const UserList: React.FC = () => {
         <div className="user-list">
             {users.map(user => (
                 <div key={user.id42} className="user-item">
-                    <img src={user.imageURL} alt="Profile" className="profile-pic" />
+                    <img src={user.imageURL || DefaultProfilPicture} alt="Profile" className="profile-pic" />
                     <h3><a href={`/users/${user.pseudo}`}>{user.pseudo}</a></h3>
                     <p>{user.email}</p>
                     

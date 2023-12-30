@@ -1,4 +1,5 @@
 import React, { useState , useEffect} from 'react';
+import DefaultProfilePic from '../../assets/default-profile.png';
 import ProfilePictureUploader from '../ProfilePictureUploader/ProfilePictureUploader';
 
 interface ProfilePictureProps {
@@ -19,7 +20,8 @@ const ProfilePicture: React.FC<ProfilePictureProps> = ({ id42 }) => {
                     return response.text();
                 })
                 .then(imageUrl => {
-                    setProfilePicUrl(imageUrl);
+                   
+                        setProfilePicUrl(imageUrl);
                 })
                 .catch(error => {
                     console.error('Erreur lors de la récupération de l\'image:', error);
@@ -46,7 +48,7 @@ const ProfilePicture: React.FC<ProfilePictureProps> = ({ id42 }) => {
     return (
         <div>
             <img
-                src={profilePicUrl || 'default-profile.png'}
+                src={ profilePicUrl ||DefaultProfilePic}
                 alt="Profile"
                 style={{ cursor: 'pointer', width: '100px', height: '100px' }}
                 onClick={handleClick}
