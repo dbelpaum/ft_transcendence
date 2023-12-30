@@ -126,9 +126,6 @@ export class OnlineGameLogic {
 				this.paddleRightSpeed = this.paddleVelocity;
 				this.socket.emit("client.game.move", { movingLeft: false, movingRight: true });
 				break;
-			case "r":
-				this.switchCamera();
-				break;
 			default:
 				break;
 		}
@@ -152,7 +149,7 @@ export class OnlineGameLogic {
 		}
 	}
 
-	private switchCamera() {
+	public switchCamera() {
 		if (this.cameraInUse.id === 0) {
 			this.cameraInUse.camera = this.camera3D;
 			this.cameraInUse.id = 1;
