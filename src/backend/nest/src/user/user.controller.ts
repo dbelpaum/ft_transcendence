@@ -10,12 +10,17 @@ import {
     UseInterceptors,
     Res,
     Response,
+    Delete,
   } from '@nestjs/common';
   import {Express} from 'express';
 import { AuthGuard } from '@nestjs/passport';
 import { PrismaService } from 'src/prisma.service';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
+import { promisify } from 'util';
+import * as fs from 'fs';
+
+const unlinkAsync = promisify(fs.unlink);
 
 
 @Controller('user')
@@ -143,9 +148,8 @@ export class UserController {
         });
     }
 
-
     @Post(':id/image')
-    // @UseGuards(AuthGuard('jwt'))
+    @UseGuards(AuthGuard('jwt'))
     @UseInterceptors(FileInterceptor('image', {
       storage: diskStorage({
         destination: './uploads/profilepics',
@@ -163,5 +167,28 @@ export class UserController {
       });
     }
 
+    @Delete(':id/image')
+    @UseGuards(AuthGuard('jwt'))
+    async deleteProfilePic(@Param('id') id: string) {
+      const user = await this.prisma.user.findUnique({
+        where: { id42: Number(id) },
+        select: { imageURL: true },
+      });
+
+      if (user && user.imageURL) {
+        try {
+          const filePath = './uploads/profilepics/' + user.imageURL.split('/').pop();
+          await unlinkAsync(filePath);
+        } catch (error) {
+          console.error('Erreur lors de la suppression de l\'image:', error);
+        }
+      }
+  
+
+      return await this.prisma.user.update({
+        where: { id42: Number(id) },
+        data: { imageURL: "http://localhost:4000/assets/default-profile.png" },
+      });
+    }
 }
 

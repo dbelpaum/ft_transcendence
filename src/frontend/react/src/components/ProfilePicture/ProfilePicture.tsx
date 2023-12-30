@@ -7,8 +7,8 @@ interface ProfilePictureProps {
 
 const ProfilePicture: React.FC<ProfilePictureProps> = ({ id42 }) => {
     const [isUploaderVisible, setUploaderVisible] = useState(false);
-    const [profilePicUrl, setProfilePicUrl] = useState('default-profile.png');
-    // URL de l'image de profil actuelle
+    const [profilePicUrl, setProfilePicUrl] = useState('');
+
     useEffect(() => {
         if (id42) {
             fetch(`http://localhost:4000/user/${id42}/image`)
@@ -16,7 +16,7 @@ const ProfilePicture: React.FC<ProfilePictureProps> = ({ id42 }) => {
                     if (!response.ok) {
                         throw new Error(`Erreur réseau: ${response.status}`);
                     }
-                    return response.text(); // Utiliser text() au lieu de json()
+                    return response.text();
                 })
                 .then(imageUrl => {
                     setProfilePicUrl(imageUrl);
@@ -27,14 +27,18 @@ const ProfilePicture: React.FC<ProfilePictureProps> = ({ id42 }) => {
         }
     }, [id42]);
     
+    
+    const handleUploadSuccess = (newImageUrl: string) => {
+        setUploaderVisible(false);
+        // setProfilePicUrl(newImageUrl);
+    };
     console.log('Profil url:' + profilePicUrl);
 
-    const handleUploadSuccess = (newImageUrl: string) => {
-        setProfilePicUrl(newImageUrl);
-        setUploaderVisible(false);
-    };
-
     const handleClick = () => {
+        if (isUploaderVisible === true) {
+            setUploaderVisible(false);
+            return;
+        }
         setUploaderVisible(true);
     };
 
