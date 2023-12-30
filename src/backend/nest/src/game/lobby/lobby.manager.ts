@@ -32,7 +32,7 @@ export class LobbyManager {
 			  });
 			
 			  if (!user) {
-				throw new Error("User not found");
+				return
 			  }
 			const imageURL =  (user && user.imageURL) ? user.imageURL : "https://upload.wikimedia.org/wikipedia/commons/thumb/0/08/MCM_London_May_15_-_Stormtrooper_%2818246218651%29.jpg/1280px-MCM_London_May_15_-_Stormtrooper_%2818246218651%29.jpg"
 			client.auth = {

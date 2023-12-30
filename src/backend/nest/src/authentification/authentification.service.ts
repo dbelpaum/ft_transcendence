@@ -21,9 +21,6 @@ export class AuthentificationService {
 
         const secret = authenticator.generateSecret();
         const otpauthUrl = authenticator.keyuri(user.email, process.env.AUTH_NAME, secret);
-		console.log(user.email)
-		console.log(otpauthUrl)
-		console.log(process.env.AUTH_NAME)
 		const qrCode = await this.generateQrCodeDataURL(otpauthUrl)
         await this.prisma.user.update({
             where: { id: userId },

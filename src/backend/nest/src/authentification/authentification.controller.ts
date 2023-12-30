@@ -1,5 +1,5 @@
 // auth.controller.ts
-import { Controller, Get, Req, Res, UseGuards, Query, Post, Body } from '@nestjs/common';
+import { Controller, Get, Req, Res, UseGuards, Query, Post, Body, UseInterceptors } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { Request, Response } from 'express';
 import { PrismaService } from '../prisma.service';
@@ -7,6 +7,7 @@ import { JwtStrategy } from './jwt.strategy';
 import { JwtService } from '@nestjs/jwt';
 import { AuthentificationService } from './authentification.service';
 import { UserTokenInfo } from 'src/chat/chat.interface';
+import { MutexInterceptor } from './mutex.interceptor';
 
 @Controller('authentification')
 export class AuthentificationController {
@@ -20,8 +21,9 @@ export class AuthentificationController {
 		return new Promise(resolve => setTimeout(resolve, ms));
 	  }
 	  
-	private async tryFetch(url, options, maxAttempts = 2, delayDuration = 1000) {
+	private async tryFetch(url, options, maxAttempts = 2, delayDuration = 1200) {
 		try {
+			await this.delay(delayDuration)
 			const response = await fetch(url, options);
 			if (!response.ok) {
 			throw new Error(`API responded with status ${response.status}`);
@@ -37,8 +39,10 @@ export class AuthentificationController {
 		}
 	}
   @Get('42')
+  @UseInterceptors(new MutexInterceptor())
   @UseGuards(AuthGuard('42'))
-  async login42(@Req() req, ) {
+  	async login42(@Req() req, ) {
+		
     // L'utilisateur est automatiquement authentifié ici
   }
 
@@ -49,6 +53,7 @@ export class AuthentificationController {
   }
 
   @Get('42/callback')
+  @UseInterceptors(new MutexInterceptor())
   @UseGuards(AuthGuard('42'))
   async callback42(@Req() req, @Res() res: Response) {
 	try{

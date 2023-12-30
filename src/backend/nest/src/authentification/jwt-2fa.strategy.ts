@@ -12,7 +12,14 @@ export class JwtStrategy2FA extends PassportStrategy(Strategy, "jwt2fa") {
     });
   }
 
+
   async validate(payload: any) {
-	return payload
+	try {
+		return payload
+		// Logique de validation ici
+	  } catch (error) {
+		// Gérer l'erreur
+		return false
+	  }
   }
 }

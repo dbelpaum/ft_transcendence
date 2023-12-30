@@ -9,6 +9,7 @@ import { JwtStrategy } from './jwt.strategy';
 import { ErrorHandlingMiddleware } from './fortytwo/error-handling.middleware';
 import { AuthentificationService } from './authentification.service';
 import { JwtStrategy2FA } from './jwt-2fa.strategy';
+import { MutexInterceptor } from './mutex.interceptor';
 
 @Module({
 	imports: [
@@ -20,7 +21,7 @@ import { JwtStrategy2FA } from './jwt-2fa.strategy';
 		// Ajoutez d'autres modules si nécessaire
 	  ],
   controllers: [AuthentificationController],
-  providers: [FortyTwoService, PrismaService, JwtStrategy, JwtStrategy2FA, AuthentificationService],
+  providers: [FortyTwoService, PrismaService, JwtStrategy, JwtStrategy2FA, AuthentificationService, MutexInterceptor],
 })
 
 export class AuthentificationModule implements NestModule {

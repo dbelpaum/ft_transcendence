@@ -13,7 +13,13 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
   }
 
   async validate(payload: any) {
-	if (payload.isConnected) return payload
-	return false
+	try {
+		if (payload.isConnected) return payload
+		return false
+		// Logique de validation ici
+	  } catch (error) {
+		// Gérer l'erreur
+		return false
+	  }
   }
 }
