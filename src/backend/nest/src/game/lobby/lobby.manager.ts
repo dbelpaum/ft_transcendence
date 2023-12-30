@@ -1,5 +1,5 @@
 import { Server } from "socket.io";
-import { Lobby } from "./lobby";
+import { Lobby, ScoreService } from "./lobby";
 import { AuthenticatedSocket } from "../types";
 import { Cron } from "@nestjs/schedule";
 import { ServerException } from "../ServerExceptions";
@@ -8,9 +8,10 @@ import { LobbyMode } from "./types";
 import { ServerEvents } from "../shared/server/ServerEvents";
 import { jwtDecode } from "jwt-decode";
 
-
+ 
 export class LobbyManager {
 	public server: Server;
+	public scoreService: ScoreService;
 
 	private readonly lobbies: Map<Lobby["id"], Lobby> = new Map<
 		Lobby["id"],
@@ -53,7 +54,7 @@ export class LobbyManager {
 	}
 
 	public createLobby(mode: LobbyMode): Lobby {
-		const lobby = new Lobby(this.server, mode, this.getUniqueCode(), this);
+		const lobby = new Lobby(this.server, mode, this.getUniqueCode(), this, this.scoreService);
 		this.lobbies.set(lobby.id, lobby);
 		console.log("Created lobby %s", lobby.id);
 		return lobby;

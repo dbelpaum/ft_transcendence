@@ -13,11 +13,12 @@ import { UserController } from './user/user.controller';
 import * as session from 'express-session';
 import { GameModule } from './game/game.module';
 import { FriendshipController } from './friendship/friendship.controller';
+import { ScoreController, ScoreService } from './score/score.controller';
 
 @Module({
   imports: [AuthentificationModule, ChatModule, ChannelModule, ScheduleModule.forRoot(), GameModule],
-  controllers: [AppController, SamTestController, LogoutController, UserController, FriendshipController],
-  providers: [AppService, PrismaService],
+  controllers: [AppController, SamTestController, LogoutController, UserController, FriendshipController, ScoreController],
+  providers: [AppService, PrismaService, ScoreService],
 })
 
 export class AppModule implements NestModule {

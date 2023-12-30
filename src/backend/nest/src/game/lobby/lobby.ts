@@ -1,7 +1,7 @@
 // lobby.ts
 import { AuthenticatedSocket } from "../types";
 import { Server, Socket } from "socket.io";
-import { Instance } from "../instance/instance";
+import { Instance, ScoreService } from "../instance/instance";
 import { ServerEvents } from "../shared/server/ServerEvents";
 import { ServerPayloads } from "../shared/server/ServerPayloads";
 import { LobbyManager } from "./lobby.manager";
@@ -16,7 +16,8 @@ export class Lobby {
 		Socket["id"],
 		AuthenticatedSocket
 	>();
-	public readonly instance: Instance = new Instance(this);
+	
+	public readonly instance: Instance = new Instance(this, this.scoreService);
 	public readonly readyStatus: Map<Socket["id"], boolean> = new Map<
 		Socket["id"],
 		boolean
@@ -29,7 +30,9 @@ export class Lobby {
 		private readonly server: Server,
 		public readonly mode: string,
 		public readonly id: string,
-		private readonly lobbyManager: LobbyManager
+		private readonly lobbyManager: LobbyManager,
+		private readonly scoreService: ScoreService // Ajoutez ScoreService en tant qu'argument ici
+		
 	) { }
 
 	public addClient(client: AuthenticatedSocket): void {
@@ -137,3 +140,5 @@ export class Lobby {
 		}
 	}
 }
+
+export {ScoreService};

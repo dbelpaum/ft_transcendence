@@ -5,11 +5,12 @@ import { ServerEvents } from "../shared/server/ServerEvents";
 import { Server } from "http";
 import { ClientMovementDto } from "../dtos";
 import { Ball, Paddle } from "./types";
-import { enregistrerScores } from "../score/score.controller";
+import { ScoreService } from '../../score/score.controller';
+
 const TICK_RATE = 1000 / 60; // 60 updates per second
 const PADDLE_SPEED = 3.75;
 const BALL_SPEED_INCREMENT = 0.0003;
-const BALL_DEFAULT_SPEED = 2;
+const BALL_DEFAULT_SPEED = 20;
 const WIDTH = 600;
 const HEIGHT = 800;
 
@@ -26,7 +27,7 @@ export class Instance {
 	private updateInterval: NodeJS.Timeout | null = null;
 	private hostPseudo: string;
 	private guestPseudo: string;
-	constructor(private readonly lobby: Lobby) {
+	constructor(private readonly lobby: Lobby, public scoreService: ScoreService) {
 		this.ball = {
 			radius: 5,
 			speedModifier: BALL_DEFAULT_SPEED,
@@ -171,13 +172,13 @@ export class Instance {
 			}
 		});
 		this.stopGameRuntime();
-		enregistrerScores(this.lobby.host.auth.id.toString(), this.lobby.guest.auth.id.toString(), this.scores[this.hostPseudo], this.scores[this.guestPseudo])
-			.then((nouveauScore) => {
-				console.log('New score added:', nouveauScore);
-			})
-			.catch((erreur) => {
-				console.error('Error during adding score in db', erreur);
-			})
+
+			this.scoreService.enregistrerScores(
+			  this.lobby.host.auth.id,
+			  this.lobby.guest.auth.id,
+			  this.scores[this.hostPseudo],
+			  this.scores[this.guestPseudo]
+			);
 	}
 
 	private gameRuntime(): void {
@@ -255,3 +256,4 @@ export class Instance {
 		});
 	}
 }
+export {ScoreService};
