@@ -59,9 +59,6 @@ async getFriendsAndBlocked(@Param('userId') userId: string) {
         }
     });
 
-    console.log("friends:", JSON.stringify(friends, null, 2));
-	console.log("blocked:", JSON.stringify(blocked, null, 2));
-
     return { friends, blocked };
 }
 
