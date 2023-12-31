@@ -149,6 +149,24 @@ export class OnlineGameLogic {
 		}
 	}
 
+	private handleResize() {
+		if (window.innerWidth < 500) { // Mobile
+			this.width = window.innerWidth * 0.9;
+			this.height = window.innerHeight * 0.9;
+		}
+		else if (window.innerWidth < 1000) { // Tablet
+			this.width = window.innerWidth * 0.8;
+			this.height = window.innerHeight * 0.7;
+		}
+		else { // Desktop
+			this.width = window.innerWidth * 0.6;
+			this.height = window.innerHeight * 0.6;
+		}
+		console.log("Inner width: " + window.innerWidth + ", Inner height: " + window.innerHeight);
+		console.log("Resizing to: " + this.width + "x" + this.height);
+		this.renderer.setSize(this.width, this.height);
+	}
+
 	public switchCamera() {
 		if (this.cameraInUse.id === 0) {
 			this.cameraInUse.camera = this.camera3D;
@@ -263,16 +281,18 @@ export class OnlineGameLogic {
 		})
 
 		this.animate();
+		this.handleResize();
 
 		// Add event listeners for keydown and keyup
 		window.addEventListener("keydown", this.handleKeyDown.bind(this));
 		window.addEventListener("keyup", this.handleKeyUp.bind(this));
+		window.addEventListener("resize", this.handleResize.bind(this));
 	}
 
 	public dispose(): void {
 		window.removeEventListener("keydown", this.handleKeyDown);
 		window.removeEventListener("keyup", this.handleKeyUp);
-		// window.removeEventListener('resize', handleResize);
+		window.removeEventListener('resize', this.handleResize);
 		this.renderer.dispose();
 	}
 }
