@@ -8,24 +8,43 @@ interface ProfilePictureUploaderProps {
 const ProfilePictureUploader: React.FC<ProfilePictureUploaderProps> = ({ id42, onUploadSuccess }) => {
     const [file, setFile] = useState<File | null>(null);
 
+    const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5 MB
+    const VALID_FILE_TYPES = ['image/jpeg', 'image/png', 'image/gif'];
+
     const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         if (event.target.files) {
-            setFile(event.target.files[0]);
+            const selectedFile = event.target.files[0];
+            
+            if (!VALID_FILE_TYPES.includes(selectedFile.type)) {
+                alert('Veuillez sélectionner une image valide (JPEG, PNG, GIF).');
+                return;
+            }
+
+            if (selectedFile.size > MAX_FILE_SIZE) {
+                alert('La taille du fichier doit être inférieure à 5 MB.');
+                return;
+            }
+
+            setFile(selectedFile);
         }
     };
 
-
-
     const handleUpload = async () => {
         const jwtToken = localStorage.getItem('token');
+        if (!jwtToken) {
+            alert('Token non trouvé. Veuillez vous reconnecter.');
+            return;
+        }
+
         if (!file) {
             alert("Veuillez sélectionner une image.");
             return;
         }
-    const uploadUrl = `http://localhost:4000/user/${id42}/image`;
+
+        const uploadUrl = `https://localhost:4000/user/${id42}/image`; // Utiliser HTTPS
         const formData = new FormData();
         formData.append('image', file);
-        formData.append('id42', id42.toString()); // Ajout de l'identifiant de l'utilisateur
+        formData.append('id42', id42.toString());
 
         try {
             const response = await fetch(uploadUrl, {
@@ -41,12 +60,10 @@ const ProfilePictureUploader: React.FC<ProfilePictureUploaderProps> = ({ id42, o
             }
 
             const responseData = await response.json();
-            console.log(responseData);
-
-            // Supposons que responseData contient l'URL de la nouvelle image de profil
             onUploadSuccess(responseData.imageUrl);
         } catch (error) {
             console.error("Erreur lors de l'envoi du fichier:", error);
+            alert("Erreur lors du téléchargement de l'image. Veuillez réessayer.");
         }
     };
 
@@ -72,7 +89,6 @@ const ProfilePictureUploader: React.FC<ProfilePictureUploaderProps> = ({ id42, o
             const responseData = await response.json();
             console.log(responseData);
 
-            // Supposons que responseData contient l'URL de la nouvelle image de profil
             onUploadSuccess(responseData.imageUrl);
         } catch (error) {
             console.error("Erreur lors de l'envoi du fichier:", error);
@@ -81,7 +97,7 @@ const ProfilePictureUploader: React.FC<ProfilePictureUploaderProps> = ({ id42, o
 
     return (
         <div>
-            <input type="file" onChange={handleFileChange} />
+            <input type="file" accept="image/jpeg, image/png, image/gif" onChange={handleFileChange} />
             <button onClick={handleUpload}>Télécharger</button>
             <button onClick={handleDeleteFile}>Supprimer</button>
         </div>
