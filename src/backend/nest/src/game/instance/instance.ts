@@ -9,6 +9,8 @@ import { enregistrerScores } from "../score/score.controller";
 import { SocketExceptions } from "../shared/server/SocketExceptions";
 import { ServerException } from "../ServerExceptions";
 import { AuthenticatedSocket } from "../types";
+import { ScoreController } from "src/score/score.controller";
+import { UserController } from "src/user/user.controller";
 const TICK_RATE = 1000 / 60; // 60 updates per second
 const PADDLE_SPEED = 3.75;
 const BALL_SPEED_INCREMENT = 0.0003;
@@ -18,6 +20,7 @@ const WIDTH = 600;
 const HEIGHT = 800;
 
 export class Instance {
+
 	public hasStarted: boolean = false;
 	public hasFinished: boolean = false;
 	public isSuspended: boolean = false;
@@ -30,7 +33,7 @@ export class Instance {
 	private updateInterval: NodeJS.Timeout | null = null;
 	private hostPseudo: string;
 	private guestPseudo: string;
-	constructor(private readonly lobby: Lobby) {
+	constructor(private readonly lobby: Lobby, private scoreController: ScoreController, private UserController : UserController) {
 		this.ball = {
 			radius: 5,
 			speedModifier: BALL_DEFAULT_SPEED,
@@ -205,6 +208,17 @@ export class Instance {
 		// Faire la requête, attention il ne faut pas prendre en compte le score pour le gagnant ici
 	}
 
+	private async updateScores(winnerPseudo: string, loserPseudo: string): Promise<void> {
+		try {
+			const winnerId = await this.UserController.getUserIdByPseudo(winnerPseudo);
+			const loserId = await this.UserController.getUserIdByPseudo(loserPseudo);
+			// Assuming your ScoreController has an 'updateScore' method that you want to call
+			await this.scoreController.updateScore(winnerId, loserId);
+		} catch (error) {
+			console.error('Error updating scores:', error);
+		}
+	}
+
 	private gameRuntime(): void {
 		// Update ball position
 		this.ball.position.x += this.ball.velocity.x * this.ball.speedModifier;
@@ -227,6 +241,9 @@ export class Instance {
 		// Check for game end conditions and stop the game if necessary
 		if (this.scores[this.hostPseudo] >= MAX_SCORE || this.scores[this.guestPseudo] >= MAX_SCORE) {
 			this.gameOver();
+			//recuperer les id des joueurs
+			
+			
 			return;
 		}
 
