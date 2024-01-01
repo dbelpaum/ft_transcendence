@@ -7,13 +7,11 @@ import Switch from '@mui/material/Switch';
 interface OnlineGameSceneProps {
 	width: number;
 	height: number;
-	isHost: boolean;
 }
 
 const OnlineGameScene: React.FC<OnlineGameSceneProps> = ({
 	width,
 	height,
-	isHost,
 }) => {
 	const canvasRef = useRef<HTMLCanvasElement | null>(null);
 	const gameLogicRef = useRef<OnlineGameLogic | null>(null);
@@ -29,7 +27,6 @@ const OnlineGameScene: React.FC<OnlineGameSceneProps> = ({
 				width,
 				height,
 				socket,
-				isHost
 			);
 			onlineGameInstance.startGame();
 			gameLogicRef.current = onlineGameInstance;
@@ -42,7 +39,7 @@ const OnlineGameScene: React.FC<OnlineGameSceneProps> = ({
 				}
 			};
 		}
-	}, [width, height, isHost, socket]);
+	}, [width, height, socket]);
 
 	const label = { inputProps: { 'aria-label': '' } };
 	const handleCameraSwitch = () => {

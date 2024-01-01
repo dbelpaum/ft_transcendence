@@ -110,7 +110,6 @@ const Game: React.FC = () => {
 						<OnlineGameScene
 							width={800}
 							height={600}
-							isHost={lobbyData.hostId === socket.id}
 						/>
 						<div className="gameScore2" id="gameScore2"></div>
 					</div>
