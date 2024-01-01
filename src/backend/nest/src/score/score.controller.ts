@@ -20,6 +20,7 @@ export class ScoreController {
         });
 
         if (!existingScore) {
+            console.log('Score not found, creating new score');
             await this.prisma.score.create({
                 data: {
                     user1Id: winnerIdNum,
@@ -28,6 +29,7 @@ export class ScoreController {
                 },
             });
         } else {
+            console.log('Score found, updating');
             const isWinnerUser1 = existingScore.user1Id === winnerIdNum;
             await this.prisma.score.update({
                 where: { id: existingScore.id },
@@ -36,6 +38,6 @@ export class ScoreController {
                     { user2Wins: { increment: 1 } }
             });
         }
-        console.log('Score updated');
+        
     }
 }

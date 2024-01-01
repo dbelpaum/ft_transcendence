@@ -226,13 +226,18 @@ export class Instance {
 			// Convertir les réponses en JSON
 			const winnerId = await winnerResponse.json();
 			const loserId = await loserResponse.json();
+
+		
+	
 	
 			console.log(
 				'Updating scores for winner', winnerId, 'and loser', loserId, '...'
 			);
 	
 			// Mettre à jour les scores
-			// await this.scoreController.updateScore(winnerId, loserId);
+			await fetch(`http://localhost:4000/score/${winnerId.id}/update_score/${loserId.id}`, {
+				method: 'POST',
+			});
 		} catch (error) {
 			console.error('Error updating scores:', error);
 		}
