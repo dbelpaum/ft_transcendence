@@ -87,7 +87,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 		const getUserData = async (authToken: string) => {
 			try {
 				setIsLoading(true);
-				const response = await fetch(process.env.REACT_APP_URL_SERVER + 'authentification/42/profil', {
+				const response = await fetch('http://localhost:4000/authentification/42/profil', {
 					credentials: 'include',
 					headers: {
 						'Authorization': `Bearer ${authToken}`
@@ -95,6 +95,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 				});
 				if (!response.ok) throw new Error('Réponse non OK du serveur');
 				const userData = await response.json();
+				console.log("userdata")
+				console.log(userData)
 				if ('need2fa' in userData) {
 					setInfo2FA(userData as Info2FA)
 				}
