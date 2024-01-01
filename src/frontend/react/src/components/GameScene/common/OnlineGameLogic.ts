@@ -30,7 +30,6 @@ export class OnlineGameLogic {
 	private paddleLeftSpeed = 0;
 	private paddleRightSpeed = 0;
 	private socket: Socket;
-	private showMobileControls = false;
 	private leftButton: HTMLButtonElement | null = null;
 	private rightButton: HTMLButtonElement | null = null;
 
@@ -165,53 +164,34 @@ export class OnlineGameLogic {
 			this.handleKeyUp({ key: "ArrowRight" } as KeyboardEvent);
 	}
 
-	private createArrowButtons() {
-		if (this.showMobileControls)
-			return;
-		this.leftButton = document.createElement("button");
+	private bindMobileControls() {
+		this.leftButton = document.getElementById("leftButton") as HTMLButtonElement;
 		this.leftButton.textContent = "←";
-		this.leftButton.id = "leftButton";
 		this.leftButton.addEventListener("touchstart", this.handleTouchStart.bind(this));
 		this.leftButton.addEventListener("touchend", this.handleTouchEnd.bind(this));
 		this.leftButton.addEventListener("mousedown", this.handleTouchStart.bind(this));
 		this.leftButton.addEventListener("mouseup", this.handleTouchEnd.bind(this));
-		document.body.appendChild(this.leftButton);
 
-		this.rightButton = document.createElement("button");
+		this.rightButton = document.getElementById("rightButton") as HTMLButtonElement;
 		this.rightButton.textContent = "→";
-		this.rightButton.id = "rightButton";
 		this.rightButton.addEventListener("touchstart", this.handleTouchStart.bind(this));
 		this.rightButton.addEventListener("touchend", this.handleTouchEnd.bind(this));
 		this.rightButton.addEventListener("mousedown", this.handleTouchStart.bind(this));
 		this.rightButton.addEventListener("mouseup", this.handleTouchEnd.bind(this));
-		document.body.appendChild(this.rightButton);
-	}
-
-	private removeArrowButtons() {
-		if (this.showMobileControls && this.leftButton && this.rightButton) {
-			document.body.removeChild(this.leftButton);
-			document.body.removeChild(this.rightButton);
-		}
 	}
 
 	private handleResize() {
 		if (window.innerWidth < 500) { // Mobile
 			this.width = window.innerWidth * 0.9;
 			this.height = window.innerHeight * 0.6;
-			this.createArrowButtons();
-			this.showMobileControls = true;
 		}
 		else if (window.innerWidth < 1000) { // Tablet
 			this.width = window.innerWidth * 0.8;
 			this.height = window.innerHeight * 0.7;
-			this.createArrowButtons();
-			this.showMobileControls = true;
 		}
 		else { // Desktop
 			this.width = window.innerWidth * 0.6;
 			this.height = window.innerHeight * 0.6;
-			this.removeArrowButtons();
-			this.showMobileControls = false;
 		}
 		// console.log("Inner width: " + window.innerWidth + ", Inner height: " + window.innerHeight);
 		// console.log("Resizing to: " + this.width + "x" + this.height);
@@ -337,6 +317,7 @@ export class OnlineGameLogic {
 		// Add event listeners for keydown and keyup
 		window.addEventListener("keydown", this.handleKeyDown.bind(this));
 		window.addEventListener("keyup", this.handleKeyUp.bind(this));
+		this.bindMobileControls();
 		window.addEventListener("resize", this.handleResize.bind(this));
 	}
 
