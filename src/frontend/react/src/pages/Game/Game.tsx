@@ -104,17 +104,20 @@ const Game: React.FC = () => {
 						)}
 					</>
 				)}
-				{gameStarted && (
+				{gameStarted && (<>
 					<div className="game-container">
 						<div className="gameScore1" id="gameScore1"></div>
 						<OnlineGameScene
 							width={800}
 							height={600}
-							isHost={lobbyData.hostId === socket.id}
 						/>
 						<div className="gameScore2" id="gameScore2"></div>
 					</div>
-				)}
+					<div className="mobileControls">
+						<button className="leftButton" id="leftButton">←</button>
+						<button className="rightButton" id="rightButton">→</button>
+					</div>
+				</>)}
 			</div>
 		</SocketContext.Provider>
 	);
