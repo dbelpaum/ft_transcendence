@@ -5,12 +5,14 @@ import { ServerEvents } from "../shared/server/ServerEvents";
 import { Server } from "http";
 import { ClientMovementDto } from "../dtos";
 import { Ball, Paddle } from "./types";
-import { enregistrerScores } from "../score/score.controller";
 import { SocketExceptions } from "../shared/server/SocketExceptions";
 import { ServerException } from "../ServerExceptions";
 import { AuthenticatedSocket } from "../types";
-import { ScoreController } from "src/score/score.controller";
-import { UserController } from "src/user/user.controller";
+// import fetch from "node-fetch";
+
+
+// import { ScoreController } from "src/score/score.controller";
+// import { UserController } from "src/user/user.controller";
 const TICK_RATE = 1000 / 60; // 60 updates per second
 const PADDLE_SPEED = 3.75;
 const BALL_SPEED_INCREMENT = 0.0003;
@@ -33,7 +35,7 @@ export class Instance {
 	private updateInterval: NodeJS.Timeout | null = null;
 	private hostPseudo: string;
 	private guestPseudo: string;
-	constructor(private readonly lobby: Lobby, private scoreController: ScoreController, private UserController : UserController) {
+	constructor(private readonly lobby: Lobby) {
 		this.ball = {
 			radius: 5,
 			speedModifier: BALL_DEFAULT_SPEED,
@@ -179,6 +181,11 @@ export class Instance {
 		});
 		this.lobby.lobbyManager.deleteLobby(this.lobby.id);
 		this.stopGameRuntime();
+		if (this.scores[this.hostPseudo] >= this.scores[this.guestPseudo]) {
+			this.updateScores(this.hostPseudo, this.guestPseudo);
+		} else {
+			this.updateScores(this.guestPseudo, this.hostPseudo);
+		}
 		// enregistrerScores(this.lobby.hostSocketId, this.lobby.guestSocketId, this.scores[this.lobby.hostSocketId], this.scores[this.lobby.guestSocketId])
 		// 	.then((nouveauScore) => {
 		// 		console.log('New score added:', nouveauScore);
@@ -210,10 +217,22 @@ export class Instance {
 
 	private async updateScores(winnerPseudo: string, loserPseudo: string): Promise<void> {
 		try {
-			const winnerId = await this.UserController.getUserIdByPseudo(winnerPseudo);
-			const loserId = await this.UserController.getUserIdByPseudo(loserPseudo);
-			// Assuming your ScoreController has an 'updateScore' method that you want to call
-			await this.scoreController.updateScore(winnerId, loserId);
+			// Récupérer les ID des utilisateurs simultanément
+			const [winnerResponse, loserResponse] = await Promise.all([
+				fetch(`http://localhost:4000/user/by-pseudo-id/${winnerPseudo}`),
+				fetch(`http://localhost:4000/user/by-pseudo-id/${loserPseudo}`)
+			]);
+	
+			// Convertir les réponses en JSON
+			const winnerId = await winnerResponse.json();
+			const loserId = await loserResponse.json();
+	
+			console.log(
+				'Updating scores for winner', winnerId, 'and loser', loserId, '...'
+			);
+	
+			// Mettre à jour les scores
+			// await this.scoreController.updateScore(winnerId, loserId);
 		} catch (error) {
 			console.error('Error updating scores:', error);
 		}
