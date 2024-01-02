@@ -5,7 +5,7 @@ import React, { ReactElement, useEffect } from 'react';
 import { Navigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContexte'; 
 import { useErrorMessage } from '../../context/ErrorContexte';
-
+import { showNotification } from '../../pages/Game/Notification';
 
 type ProtectedElementProps = {
 	children: ReactElement;
@@ -18,12 +18,9 @@ export const ProtectedElement: React.FC<ProtectedElementProps> = ({ children }) 
 
 	useEffect(() => {
 		if (!isLoading && !user) {
-			setErrorMessage({
-				message: 'Vous devez être connecté pour accéder à cette page.',
-				type: 'error'
-			});
+			showNotification("Acces interdit", "Vous devez être connecté pour accéder à cette page.", "warning")
 		}
-	}, [user, isLoading, setErrorMessage]);
+	}, [user, isLoading]);
 	
 	if (isLoading) {
 		return <div>Chargement...</div>;

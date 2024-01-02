@@ -13,10 +13,9 @@ services:
   frontend:
     build:
       context: ./src/frontend
-      dockerfile: Dockerfile_prod
+      dockerfile: Dockerfile
     ports:
       - "3000:3000"
-      - "80:80"
     volumes:
       - ./src/frontend/react:/app
       - /app/node_modules
