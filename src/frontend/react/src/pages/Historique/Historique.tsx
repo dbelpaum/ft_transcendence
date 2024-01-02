@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContexte';
+import defautProfilePic from '../../assets/default-profile.png';
 
 import './Historique.css';
 
@@ -26,6 +27,24 @@ const Historique: React.FC = () => {
         }
     }, [auth.user]);
 
+
+    const timeSince = (date: string) => {
+        const seconds = Math.floor((new Date().getTime() - new Date(date).getTime()) / 1000);
+        let interval = seconds / 31536000;
+
+        if (interval > 1) return `${Math.floor(interval)} ans`;
+        interval = seconds / 2592000;
+        if (interval > 1) return `${Math.floor(interval)} mois`;
+        interval = seconds / 86400;
+        if (interval > 1) return `${Math.floor(interval)} jours`;
+        interval = seconds / 3600;
+        if (interval > 1) return `${Math.floor(interval)} heures`;
+        interval = seconds / 60;
+        if (interval > 1) return `${Math.floor(interval)} minutes`;
+
+        return `${Math.floor(seconds)} secondes`;
+    };
+
     const fetchUserDetails = async (userId: number) => {
         try {
             const response = await fetch(`http://localhost:4000/user/by-id/${userId}`);
@@ -35,7 +54,7 @@ const Historique: React.FC = () => {
             return await response.json();
         } catch (error) {
             console.error('Erreur lors de la récupération des détails de l\'utilisateur:', error);
-            return null; // Retourne null en cas d'erreur
+            return null; 
         }
     };
 
@@ -51,6 +70,8 @@ const Historique: React.FC = () => {
             const matchesWithUserDetails = await Promise.all(matchesData.map(async (match: Match) => {
                 const user1Details = await fetchUserDetails(match.user1Id);
                 const user2Details = await fetchUserDetails(match.user2Id);
+
+                
             
                 return {
                     ...match,
@@ -60,6 +81,7 @@ const Historique: React.FC = () => {
                     user2ImageURL: user2Details?.imageURL,
                 };
             }));
+            matchesWithUserDetails.sort((a, b) => new Date(b.playedAt).getTime() - new Date(a.playedAt).getTime());
 
             console.log('Matches:', matchesWithUserDetails);
 
@@ -75,23 +97,28 @@ const Historique: React.FC = () => {
 
     return (
         <div className="historique">
+            <h1>Historique des parties</h1>
             {matches.map((match) => (
                 <div key={match.id} className={`match ${isUserWinner(match) ? 'green' : 'red'}`}>
                     <div className="player-info">
-                        <img src={match.user1Id === auth.user?.id ? match.user1ImageURL : match.user2ImageURL} alt="User" />
-                        <p>{match.user1Id === auth.user?.id ? match.user1Pseudo : match.user2Pseudo}</p>
+                        <img src={auth.user?.id === match.user1Id  ? match.user1ImageURL || defautProfilePic : match.user2ImageURL || defautProfilePic} alt="User" />
+                        <p>{auth.user?.id === match.user1Id ? match.user1Pseudo : match.user2Pseudo}</p>
                     </div>
                     <div className="score">
-                        <p>{match.user1Score} - {match.user2Score}</p>
+                        <p>{auth.user?.id === match.user1Id ? `${match.user1Score} - ${match.user2Score}` : `${match.user2Score} - ${match.user1Score}`}</p>
                     </div>
                     <div className="player-info">
-                        <img src={match.user1Id === auth.user?.id ? match.user2ImageURL : match.user1ImageURL} alt="Opponent" />
-                        <p>{match.user1Id === auth.user?.id ? match.user2Pseudo : match.user1Pseudo}</p>
+                        <img src={auth.user?.id === match.user1Id ? match.user2ImageURL : match.user1ImageURL || defautProfilePic} alt="player-info opponent" />
+                        <p>{auth.user?.id === match.user1Id ? match.user2Pseudo : match.user1Pseudo}</p>
+                        <div className="time-since">
+                        <p>Il y a {timeSince(match.playedAt)}</p>
+                    </div>
                     </div>
                 </div>
             ))}
         </div>
     );
+    
 };
 
 export default Historique;

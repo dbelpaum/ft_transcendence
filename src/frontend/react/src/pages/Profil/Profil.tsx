@@ -44,7 +44,7 @@ function Profil() {
       const updatedUserInfo = { ...userInfo, [field]: value };
       setUserInfo(updatedUserInfo);
 
-      const jwtToken = localStorage.getItem('token'); // Récupérez le JWT depuis le localStorage
+      const jwtToken = localStorage.getItem('token');
 
       
       fetch(`http://localhost:4000/user/${userId}/${field}`, {
