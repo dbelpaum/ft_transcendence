@@ -102,7 +102,7 @@ const UserProfile: React.FC = () => {
 
 		socket.on("server.getuserstatus", (data: { isPlaying: boolean }) => {
 			setIsPlaying(data.isPlaying);
-			console.log(data);
+			// console.log(data);
 		});
 
 		// Cleanup socket connection on component unmount
@@ -110,7 +110,6 @@ const UserProfile: React.FC = () => {
 			socket.disconnect();
 		};
 	}, [pseudo]);
-
 
 	useEffect(() => {
 		if (!userInfo) {
@@ -168,30 +167,6 @@ const UserProfile: React.FC = () => {
 	}, [user?.id, userInfo?.id]);
 
 
-
-	useEffect(() => {
-		if (!user || !userInfo) {
-			return;
-		}
-
-		fetch(`http://localhost:4000/score/${user.id}/consult_score/${userInfo.id}`, {
-			method: 'GET',
-			headers: {
-				'Authorization': `Bearer ${authToken}`
-			},
-		})
-			.then(response => response.json())
-			.then(score => {
-				if (score.user1Id === user.id) {
-					setUserScore({ actualUser: score.user1Wins, OpponentUser: score.user2Wins });
-				} else {
-					setUserScore({ actualUser: score.user2Wins, OpponentUser: score.user1Wins });
-				}
-			})
-			.catch(error => console.error("Erreur lors de la récupération du score", error));
-	}, [user, userInfo]);
-
-
 	if (!userInfo) {
 		return <div>Chargement...</div>;
 	}
@@ -226,155 +201,74 @@ const UserProfile: React.FC = () => {
 	}
 
 	const handleRemoveFriendClick = async () => {
-        try {
-            const response = await fetch(`http://localhost:4000/friendship/${user?.id}/remove-friend/${userInfo?.id}`, {
-                method: 'POST',
-                credentials: 'include',
-                headers: {
-                    'Authorization': `Bearer ${authToken}`
-                },
-                
-            });
-    
-            if (!response.ok) {
-                throw new Error('Failed to remove friend');
-            }
-    
-            setButtonStatus('addFriend');
-            setFriendshipStatus('notFriend');
-        } catch (error) {
-            console.error(error);
-        }
-    }
+		try {
+			const response = await fetch(`http://localhost:4000/friendship/${user?.id}/remove-friend/${userInfo?.id}`, {
+				method: 'POST',
+				credentials: 'include',
+				headers: {
+					'Authorization': `Bearer ${authToken}`
+				},
 
+			});
 
+			if (!response.ok) {
+				throw new Error('Failed to remove friend');
+			}
 
-useEffect(() => {
-    if (!user?.id42 || !userInfo?.id42) {
-        return;
-    }
-    fetch(`http://localhost:4000/friendship/${user?.id}/relation/${userInfo?.id}`)
-        .then(response => response.json())
-        .then((response) => {
-            setFriendshipStatus(response.status);
-            if (friendshipStatus === 'friend') {
-                setButtonStatus('removeFriend');
-            } else if (friendshipStatus === 'blocked') {
-                setButtonStatus('unblock');
-                console.log('On rentre dans le else if')
-            } else {
-                
-                setButtonStatus('addFriend');
-                console.log('On rentre dans le else')
-            }
-        })
-        .catch(error => console.log(error));
-     }, [user?.id, userInfo?.id]);
+			setButtonStatus('addFriend');
+			setFriendshipStatus('notFriend');
+		} catch (error) {
+			console.error(error);
+		}
+	}
 
+	const handleBlockUserClick = async () => {
+		try {
+			const response = await fetch(`http://localhost:4000/friendship/${user?.id}/block/${userInfo?.id}`, {
+				method: 'POST',
+				credentials: 'include',
+				headers: {
+					'Authorization': `Bearer ${authToken}`
+				},
+			});
 
-    if (!userInfo) {
-        return <div>Chargement...</div>;
-    }
+			if (!response.ok) {
+				throw new Error('Failed to block user');
+			}
 
-    console.log('Friendship status initial ' + friendshipStatus);
+			setButtonStatus('unblock');
+			setFriendshipStatus('blocked');
+		} catch (error) {
+			console.error(error);
+		}
+	}
 
-    const handleAddFriendClick = () => {
-        // Envoyer la requête d'ami
-        fetch(`http://localhost:4000/friendship/${user?.id}/add-friend/${userInfo?.id}`, {
-            method: 'POST',
-            credentials: 'include',
-            headers: {
-                'Authorization': `Bearer ${authToken}`
-            },
-        })
-        .then(response => {
-            if (response.ok) {
-                setButtonStatus('removeFriend');
-                setFriendshipStatus('friend');
-            }
-            // } else {
-            //     throw new Error('Échec de la demande d\'ami');
-            // }
-        })
-        .catch(error => {
-            console.error(error);
-            setButtonStatus('addFriend');
-        });
+	const handleUnblockUserClick = async () => {
+		try {
+			const response = await fetch(`http://localhost:4000/friendship/${user?.id}/unblock/${userInfo?.id}`, {
+				method: 'POST',
+				credentials: 'include',
+				headers: {
+					'Authorization': `Bearer ${authToken}`
+				},
+			});
 
+			if (!response.ok) {
+				throw new Error('Failed to unblock user');
+			}
 
-
-    }
-
-    const handleRemoveFriendClick = async () => {
-        try {
-            const response = await fetch(`http://localhost:4000/friendship/${user?.id}/remove-friend/${userInfo?.id}`, {
-                method: 'POST',
-                credentials: 'include',
-                headers: {
-                    'Authorization': `Bearer ${authToken}`
-                },
-                
-            });
-    
-            if (!response.ok) {
-                throw new Error('Failed to remove friend');
-            }
-    
-            setButtonStatus('addFriend');
-            setFriendshipStatus('notFriend');
-        } catch (error) {
-            console.error(error);
-        }
-    }
-
-     const handleBlockUserClick = async () => {
-        try {
-            const response = await fetch(`http://localhost:4000/friendship/${user?.id}/block/${userInfo?.id}`, {
-                method: 'POST',
-                credentials: 'include',
-                headers: {
-                    'Authorization': `Bearer ${authToken}`
-                },
-            });
-    
-            if (!response.ok) {
-                throw new Error('Failed to block user');
-            }
-    
-            setButtonStatus('unblock');
-            setFriendshipStatus('blocked');
-        } catch (error) {
-            console.error(error);
-        }
-    }
-
-    const handleUnblockUserClick = async () => {
-        try {
-            const response = await fetch(`http://localhost:4000/friendship/${user?.id}/unblock/${userInfo?.id}`, {
-                method: 'POST',
-                credentials: 'include',
-                headers: {
-                    'Authorization': `Bearer ${authToken}`
-                },
-            });
-    
-            if (!response.ok) {
-                throw new Error('Failed to unblock user');
-            }
-    
-            setButtonStatus('block');
-            setFriendshipStatus('notFriend');
-        } catch (error) {
-            console.error(error);
-        }
-    }
+			setButtonStatus('block');
+			setFriendshipStatus('notFriend');
+		} catch (error) {
+			console.error(error);
+		}
+	}
 
 
 
 	const triggerMp = () => {
-		if (user && chatSocket)
-		{
-			const mpCreateInfo : MpChannel =
+		if (user && chatSocket) {
+			const mpCreateInfo: MpChannel =
 			{
 				user1: user,
 				user2: userInfo,
@@ -433,24 +327,24 @@ useEffect(() => {
 
 
 				{friendshipStatus === 'blocked' && (
-            <FriendshipButton
-                status={'unblock'}
-                onButtonClick={handleUnblockUserClick}
-                color="green"
-                />
-            )}
+					<FriendshipButton
+						status={'unblock'}
+						onButtonClick={handleUnblockUserClick}
+						color="green"
+					/>
+				)}
 
 
 			</div>
 			<div className="mp">{
-                user?.id !== userInfo?.id && (
-				<button onClick={triggerMp}>Envoyer un mp</button>
-                )
-            }
-			
-</div>
+				user?.id !== userInfo?.id && (
+					<button onClick={triggerMp}>Envoyer un mp</button>
+				)
+			}
+
+			</div>
 		</main>
-  );
+	);
 };
 
 export default UserProfile;
