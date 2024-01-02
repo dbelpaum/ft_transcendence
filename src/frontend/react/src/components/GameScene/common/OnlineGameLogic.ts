@@ -30,16 +30,15 @@ export class OnlineGameLogic {
 	private paddleLeftSpeed = 0;
 	private paddleRightSpeed = 0;
 	private socket: Socket;
-	private isHost = false;
+	private leftButton: HTMLButtonElement | null = null;
+	private rightButton: HTMLButtonElement | null = null;
 
 	constructor(
 		canvas: HTMLCanvasElement,
 		width: number,
 		height: number,
 		socket: Socket,
-		isHost: boolean
 	) {
-		this.isHost = isHost;
 		this.socket = socket;
 		this.width = width;
 		this.height = height;
@@ -149,10 +148,42 @@ export class OnlineGameLogic {
 		}
 	}
 
+	private handleTouchStart(event: TouchEvent | MouseEvent) {
+		event.preventDefault();
+		if (event.target === this.leftButton)
+			this.handleKeyDown({ key: "ArrowLeft" } as KeyboardEvent);
+		else if (event.target === this.rightButton)
+			this.handleKeyDown({ key: "ArrowRight" } as KeyboardEvent);
+	}
+
+	private handleTouchEnd(event: TouchEvent | MouseEvent) {
+		event.preventDefault();
+		if (event.target === this.leftButton)
+			this.handleKeyUp({ key: "ArrowLeft" } as KeyboardEvent);
+		else if (event.target === this.rightButton)
+			this.handleKeyUp({ key: "ArrowRight" } as KeyboardEvent);
+	}
+
+	private bindMobileControls() {
+		this.leftButton = document.getElementById("leftButton") as HTMLButtonElement;
+		this.leftButton.textContent = "←";
+		this.leftButton.addEventListener("touchstart", this.handleTouchStart.bind(this));
+		this.leftButton.addEventListener("touchend", this.handleTouchEnd.bind(this));
+		this.leftButton.addEventListener("mousedown", this.handleTouchStart.bind(this));
+		this.leftButton.addEventListener("mouseup", this.handleTouchEnd.bind(this));
+
+		this.rightButton = document.getElementById("rightButton") as HTMLButtonElement;
+		this.rightButton.textContent = "→";
+		this.rightButton.addEventListener("touchstart", this.handleTouchStart.bind(this));
+		this.rightButton.addEventListener("touchend", this.handleTouchEnd.bind(this));
+		this.rightButton.addEventListener("mousedown", this.handleTouchStart.bind(this));
+		this.rightButton.addEventListener("mouseup", this.handleTouchEnd.bind(this));
+	}
+
 	private handleResize() {
 		if (window.innerWidth < 500) { // Mobile
 			this.width = window.innerWidth * 0.9;
-			this.height = window.innerHeight * 0.9;
+			this.height = window.innerHeight * 0.6;
 		}
 		else if (window.innerWidth < 1000) { // Tablet
 			this.width = window.innerWidth * 0.8;
@@ -162,8 +193,8 @@ export class OnlineGameLogic {
 			this.width = window.innerWidth * 0.6;
 			this.height = window.innerHeight * 0.6;
 		}
-		console.log("Inner width: " + window.innerWidth + ", Inner height: " + window.innerHeight);
-		console.log("Resizing to: " + this.width + "x" + this.height);
+		// console.log("Inner width: " + window.innerWidth + ", Inner height: " + window.innerHeight);
+		// console.log("Resizing to: " + this.width + "x" + this.height);
 		this.renderer.setSize(this.width, this.height);
 	}
 
@@ -286,6 +317,7 @@ export class OnlineGameLogic {
 		// Add event listeners for keydown and keyup
 		window.addEventListener("keydown", this.handleKeyDown.bind(this));
 		window.addEventListener("keyup", this.handleKeyUp.bind(this));
+		this.bindMobileControls();
 		window.addEventListener("resize", this.handleResize.bind(this));
 	}
 

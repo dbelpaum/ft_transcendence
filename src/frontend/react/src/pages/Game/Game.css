@@ -18,9 +18,16 @@
 	align-items: center;
 }
 
+@media (max-width: 1000px) {
+	.gameScore1,
+	.gameScore2 {
+	  	display: none;
+	}
+}
+
 .gameScore1,
 .gameScore2 {
-	margin: 0px 100px; /* Adjust the top and bottom margins and horizontal spacing */
+	margin: 0px 40px; /* Adjust the top and bottom margins and horizontal spacing */
 	font-size: 20px;
 	border:#ffffff 3px solid;
 	/* background: #2d3fa6; */
@@ -38,6 +45,29 @@
 
 .OnlineGameScene {
 	flex: 2; /* Adjust the flex value based on your layout preferences */
+}
+
+@media (min-width: 1000px) {
+	.mobileControls {
+	  	display: none;
+	}
+}
+  
+.leftButton,
+.rightButton {
+	font-size: 24px; /* Adjust the font size as needed */
+	padding: 10px 20px; /* Adjust the padding as needed */
+	margin: 0 50px; /* Adjust the horizontal margin as needed */
+	border: 2px solid #ffffff;
+	border-radius: 10px;
+	background-color: #2d3fa6; /* Adjust the background color as needed */
+	color: white;
+	cursor: pointer;
+}
+
+.leftButton:hover,
+.rightButton:hover {
+	background-color: #1a245b; /* Adjust the hover background color as needed */
 }
 
 .scoreRankingOverlay {
