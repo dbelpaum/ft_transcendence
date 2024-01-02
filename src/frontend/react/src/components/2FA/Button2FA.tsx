@@ -32,8 +32,8 @@ const Button2FA = () => {
       .then(response => response.json())
       .then(
 		data => {setIsActive(data.isActive);
-		console.log("data renvoie ");
-		console.log(data.isActive)}
+		/* console.log("data renvoie ");
+		console.log(data.isActive) */}
 		) // Supposons que 'isActive' est un booléen renvoyé par l'API
       .catch(error => console.error('Erreur lors de la vérification de la 2FA:', error));
   }, []);

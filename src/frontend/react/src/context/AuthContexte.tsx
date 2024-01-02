@@ -95,8 +95,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 				});
 				if (!response.ok) throw new Error('Réponse non OK du serveur');
 				const userData = await response.json();
-				console.log("userdata")
-				console.log(userData)
+				// console.log("userdata")
+				// console.log(userData)
 				if ('need2fa' in userData) {
 					setInfo2FA(userData as Info2FA)
 				}
