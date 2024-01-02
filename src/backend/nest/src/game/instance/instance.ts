@@ -5,10 +5,14 @@ import { ServerEvents } from "../shared/server/ServerEvents";
 import { Server } from "http";
 import { ClientMovementDto } from "../dtos";
 import { Ball, Paddle } from "./types";
-import { enregistrerScores } from "../score/score.controller";
 import { SocketExceptions } from "../shared/server/SocketExceptions";
 import { ServerException } from "../ServerExceptions";
 import { AuthenticatedSocket } from "../types";
+// import fetch from "node-fetch";
+
+
+// import { ScoreController } from "src/score/score.controller";
+// import { UserController } from "src/user/user.controller";
 const TICK_RATE = 1000 / 60; // 60 updates per second
 const PADDLE_SPEED = 3.75;
 const BALL_SPEED_INCREMENT = 0.0003;
@@ -18,6 +22,7 @@ const WIDTH = 600;
 const HEIGHT = 800;
 
 export class Instance {
+
 	public hasStarted: boolean = false;
 	public hasFinished: boolean = false;
 	public isSuspended: boolean = false;
@@ -176,6 +181,11 @@ export class Instance {
 		});
 		this.lobby.lobbyManager.deleteLobby(this.lobby.id);
 		this.stopGameRuntime();
+		if (this.scores[this.hostPseudo] >= this.scores[this.guestPseudo]) {
+			this.updateScores(this.hostPseudo, this.guestPseudo);
+		} else {
+			this.updateScores(this.guestPseudo, this.hostPseudo);
+		}
 		// enregistrerScores(this.lobby.hostSocketId, this.lobby.guestSocketId, this.scores[this.lobby.hostSocketId], this.scores[this.lobby.guestSocketId])
 		// 	.then((nouveauScore) => {
 		// 		console.log('New score added:', nouveauScore);
@@ -205,6 +215,34 @@ export class Instance {
 		// Faire la requête, attention il ne faut pas prendre en compte le score pour le gagnant ici
 	}
 
+	private async updateScores(winnerPseudo: string, loserPseudo: string): Promise<void> {
+		try {
+			// Récupérer les ID des utilisateurs simultanément
+			const [winnerResponse, loserResponse] = await Promise.all([
+				fetch(`http://localhost:4000/user/by-pseudo-id/${winnerPseudo}`),
+				fetch(`http://localhost:4000/user/by-pseudo-id/${loserPseudo}`)
+			]);
+	
+			// Convertir les réponses en JSON
+			const winnerId = await winnerResponse.json();
+			const loserId = await loserResponse.json();
+
+		
+	
+	
+			console.log(
+				'Updating scores for winner', winnerId, 'and loser', loserId, '...'
+			);
+	
+			// Mettre à jour les scores
+			await fetch(`http://localhost:4000/score/${winnerId.id}/update_score/${loserId.id}`, {
+				method: 'POST',
+			});
+		} catch (error) {
+			console.error('Error updating scores:', error);
+		}
+	}
+
 	private gameRuntime(): void {
 		// Update ball position
 		this.ball.position.x += this.ball.velocity.x * this.ball.speedModifier;
@@ -227,6 +265,9 @@ export class Instance {
 		// Check for game end conditions and stop the game if necessary
 		if (this.scores[this.hostPseudo] >= MAX_SCORE || this.scores[this.guestPseudo] >= MAX_SCORE) {
 			this.gameOver();
+			//recuperer les id des joueurs
+			
+			
 			return;
 		}
 

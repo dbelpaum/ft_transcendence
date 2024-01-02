@@ -42,6 +42,15 @@ export class UserController {
         });
     }
 
+    @Get('by-pseudo-id/:pseudo')
+    async getUserIdByPseudo(@Param('pseudo') pseudo: string) {
+        return await this.prisma.user.findUnique({
+            where: { pseudo },
+            select: { id: true },
+        });
+
+    }
+
 
 
 

@@ -70,6 +70,26 @@
     animation: pulse 1s infinite ease-in-out;
 }
 
+.profile-score {
+    text-align: center;
+    margin-top: 20px;
+}
+
+.score-display {
+    font-size: 24px;
+    font-weight: bold;
+}
+
+.user-score {
+    color: #4CAF50; /* couleur verte pour les victoires de l'utilisateur */
+}
+
+.opponent-score {
+    color: #F44336; /* couleur rouge pour les victoires de l'adversaire */
+}
+
+
+
 h1, h2 {
     text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
 }
