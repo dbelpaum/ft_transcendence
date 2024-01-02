@@ -27,14 +27,14 @@ export interface ClientToServerEvents {
 
 export interface Channel {
 	name: string
-	host: string[]
+	host: number[]
 	owner: User;
 	users: User[]
 	type: string
 	mdp: string
 	invited: string[]
-	ban: string[]
-	mute: string[]
+	ban: number[]
+	mute: number[]
 }
 
 export interface MpChannel {
