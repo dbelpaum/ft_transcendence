@@ -159,9 +159,6 @@ export class Instance {
 		if (Math.abs(this.ball.position.x) >= WIDTH / 2) {
 			this.ball.velocity.x = -this.ball.velocity.x;
 		}
-
-		// console.log("Scores: " + this.scores[this.hostPseudo] + " h-g " + this.scores[this.guestPseudo])
-		// console.log(this.ball.speedModifier);
 	}
 
 	private gameOver(): void {
