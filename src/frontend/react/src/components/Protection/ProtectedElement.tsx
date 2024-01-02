@@ -20,7 +20,7 @@ export const ProtectedElement: React.FC<ProtectedElementProps> = ({ children }) 
 		if (!isLoading && !user) {
 			showNotification("Acces interdit", "Vous devez être connecté pour accéder à cette page.", "warning")
 		}
-	}, [user, isLoading, setErrorMessage]);
+	}, [user, isLoading]);
 	
 	if (isLoading) {
 		return <div>Chargement...</div>;

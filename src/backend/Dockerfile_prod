@@ -6,6 +6,7 @@ RUN npm install
 COPY ./nest/prisma ./prisma
 RUN npx prisma generate
 COPY ./nest/ .
+RUN npm install
 RUN npm run build
 
 # Étape de production
