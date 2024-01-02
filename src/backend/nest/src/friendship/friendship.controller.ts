@@ -91,6 +91,7 @@ async getFriendsAndBlocked(@Param('userId') userId: string) {
 
 
 	@Post(':requesterId/add-friend/:addresseeId')
+	@UseGuards(AuthGuard('jwt'))
 	async addFriend(
 		@Param('requesterId') requesterId: string,
 		@Param('addresseeId') addresseeId: string
@@ -147,6 +148,7 @@ async getFriendsAndBlocked(@Param('userId') userId: string) {
 	// FriendshipController
 
 	@Post(':requesterId/remove-friend/:addresseeId')
+	@UseGuards(AuthGuard('jwt'))
 	async removeFriend(
 		@Param('requesterId') requesterId: string,
 		@Param('addresseeId') addresseeId: string
@@ -188,6 +190,7 @@ async getFriendsAndBlocked(@Param('userId') userId: string) {
 
 
 	@Post(':requesterId/block/:addresseeId')
+	@UseGuards(AuthGuard('jwt'))
 	async blockUser(
 		@Param('requesterId') requesterId: string,
 		@Param('addresseeId') addresseeId: string
@@ -236,6 +239,7 @@ async getFriendsAndBlocked(@Param('userId') userId: string) {
 
 
 	@Post(':requesterId/unblock/:addresseeId')
+	@UseGuards(AuthGuard('jwt'))
 	async unblockUser(
 		@Param('requesterId') requesterId: string,
 		@Param('addresseeId') addresseeId: string

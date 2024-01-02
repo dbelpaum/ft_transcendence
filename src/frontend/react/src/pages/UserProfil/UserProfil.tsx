@@ -184,6 +184,9 @@ useEffect(() => {
         fetch(`http://localhost:4000/friendship/${user?.id}/add-friend/${userInfo?.id}`, {
             method: 'POST',
             credentials: 'include',
+            headers: {
+                'Authorization': `Bearer ${authToken}`
+            },
         })
         .then(response => {
             if (response.ok) {
@@ -208,6 +211,10 @@ useEffect(() => {
             const response = await fetch(`http://localhost:4000/friendship/${user?.id}/remove-friend/${userInfo?.id}`, {
                 method: 'POST',
                 credentials: 'include',
+                headers: {
+                    'Authorization': `Bearer ${authToken}`
+                },
+                
             });
     
             if (!response.ok) {
@@ -226,6 +233,9 @@ useEffect(() => {
             const response = await fetch(`http://localhost:4000/friendship/${user?.id}/block/${userInfo?.id}`, {
                 method: 'POST',
                 credentials: 'include',
+                headers: {
+                    'Authorization': `Bearer ${authToken}`
+                },
             });
     
             if (!response.ok) {
@@ -244,6 +254,9 @@ useEffect(() => {
             const response = await fetch(`http://localhost:4000/friendship/${user?.id}/unblock/${userInfo?.id}`, {
                 method: 'POST',
                 credentials: 'include',
+                headers: {
+                    'Authorization': `Bearer ${authToken}`
+                },
             });
     
             if (!response.ok) {
