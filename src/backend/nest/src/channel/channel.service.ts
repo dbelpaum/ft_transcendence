@@ -227,7 +227,7 @@ export class ChannelService {
 
 
 		// Si l'utilisateur n'est pas administrateur, on ne fait rien
-		if (!this.userIsHost(inviteInfo.user.pseudo,this.channels[channelIndex])) return
+		if (!this.userIsHost(inviteInfo.user.id,this.channels[channelIndex])) return
 
 		// Sinon, on ajoute le nom a la liste des invités
 		this.channels[channelIndex].invited.push(inviteInfo.invited_name)

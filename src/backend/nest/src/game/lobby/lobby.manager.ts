@@ -9,7 +9,7 @@ import { SocketExceptions } from "../shared/server/SocketExceptions";
 import { LobbyMode } from "./types";
 import { ServerEvents } from "../shared/server/ServerEvents";
 import { jwtDecode } from "jwt-decode";
-
+import * as jwt from 'jsonwebtoken';
 import { PrismaService } from "src/prisma.service";
 
 @Injectable()
@@ -25,7 +25,7 @@ export class LobbyManager {
 	public async initializeSocket(client: AuthenticatedSocket): Promise<void> {
 		try {
 			const token = client.handshake.auth.token;
-			const payload = jwtDecode(token) as any;
+			const payload = jwt.verify(token, process.env.SECRET_JWT) as any;
 			const user = await this.prisma.user.findUnique({
 				where: { id: payload.id },
 				select: { imageURL: true }
