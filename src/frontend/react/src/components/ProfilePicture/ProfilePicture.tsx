@@ -34,7 +34,7 @@ const ProfilePicture: React.FC<ProfilePictureProps> = ({ id42 }) => {
         setUploaderVisible(false);
         // setProfilePicUrl(newImageUrl);
     };
-    console.log('Profil url:' + profilePicUrl);
+    // console.log('Profil url:' + profilePicUrl);
 
     const handleClick = () => {
         if (isUploaderVisible === true) {

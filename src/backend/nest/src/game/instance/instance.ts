@@ -8,6 +8,7 @@ import { Ball, Paddle } from "./types";
 import { SocketExceptions } from "../shared/server/SocketExceptions";
 import { ServerException } from "../ServerExceptions";
 import { AuthenticatedSocket } from "../types";
+import { UploadedFile } from "@nestjs/common";
 // import fetch from "node-fetch";
 
 
@@ -183,14 +184,6 @@ export class Instance {
 		} else {
 			this.updateScores(this.guestPseudo, this.hostPseudo);
 		}
-		// enregistrerScores(this.lobby.hostSocketId, this.lobby.guestSocketId, this.scores[this.lobby.hostSocketId], this.scores[this.lobby.guestSocketId])
-		// 	.then((nouveauScore) => {
-		// 		console.log('New score added:', nouveauScore);
-		// 	})
-		// 	.catch((erreur) => {
-
-		// 		console.error('Error during adding score in db', erreur);
-		// 	})
 	}
 
 	public gameAbort(leaver: AuthenticatedSocket): void {
@@ -209,7 +202,11 @@ export class Instance {
 		});
 		this.lobby.lobbyManager.deleteLobby(this.lobby.id);
 		this.stopGameRuntime();
+
+		this.updateScores(winner.auth.pseudo, leaver.auth.pseudo);
 		// Faire la requête, attention il ne faut pas prendre en compte le score pour le gagnant ici
+	
+	
 	}
 
 	private async updateScores(winnerPseudo: string, loserPseudo: string): Promise<void> {
@@ -226,10 +223,6 @@ export class Instance {
 
 		
 	
-	
-			console.log(
-				'Updating scores for winner', winnerId, 'and loser', loserId, '...'
-			);
 	
 			// Mettre à jour les scores
 			await fetch(`http://localhost:4000/score/${winnerId.id}/update_score/${loserId.id}`, {
