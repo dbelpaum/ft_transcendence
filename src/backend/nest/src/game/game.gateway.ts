@@ -85,4 +85,9 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 	onMatchmakingLeave(client: AuthenticatedSocket): void {
 		this.lobbyManager.leaveMatchmaking(client);
 	}
+
+	@SubscribeMessage(ClientEvents.GetUserStatus)
+	onGetUserStatus(client: AuthenticatedSocket): void {
+		this.lobbyManager.getUserStatus(client);
+	}
 }
