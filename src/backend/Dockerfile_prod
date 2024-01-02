@@ -1,12 +1,12 @@
 # Étape de construction
 FROM node:21 as build
-ENV DATABASE_URL=postgresql://samir:samir@postgres:5432
 WORKDIR /app
 COPY ./nest/package*.json ./
 RUN npm install
 COPY ./nest/prisma ./prisma
 RUN npx prisma generate
 COPY ./nest/ .
+RUN npm install
 RUN npm run build
 
 # Étape de production

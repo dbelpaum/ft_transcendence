@@ -533,3 +533,8 @@ a{
 	background-color: #3ac93a;;
 
 }
+
+.messages:last-child
+{
+	margin-bottom: 64px;
+}

@@ -33,36 +33,33 @@ export class FriendshipController {
 	}
 
 
-	@Get(':userId/friends-and-blocked')
-	@UseGuards(AuthGuard('jwt'))
-	async getFriendsAndBlocked(@Param('userId') userId: string) {
-		const friends = await this.prisma.friendship.findMany({
-			where: {
-				OR: [
-					{ requesterId: Number(userId), status: 'friend' },
+@Get(':userId/friends-and-blocked')
+@UseGuards(AuthGuard('jwt'))
+async getFriendsAndBlocked(@Param('userId') userId: string) {
+    const friends = await this.prisma.friendship.findMany({
+        where: {
+            OR: [
+                { requesterId: Number(userId), status: 'friend' },
+                
+            ],
+        },
+        include: {
+            addressee: true
+        }
+    });
 
-				],
-			},
-			include: {
-				addressee: true
-			}
-		});
+    const blocked = await this.prisma.friendship.findMany({
+        where: {
+            requesterId: Number(userId),
+            status: 'blocked',
+        },
+        include: {
+            addressee: true
+        }
+    });
 
-		const blocked = await this.prisma.friendship.findMany({
-			where: {
-				requesterId: Number(userId),
-				status: 'blocked',
-			},
-			include: {
-				addressee: true
-			}
-		});
-
-		// console.log("friends:", JSON.stringify(friends, null, 2));
-		// console.log("blocked:", JSON.stringify(blocked, null, 2));
-
-		return { friends, blocked };
-	}
+    return { friends, blocked };
+}
 
 
 
@@ -274,6 +271,7 @@ export class FriendshipController {
 
 		return unblockedFriendship;
 	}
+
 
 
 

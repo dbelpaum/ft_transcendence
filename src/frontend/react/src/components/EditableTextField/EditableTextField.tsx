@@ -6,16 +6,19 @@ interface EditableTextFieldProps {
   value: string;
   onSave: (value: string) => void;
   editable?: boolean;
+  maxLength?: number; // Ajout d'une nouvelle propriété pour la limite de caractères
 }
 
-function EditableTextField({ label, value, onSave, editable = true }: EditableTextFieldProps) {
+function EditableTextField({ label, value, onSave, editable = true, maxLength = 25 }: EditableTextFieldProps) {
   const [inputValue, setInputValue] = useState(value || '');
   const [isEdited, setIsEdited] = useState(false);
 
-
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setInputValue(e.target.value);
-    setIsEdited(true);
+    const newValue = e.target.value;
+    if (!maxLength || newValue.length <= maxLength) { // Vérifie la limite de caractères
+      setInputValue(newValue);
+      setIsEdited(true);
+    }
   };
 
   const handleSave = () => {
@@ -28,7 +31,7 @@ function EditableTextField({ label, value, onSave, editable = true }: EditableTe
       <label>{label}: </label>
       {editable ? (
         <>
-          <input type="text" value={inputValue} onChange={handleChange} />
+          <input type="text" value={inputValue} onChange={handleChange} maxLength={maxLength} />
           {isEdited && (
             <button className='save-button' onClick={handleSave}>Sauvegarder</button>
           )}
