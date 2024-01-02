@@ -35,6 +35,7 @@ const UserProfile: React.FC = () => {
     const {authToken, user, chatSocket, recharger} = useAuth();
     const [friendshipStatus, setFriendshipStatus] = useState<string | null>(null); // 'friend' | 'pending' | 'blocked' | null
 	const navigate = useNavigate();
+    const [userScore, setUserScore] = useState({ actualUser: 0, OpponentUser: 0 });
     
 
     const { pseudo } = useParams<{ pseudo: string }>();
@@ -56,6 +57,7 @@ const UserProfile: React.FC = () => {
             .catch(error => console.log(error));
 
     }, [pseudo]);
+
 
 
 	useEffect(() => {
@@ -131,7 +133,6 @@ useEffect(() => {
     fetch(`http://localhost:4000/friendship/${user?.id}/relation/${userInfo?.id}`)
         .then(response => response.json())
         .then((response) => {
-            console.log('test de response ' + response.status)
             setFriendshipStatus(response.status);
             if (friendshipStatus === 'friend') {
                 setButtonStatus('removeFriend');
@@ -147,14 +148,30 @@ useEffect(() => {
         .catch(error => console.log(error));
      }, [user?.id, userInfo?.id]);
 
-     
-
-    // console.log(friendshipStatus);
-    // console.log(buttonStatus);
 
 
-    // console.log(`L'utilisateur a ajouter est: ${userInfo?.pseudo}`);
-    // console.log(`L'utilisateur connecté est: ${user?.pseudo}`)
+     useEffect(() => {
+        if (!user || !userInfo) {
+            return;
+        }
+    
+        fetch(`http://localhost:4000/score/${user.id}/consult_score/${userInfo.id}`, {
+            method: 'GET',
+                headers: {
+					'Authorization': `Bearer ${authToken}`
+                },
+    })
+            .then(response => response.json())
+            .then(score => {
+                if (score.user1Id === user.id) {
+                    setUserScore({ actualUser: score.user1Wins, OpponentUser: score.user2Wins });
+                } else {
+                    setUserScore({ actualUser: score.user2Wins, OpponentUser: score.user1Wins });
+                }
+            })
+            .catch(error => console.error("Erreur lors de la récupération du score", error));
+    }, [user, userInfo]);
+
 
     if (!userInfo) {
         return <div>Chargement...</div>;
@@ -319,6 +336,15 @@ useEffect(() => {
                 )
             }
 			</div>
+
+            <div className="profile-score">
+            <h2>Score contre moi</h2>
+            <div className="score-display">
+                <span className="user-score">{userScore.actualUser}</span>
+                <span>-</span>
+                <span className="opponent-score">{userScore.OpponentUser}</span>
+            </div>
+</div>
 		</main>
   );
 };
