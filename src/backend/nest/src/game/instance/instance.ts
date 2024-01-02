@@ -180,9 +180,9 @@ export class Instance {
 		this.lobby.lobbyManager.deleteLobby(this.lobby.id);
 		this.stopGameRuntime();
 		if (this.scores[this.hostPseudo] >= this.scores[this.guestPseudo]) {
-			this.updateScores(this.hostPseudo, this.guestPseudo);
+			this.updateScores(this.hostPseudo, this.guestPseudo, this.scores[this.guestPseudo]);
 		} else {
-			this.updateScores(this.guestPseudo, this.hostPseudo);
+			this.updateScores(this.guestPseudo, this.hostPseudo, this.scores[this.hostPseudo]);
 		}
 	}
 
@@ -203,13 +203,13 @@ export class Instance {
 		this.lobby.lobbyManager.deleteLobby(this.lobby.id);
 		this.stopGameRuntime();
 
-		this.updateScores(winner.auth.pseudo, leaver.auth.pseudo);
+		
 		// Faire la requête, attention il ne faut pas prendre en compte le score pour le gagnant ici
 	
 	
 	}
 
-	private async updateScores(winnerPseudo: string, loserPseudo: string): Promise<void> {
+	private async updateScores(winnerPseudo: string, loserPseudo: string, loserScore: Number): Promise<void> {
 		try {
 			// Récupérer les ID des utilisateurs simultanément
 			const [winnerResponse, loserResponse] = await Promise.all([
@@ -225,7 +225,7 @@ export class Instance {
 	
 	
 			// Mettre à jour les scores
-			await fetch(`http://localhost:4000/score/${winnerId.id}/update_score/${loserId.id}`, {
+			await fetch(`http://localhost:4000/score/create_match/${winnerId.id}/${loserId.id}/${loserScore}`, {
 				method: 'POST',
 			});
 		} catch (error) {

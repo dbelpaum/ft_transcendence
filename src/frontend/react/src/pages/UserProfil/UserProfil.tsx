@@ -149,30 +149,6 @@ useEffect(() => {
      }, [user?.id, userInfo?.id]);
 
 
-
-     useEffect(() => {
-        if (!user || !userInfo) {
-            return;
-        }
-    
-        fetch(`http://localhost:4000/score/${user.id}/consult_score/${userInfo.id}`, {
-            method: 'GET',
-                headers: {
-					'Authorization': `Bearer ${authToken}`
-                },
-    })
-            .then(response => response.json())
-            .then(score => {
-                if (score.user1Id === user.id) {
-                    setUserScore({ actualUser: score.user1Wins, OpponentUser: score.user2Wins });
-                } else {
-                    setUserScore({ actualUser: score.user2Wins, OpponentUser: score.user1Wins });
-                }
-            })
-            .catch(error => console.error("Erreur lors de la récupération du score", error));
-    }, [user, userInfo]);
-
-
     if (!userInfo) {
         return <div>Chargement...</div>;
     }
@@ -348,15 +324,7 @@ useEffect(() => {
 				<button onClick={triggerMp}>Envoyer un mp</button>
                 )
             }
-			</div>
-
-            <div className="profile-score">
-            <h2>Score contre moi</h2>
-            <div className="score-display">
-                <span className="user-score">{userScore.actualUser}</span>
-                <span>-</span>
-                <span className="opponent-score">{userScore.OpponentUser}</span>
-            </div>
+			
 </div>
 		</main>
   );
