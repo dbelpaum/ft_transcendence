@@ -52,7 +52,7 @@ model Score {
   user2       User     @relation("UserScores2", fields: [user2Id], references: [id])
   user1Score  Int  
   user2Score  Int     
-  playedAt    DateTime @default(now()) 
+  playedAt    DateTime @default(now())
 
 
   @@unique([user1Id, user2Id, playedAt])
