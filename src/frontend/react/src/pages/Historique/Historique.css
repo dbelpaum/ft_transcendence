@@ -1,0 +1,32 @@
+.historique .match {
+    display: flex;
+    align-items: center;
+    margin: 10px;
+    padding: 10px;
+    border-radius: 5px;
+}
+
+.historique .match.green {
+    background-color: lightgreen;
+}
+
+.historique .match.red {
+    background-color: lightcoral;
+}
+
+.player-info {
+    flex: 1;
+    display: flex;
+    align-items: center;
+}
+
+.player-info img {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    margin-right: 10px;
+}
+
+.score {
+    font-weight: bold;
+}

@@ -9,6 +9,8 @@ import { User } from '../../context/AuthInteface';
 import FriendshipList from '../../components/FriendshipList/FriendshipList';
 import Button2FA from '../../components/2FA/Button2FA';
 import ProfilePicture from '../../components/ProfilePicture/ProfilePicture';
+import Historique from '../Historique/Historique';
+
 
 interface UserInfo {
   pseudo: string;
@@ -115,6 +117,9 @@ function Profil() {
 		{user?.id && <FriendshipList userId={user?.id} />}
 		<Link to="/UserList">Liste des joueurs</Link>
 	</div>
+
+  <Link to="/historique">Historique des parties</Link>
+  
 
       </div>
     </main>

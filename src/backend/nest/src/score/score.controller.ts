@@ -7,7 +7,19 @@ import { UserTokenInfo } from 'src/chat/chat.interface';
 export class ScoreController {
     constructor(private prisma: PrismaService) {}
 
+    @Get('matches/:userId')
+    async getUserMatches(@Param('userId') userId: string) {
+        const userMatches = await this.prisma.score.findMany({
+            where: {
+                OR: [
+                    { user1Id: Number(userId) },
+                    { user2Id: Number(userId) }
+                ],
+            },
+        });
 
+        return userMatches;
+    }
 
 
     @Post('create_match/:winnerId/:loserId/:loserScore')
