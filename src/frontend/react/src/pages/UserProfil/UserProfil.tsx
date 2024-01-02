@@ -92,8 +92,24 @@ const UserProfile: React.FC = () => {
 		return () => clearInterval(interval);
 	}, [userInfo]);
 
+	useEffect(() => {
+		if (!pseudo) {
+			return;
+		}
+		const socket = io("http://localhost:4000/game", { auth: { token: authToken } });
 
+		socket.emit("client.getuserstatus", { nickname: pseudo });
 
+		socket.on("server.getuserstatus", (data: { isPlaying: boolean }) => {
+			setIsPlaying(data.isPlaying);
+			// console.log(data);
+		});
+
+		// Cleanup socket connection on component unmount
+		return () => {
+			socket.disconnect();
+		};
+	}, [pseudo]);
 
 	useEffect(() => {
 		if (!userInfo) {
@@ -151,30 +167,6 @@ const UserProfile: React.FC = () => {
 	}, [user?.id, userInfo?.id]);
 
 
-
-	useEffect(() => {
-		if (!user || !userInfo) {
-			return;
-		}
-
-		fetch(`http://localhost:4000/score/${user.id}/consult_score/${userInfo.id}`, {
-			method: 'GET',
-			headers: {
-				'Authorization': `Bearer ${authToken}`
-			},
-		})
-			.then(response => response.json())
-			.then(score => {
-				if (score.user1Id === user.id) {
-					setUserScore({ actualUser: score.user1Wins, OpponentUser: score.user2Wins });
-				} else {
-					setUserScore({ actualUser: score.user2Wins, OpponentUser: score.user1Wins });
-				}
-			})
-			.catch(error => console.error("Erreur lors de la récupération du score", error));
-	}, [user, userInfo]);
-
-
 	if (!userInfo) {
 		return <div>Chargement...</div>;
 	}
@@ -203,36 +195,10 @@ const UserProfile: React.FC = () => {
 				console.error(error);
 				setButtonStatus('addFriend');
 			});
+
+
+
 	}
-
-	useEffect(() => {
-		if (!user?.id42 || !userInfo?.id42) {
-			return;
-		}
-		fetch(`http://localhost:4000/friendship/${user?.id}/relation/${userInfo?.id}`)
-			.then(response => response.json())
-			.then((response) => {
-				setFriendshipStatus(response.status);
-				if (friendshipStatus === 'friend') {
-					setButtonStatus('removeFriend');
-				} else if (friendshipStatus === 'blocked') {
-					setButtonStatus('unblock');
-					console.log('On rentre dans le else if')
-				} else {
-
-					setButtonStatus('addFriend');
-					console.log('On rentre dans le else')
-				}
-			})
-			.catch(error => console.log(error));
-	}, [user?.id, userInfo?.id]);
-
-
-	if (!userInfo) {
-		return <div>Chargement...</div>;
-	}
-
-	console.log('Friendship status initial ' + friendshipStatus);
 
 	const handleRemoveFriendClick = async () => {
 		try {
