@@ -53,9 +53,9 @@ const ChannelInfo: React.FC<ChannelWriteProps> = ({ channelUtility }) => {
 	
 	  const uniqueUsers = Array.from(uniqueUsersMap.values());
 
-	  function isAdmin(user:User, admin:string[]) : boolean
+	  function isAdmin(user:User, admin:number[]) : boolean
 	  {
-		  return (admin.some(l => user.pseudo === l))
+		  return (admin.some(id => user.id === id))
 	  }
 	  function isOwner(user:User, owner:User) : boolean
 	  {

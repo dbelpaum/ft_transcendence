@@ -20,9 +20,9 @@ const InviteChannel: React.FC<ChannelInviteProps> = ({ channelUtility, channelUr
 
    
 
-	function isAdmin(user:User, admin:string[]) : boolean
+	function isAdmin(user:User, admin:number[]) : boolean
 	  {
-		  return (admin.some(l => user.pseudo === l))
+		  return (admin.some(id => user.id === id))
 	  }
 
 	

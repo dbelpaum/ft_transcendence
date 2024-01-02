@@ -180,7 +180,7 @@ export class ChannelService {
 		await this.channels.push(
 			{ 
 				name: channelCreate.name, 
-				host: [channelCreate.user.pseudo],
+				host: [channelCreate.user.id],
 				owner: channelCreate.user,
 				users: [channelCreate.user],
 				type: channelCreate.type,
@@ -200,10 +200,6 @@ export class ChannelService {
 	  }
 	}
   
-	async getChannelHost(hostName: string): Promise<string[]> {
-	  const channelIndex = await this.getChannelByName(hostName)
-	  return this.channels[channelIndex].host
-	}
   
 	async getChannelByName(channelName: string): Promise<number> {
 	  const channelIndex = this.channels.findIndex((channel) => channel?.name === channelName)
@@ -218,9 +214,9 @@ export class ChannelService {
 		return (mdp === channel.mdp)
 	}
 
-	userIsHost(user_pseudo: string, channel: Channel)
+	userIsHost(user_id: number, channel: Channel)
 	{
-		return channel.host.some(l => l == user_pseudo)
+		return channel.host.some(l => l == user_id)
 	}
 
 	async addInviteToChannel(inviteInfo: InviteToChannel) : Promise<void>
@@ -246,10 +242,10 @@ export class ChannelService {
 
 
 		// Si l'utilisateur n'est pas administrateur, on ne fait rien
-		if (!this.userIsHost(adminInfo.user.pseudo,this.channels[channelIndex])) return
+		if (!this.userIsHost(adminInfo.user.id,this.channels[channelIndex])) return
 
 		// Sinon, on ajoute le nom a la liste des admins
-		this.channels[channelIndex].host.push(adminInfo.user_to_modify.pseudo)
+		this.channels[channelIndex].host.push(adminInfo.user_to_modify.id)
 
 	}
 
@@ -261,7 +257,7 @@ export class ChannelService {
 
 
 		// Si l'utilisateur n'est pas administrateur, on ne fait rien
-		if (!this.userIsHost(adminInfo.user.pseudo,this.channels[channelIndex])) return false
+		if (!this.userIsHost(adminInfo.user.id,this.channels[channelIndex])) return false
 
 		// Si l'utilisateur a supprimer des admins est nous meme, on ne fait rien
 		if (adminInfo.user_to_modify.pseudo === adminInfo.user.pseudo) return false
@@ -271,7 +267,7 @@ export class ChannelService {
 
 		// Sinon, on enleve le nom a la liste des admins
 
-		const adminIndex = this.channels[channelIndex].host.indexOf(adminInfo.user_to_modify.pseudo);
+		const adminIndex = this.channels[channelIndex].host.indexOf(adminInfo.user_to_modify.id);
 		if (adminIndex !== -1) {
 			this.channels[channelIndex].host.splice(adminIndex, 1);
 		}
@@ -285,7 +281,7 @@ export class ChannelService {
 		if (channelIndex === -1) return false;
 
 		// Si l'utilisateur n'est pas administrateur, on ne fait rien
-		if (!this.userIsHost(adminInfo.user.pseudo,this.channels[channelIndex])) return false
+		if (!this.userIsHost(adminInfo.user.id,this.channels[channelIndex])) return false
 
 		// Si l'utilisateur a kick est nous meme, on ne fait rien
 		if (adminInfo.user_to_modify.pseudo === adminInfo.user.pseudo) return false
@@ -296,7 +292,7 @@ export class ChannelService {
 
 		// Sinon, on supprime la personne de la liste des users
 		this.channels[channelIndex].users = this.channels[channelIndex].users.filter(user => user.id !== adminInfo.user_to_modify.id);
-		this.channels[channelIndex].host = this.channels[channelIndex].host.filter(pseudo => pseudo !== adminInfo.user_to_modify.pseudo);
+		this.channels[channelIndex].host = this.channels[channelIndex].host.filter(id => id !== adminInfo.user_to_modify.id);
 		return true
 	}
   
@@ -308,7 +304,7 @@ export class ChannelService {
 
 
 		// Si l'utilisateur n'est pas administrateur, on ne fait rien
-		if (!this.userIsHost(adminInfo.user.pseudo,this.channels[channelIndex])) return false
+		if (!this.userIsHost(adminInfo.user.id,this.channels[channelIndex])) return false
 
 		// Si l'utilisateur a ban est nous meme, on ne fait rien
 		if (adminInfo.user_to_modify.pseudo === adminInfo.user.pseudo) return false
@@ -322,7 +318,7 @@ export class ChannelService {
 
 		// puis on supprime la personne de la liste des users
 		this.channels[channelIndex].users = this.channels[channelIndex].users.filter(user => user.pseudo !== adminInfo.user_to_modify.pseudo);
-		this.channels[channelIndex].host = this.channels[channelIndex].host.filter(pseudo => pseudo !== adminInfo.user_to_modify.pseudo);
+		this.channels[channelIndex].host = this.channels[channelIndex].host.filter(id => id !== adminInfo.user_to_modify.id);
 
 		
 		return true
@@ -335,7 +331,7 @@ export class ChannelService {
 
 
 		// Si l'utilisateur n'est pas administrateur, on ne fait rien
-		if (!this.userIsHost(adminInfo.user.pseudo,this.channels[channelIndex])) return false
+		if (!this.userIsHost(adminInfo.user.id,this.channels[channelIndex])) return false
 
 		// Si l'utilisateur a ban est nous meme, on ne fait rien
 		if (adminInfo.user_to_modify.pseudo === adminInfo.user.pseudo) return false
