@@ -156,4 +156,12 @@ export class LobbyManager {
 		client.data.lobby?.removeClient(client);
 		client.emit(ServerEvents.MatchmakingStatus, { status: "left" });
 	}
+
+	public getUserStatus(client: AuthenticatedSocket): void {
+		if (this.isUserInAnyLobby(client)) {
+			client.emit(ServerEvents.GetUserStatus, { isPlaying: true });
+		} else {
+			client.emit(ServerEvents.GetUserStatus, { isPlaying: false });
+		}
+	}
 }

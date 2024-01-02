@@ -8,4 +8,5 @@ export enum ClientEvents {
 	ClientMovement = "client.game.move",
 	MatchmakingJoin = "client.matchmaking.join",
 	MatchmakingLeave = "client.matchmaking.leave",
+	GetUserStatus = "client.getuserstatus",
 }

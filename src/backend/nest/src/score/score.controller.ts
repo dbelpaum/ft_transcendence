@@ -1,11 +1,11 @@
-import { Controller, Get, Param, Post , UseGuards} from '@nestjs/common';
+import { Controller, Get, Param, Post, UseGuards } from '@nestjs/common';
 import { PrismaService } from 'src/prisma.service';
 import { AuthGuard } from '@nestjs/passport';
 import { UserTokenInfo } from 'src/chat/chat.interface';
 
 @Controller('score')
 export class ScoreController {
-    constructor(private prisma: PrismaService) {}
+	constructor(private prisma: PrismaService) { }
 
     @Get('matches/:userId')
     async getUserMatches(@Param('userId') userId: string) {
