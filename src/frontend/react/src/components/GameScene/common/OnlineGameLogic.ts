@@ -182,12 +182,12 @@ export class OnlineGameLogic {
 
 	private handleResize() {
 		if (window.innerWidth < 500) { // Mobile
-			this.width = window.innerWidth * 0.9;
-			this.height = window.innerHeight * 0.6;
+			this.width = window.innerWidth * 0.7;
+			this.height = window.innerHeight * 0.5;
 		}
 		else if (window.innerWidth < 1000) { // Tablet
-			this.width = window.innerWidth * 0.8;
-			this.height = window.innerHeight * 0.7;
+			this.width = window.innerWidth * 0.7;
+			this.height = window.innerHeight * 0.6;
 		}
 		else { // Desktop
 			this.width = window.innerWidth * 0.6;
@@ -319,6 +319,7 @@ export class OnlineGameLogic {
 		window.addEventListener("keyup", this.handleKeyUp.bind(this));
 		this.bindMobileControls();
 		window.addEventListener("resize", this.handleResize.bind(this));
+		this.handleResize();
 	}
 
 	public dispose(): void {

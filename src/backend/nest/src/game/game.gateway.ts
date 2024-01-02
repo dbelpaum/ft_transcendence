@@ -21,15 +21,9 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 	afterInit(server: Server): any {
 		// Pass server instance to managers
 		this.lobbyManager.server = server;
-		console.log('Game server initialized !');
 	}
 
 	async handleConnection(client: Socket, ...args: any[]): Promise<void> {
-		// from here you can verify if the user is authenticated correctly,
-		// you can perform whatever operation (database call, token check, ...) 
-		// you can disconnect client if it didn't match authentication criterias
-		// you can also perform other operations, such as initializing socket attached data 
-		// or whatever you would like upon connection
 		this.lobbyManager.initializeSocket(client as AuthenticatedSocket);
 	}
 
@@ -40,7 +34,6 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 
 	@SubscribeMessage(ClientEvents.Ping)
 	onPing(client: Socket): void {
-		console.log("Received event :" + ClientEvents.Ping);
 		client.emit(ServerEvents.Pong, {
 			message: 'pong',
 		});
@@ -48,11 +41,8 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 
 	@SubscribeMessage(ClientEvents.LobbyCreate)
 	onLobbyCreate(client: AuthenticatedSocket, data: LobbyCreateDto): WsResponse<ServerPayloads[ServerEvents.GameMessage]> {
-		console.log("Received event :" + ClientEvents.LobbyCreate + " from " + client.auth.pseudo);
 		const lobby = this.lobbyManager.createLobby(data.mode, client);
-		console.log('Created %s Lobby with id %s', data.mode, lobby.id);
 		lobby.addClient(client);
-
 		return {
 			event: ServerEvents.GameMessage,
 			data: {
@@ -63,26 +53,21 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 
 	@SubscribeMessage(ClientEvents.LobbyJoin)
 	onLobbyJoin(client: AuthenticatedSocket, data: LobbyJoinDto): void {
-		console.log("Received event :" + ClientEvents.LobbyJoin);
-		console.log('Client %s joined lobby %s', client.id, data.lobbyId);
 		this.lobbyManager.joinLobby(data.lobbyId, client);
 	}
 
 	@SubscribeMessage(ClientEvents.LobbyLeave)
 	onLobbyLeave(client: AuthenticatedSocket): void {
-		console.log("Received event :" + ClientEvents.LobbyLeave);
 		client.data.lobby?.removeClient(client);
 	}
 
 	@SubscribeMessage(ClientEvents.ClientReady)
 	onClientReady(client: AuthenticatedSocket): void {
-		console.log("Received event :" + ClientEvents.ClientReady);
 		client.data.lobby?.setReadyStatus(client, true);
 	}
 
 	@SubscribeMessage(ClientEvents.ClientUnready)
 	onClientUnready(client: AuthenticatedSocket): void {
-		console.log("Received event :" + ClientEvents.ClientUnready);
 		client.data.lobby?.setReadyStatus(client, false);
 	}
 

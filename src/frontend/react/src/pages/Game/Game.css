@@ -12,35 +12,73 @@
 		inset 0 -2px 2px rgba(255, 255, 255, 0.5);
 }
 
-.game-container {
-	display: flex;
-	justify-content: space-around; /* Add horizontal space between components */
-	align-items: center;
-}
-
-@media (max-width: 1000px) {
-	.gameScore1,
-	.gameScore2 {
-	  	display: none;
+/* Desktop */
+@media (min-width: 1000px) {
+	.game-container {
+		display: flex;
+		justify-content: space-around; /* Add horizontal space between components */
+		align-items: center;
 	}
 }
 
-.gameScore1,
-.gameScore2 {
-	margin: 0px 40px; /* Adjust the top and bottom margins and horizontal spacing */
-	font-size: 20px;
-	border:#ffffff 3px solid;
-	/* background: #2d3fa6; */
-	padding: 10px;
-	border-radius: 30px;
-	text-align: center;
-	color: white;
-	/* Add styling for game scores as needed */
+/* Mobile */
+@media (max-width: 1000px) {
+	.game-container {
+		display: flex;
+		flex-direction: column; /* Change to column layout for smaller screens */
+		justify-content: flex-start; /* Align items at the top of the container */
+		align-items: center;
+	}
+}
+  
+/* Mobile */
+@media (max-width: 1000px) {
+	.gameScore1,
+	.gameScore2 {
+		margin: 20px 0; /* Adjust the top and bottom margins */
+		order: -1; /* Set a negative order to move them to the top */
+	}
 }
 
-.gameScore1 > div,
-.gameScore2 > div {
-  margin-top: 15px; /* Adjust the vertical padding as needed */
+@media (min-width: 1000px) {
+	.gameScore1,
+	.gameScore2 {
+		margin: 0px 40px; /* Adjust the top and bottom margins and horizontal spacing */
+		font-size: 20px;
+		border:#ffffff 3px solid;
+		/* background: #2d3fa6; */
+		padding: 10px;
+		border-radius: 30px;
+		text-align: center;
+		color: white;
+		/* Add styling for game scores as needed */
+	}
+
+	.gameScore1 > div,
+	.gameScore2 > div {
+	margin-top: 15px; /* Adjust the vertical padding as needed */
+	}
+}
+
+/* Mobile */
+@media (max-width: 1000px) {
+	.gameScore1,
+	.gameScore2 {
+		margin: 0px 0px; /* Adjust the top and bottom margins and horizontal spacing */
+		font-size: 15px;
+		border:#ffffff 3px solid;
+		/* background: #2d3fa6; */
+		padding: 5px;
+		border-radius: 30px;
+		text-align: center;
+		color: white;
+		/* Add styling for game scores as needed */
+	}
+
+	.gameScore1 > div,
+	.gameScore2 > div {
+	margin-top: 10px; /* Adjust the vertical padding as needed */
+	}
 }
 
 .OnlineGameScene {
