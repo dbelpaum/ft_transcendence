@@ -15,7 +15,7 @@ import { MutexInterceptor } from './mutex.interceptor';
 	imports: [
 		PassportModule,
 		JwtModule.register({
-		  secret: 'votre_secret_jwt', // Remplacez ceci par votre propre secret en production
+		  secret: process.env.SECRET_JWT, // Remplacez ceci par votre propre secret en production
 		  signOptions: { expiresIn: '60m' }, // Durée de vie du token (ici 60 minutes)
 		}),
 		// Ajoutez d'autres modules si nécessaire

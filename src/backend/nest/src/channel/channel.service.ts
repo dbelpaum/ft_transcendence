@@ -318,7 +318,7 @@ export class ChannelService {
 
 
 		// Sinon, on ajoute la personne de la liste des bannis
-		this.channels[channelIndex].ban.push(adminInfo.user_to_modify.pseudo)
+		this.channels[channelIndex].ban.push(adminInfo.user_to_modify.id)
 
 		// puis on supprime la personne de la liste des users
 		this.channels[channelIndex].users = this.channels[channelIndex].users.filter(user => user.pseudo !== adminInfo.user_to_modify.pseudo);
@@ -408,7 +408,7 @@ export class ChannelService {
 			}
 
 			// Si l'utilisateur est ban, qu'il le reste
-			if (this.channels[channelIndex].ban.some(name => name === channelCreate.user.pseudo))
+			if (this.channels[channelIndex].ban.some(id => id === channelCreate.user.id))
 			{
 				return {
 					errorNumber: 26,
