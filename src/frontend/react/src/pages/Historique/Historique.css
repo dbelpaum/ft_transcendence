@@ -1,0 +1,67 @@
+.historique {
+    margin-top: 20px;
+    margin-left: auto;
+    margin-right: auto;
+    max-width: 70%;
+    padding: 0 5px;
+}
+
+.historique h1 {
+    text-align: center;
+    color: #ffffff;
+    margin-bottom: 20px;
+    font-family: 'Arial', sans-serif;
+    font-weight: bold;
+    font-size: 1.5em;
+    text-shadow: 1px 1px 2px #000000;
+}
+
+.match {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin: 8px 0;
+    padding: 8px;
+    border-radius: 5px;
+    background-color: #ffffff;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.match.green {
+    background-color: lightgreen;
+}
+
+.match.red {
+    background-color: lightcoral;
+}
+
+.player-info, .time-since {
+    flex: 1;
+    display: flex;
+    align-items: center;
+}
+
+.player-info img, .time-since img {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    margin-right: 8px;
+}
+
+.player-info {
+    justify-content: flex-start;
+}
+
+.time-since {
+    justify-content: flex-end;
+    margin-right: 15px; 
+    font-size: 0.8em; 
+    color: #666666; 
+    font-style: italic;
+}
+
+.score {
+    font-weight: bold;
+    font-size: 0.9em;
+    margin: 0 15px;
+}

@@ -57,10 +57,25 @@ export class UserController {
 
 
     @Get(':id')
-    async getUserById(@Param('id') id: string) {
-        return await this.prisma.user.findUnique({
+    async getUserById42(@Param('id') id: string) {
+      console.log(id);
+        const user = await this.prisma.user.findUnique({
             where: { id42: Number(id) },
         });
+
+        console.log(user);
+        return user ? user : null;
+    }
+
+    @Get('by-id/:id')
+    async getUserById(@Param('id') id: string) {
+      console.log(id);
+        const user = await this.prisma.user.findUnique({
+            where: { id: Number(id) },
+        });
+
+        console.log(user);
+        return user ? user : null;
     }
     
     @Get(':id/pseudo')

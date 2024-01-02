@@ -7,68 +7,41 @@ import { UserTokenInfo } from 'src/chat/chat.interface';
 export class ScoreController {
 	constructor(private prisma: PrismaService) { }
 
-	@Get(':userId/consult_score/:opponentId')
-	@UseGuards(AuthGuard('jwt'))
-	async consultScore(@Param('userId') userId: string, @Param('opponentId') opponentId: string) {
-		const userIdNum = Number(userId);
-		const opponentIdNum = Number(opponentId);
+    @Get('matches/:userId')
+    async getUserMatches(@Param('userId') userId: string) {
+        const userMatches = await this.prisma.score.findMany({
+            where: {
+                OR: [
+                    { user1Id: Number(userId) },
+                    { user2Id: Number(userId) }
+                ],
+            },
+        });
 
-		const existingScore = await this.prisma.score.findFirst({
-			where: {
-				OR: [
-					{ user1Id: userIdNum, user2Id: opponentIdNum },
-					{ user1Id: opponentIdNum, user2Id: userIdNum }
-				],
-			},
-		});
-
-		if (!existingScore) {
-			return {
-				user1Id: userIdNum,
-				user2Id: opponentIdNum,
-				user1Wins: 0,
-				user2Wins: 0,
-			};
-		}
-
-		return existingScore;
-	}
+        return userMatches;
+    }
 
 
-	@Post(':winnerId/update_score/:loserId')
-	// @UseGuards(AuthGuard('jwt'))
-	async updateScore(@Param('winnerId') winnerId: string, @Param('loserId') loserId: string) {
-		const winnerIdNum = Number(winnerId);
-		const loserIdNum = Number(loserId);
+    @Post('create_match/:winnerId/:loserId/:loserScore')
+    async createScore(@Param('winnerId') winnerId: string, @Param('loserId') loserId: string, @Param('loserScore') loserScore: string) {
+        const data = {
+            user1Id: Number(winnerId),
+            user2Id: Number(loserId),
+            user1Score: 5,
+            user2Score: Number(loserScore),
+        };
 
-		const existingScore = await this.prisma.score.findFirst({
-			where: {
-				OR: [
-					{ user1Id: winnerIdNum, user2Id: loserIdNum },
-					{ user1Id: loserIdNum, user2Id: winnerIdNum }
-				],
-			},
-		});
-
-		if (!existingScore) {
-			console.log('Score not found, creating new score');
-			await this.prisma.score.create({
-				data: {
-					user1Id: winnerIdNum,
-					user2Id: loserIdNum,
-					user1Wins: 1,
-				},
-			});
-		} else {
-			console.log('Score found, updating');
-			const isWinnerUser1 = existingScore.user1Id === winnerIdNum;
-			await this.prisma.score.update({
-				where: { id: existingScore.id },
-				data: isWinnerUser1 ?
-					{ user1Wins: { increment: 1 } } :
-					{ user2Wins: { increment: 1 } }
-			});
-		}
-
-	}
+        console.log(data);
+        
+        try {
+            const newGame = await this.prisma.score.create({
+                data,
+            });
+            console.log(newGame);
+            return newGame;
+        } catch (error) {
+            console.error(error);
+            // Gérer l'erreur ici (par exemple, en renvoyant une réponse d'erreur)
+        }
+    }
 }
