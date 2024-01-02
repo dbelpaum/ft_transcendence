@@ -34,7 +34,7 @@ export interface Channel {
 	mdp: string
 	invited: string[]
 	ban: number[]
-	mute: string[]
+	mute: number[]
 }
 
 export interface MpChannel {

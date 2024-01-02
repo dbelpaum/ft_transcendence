@@ -340,11 +340,11 @@ export class ChannelService {
 		if (adminInfo.user_to_modify.socketId === this.channels[channelIndex].owner.socketId) return false 
 
 
-		this.channels[channelIndex].mute.push(adminInfo.user_to_modify.pseudo);
+		this.channels[channelIndex].mute.push(adminInfo.user_to_modify.id);
 	
 		// Minuterie pour démuter automatiquement après 120 secondes
 		setTimeout(() => {
-			this.channels[channelIndex].mute = this.channels[channelIndex].mute.filter(m => m !== adminInfo.user_to_modify.pseudo);
+			this.channels[channelIndex].mute = this.channels[channelIndex].mute.filter(m => m !== adminInfo.user_to_modify.id);
 		}, 120000);
 
 		return true
@@ -356,7 +356,7 @@ export class ChannelService {
 		if (channelIndex === -1) return;
 
 		// On return true si l'utilisateur est dans la liste des muted
-		return this.channels[channelIndex].mute.some(muted => muted === message.user.pseudo)
+		return this.channels[channelIndex].mute.some(muted => muted === message.user.id)
 	  }
 
 	async modifyChannel(channelCreate: ChannelCreate): Promise<void> {
