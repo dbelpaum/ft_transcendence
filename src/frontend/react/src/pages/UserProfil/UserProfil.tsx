@@ -96,8 +96,7 @@ const UserProfile: React.FC = () => {
 		if (!pseudo) {
 			return;
 		}
-		const socket = io("http://localhost:4000/game", { autoConnect: false, auth: { token: authToken } });
-		console.log(socket);
+		const socket = io("http://localhost:4000/game", { auth: { token: authToken } });
 
 		socket.emit("client.getuserstatus", { nickname: pseudo });
 
@@ -310,7 +309,7 @@ const UserProfile: React.FC = () => {
 				<img src={userInfo.imageURL || DefaultProfilePic} alt={userInfo.pseudo} className="profile-pic" />
 				<h1>{userInfo.firstname} {userInfo.lastname}
 					<span className='channel_status'>
-						<div className={isConnected ? "status_indicator connected" : "status_indicator"}></div>
+						<div className={isPlaying ? "status_indicator playing" : isConnected ? "status_indicator connected" : "status_indicator"}></div>
 					</span>
 				</h1>
 				<p className="user-email">{userInfo.email}</p>

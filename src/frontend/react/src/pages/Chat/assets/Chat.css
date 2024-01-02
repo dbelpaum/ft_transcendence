@@ -514,6 +514,10 @@ a{
 	background-color: green;
 }
 
+.user-profile-container .channel_status .status_indicator.playing{
+	background-color: blue;
+}
+
 .mp{
 	display: flex;
 	justify-content: center;
