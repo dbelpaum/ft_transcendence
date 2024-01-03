@@ -51,9 +51,13 @@ export class UserController {
 
     }
 
-
-
-
+  // ici
+    @Get('wins') 
+    async getUsersWins() {
+      return await this.prisma.user.findMany({
+        select: { pseudo: true, Wins: true },
+      });
+    }
 
 
     @Get(':id')
