@@ -3,14 +3,22 @@ import './UserList.css';
 import DefaultProfilPicture from '../../assets/default-profile.png';
 import UserProfile from '../UserProfil/UserProfil';
 import { User } from '../../context/AuthInteface';
+import { useAuth } from '../../context/AuthContexte';
 
 
 
 const UserList: React.FC = () => {
     const [users, setUsersList] = useState<User[]>([]);
+	const {authToken} = useAuth()
 
     useEffect(() => {
-        fetch('http://localhost:4000/user/GetAllUsers') 
+        fetch('http://localhost:4000/user/GetAllUsers',
+		{
+			headers: {
+				'Authorization': `Bearer ${authToken}`
+			}
+		}
+		) 
             .then(response => response.json())
             .then((data: User[]) => setUsersList(data))
             .catch(error => console.error(error));

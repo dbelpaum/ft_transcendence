@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import ScoreRanking from './ScoreRanking';
+import { useAuth } from '../../../context/AuthContexte';
 
 interface Score {
   player: string;
@@ -8,10 +9,17 @@ interface Score {
 
 const ScorePage: React.FC = () => {
   const [scores, setScores] = useState<Score[]>([]);
-
+	const {authToken} = useAuth()
+	
   useEffect(() => {
     
-    fetch('http://localhost:4000/user/wins')
+    fetch('http://localhost:4000/user/wins',
+		{
+			headers: {
+				'Authorization': `Bearer ${authToken}`
+			}
+		}
+	)
       .then((response) => response.json())
       .then((data) => {
         if (Array.isArray(data)) {

@@ -23,7 +23,7 @@ interface UserInfo {
 }
 
 function Profil() {
-  const { user, login} = useAuth();
+  const { user, login, authToken} = useAuth();
   const userId = user?.id42;
   const [userInfo, setUserInfo] = useState<User | null>(null);
   const [showFriendshipList, setShowFriendshipList] = useState(false);
@@ -31,7 +31,12 @@ function Profil() {
 
   useEffect(() => {
     if (userId) {
-      fetch(`http://localhost:4000/user/${userId}`)
+      fetch(`http://localhost:4000/user/${userId}`,
+	  {
+		headers: {
+			'Authorization': `Bearer ${authToken}`
+		}
+	})
         .then(response => response.json())
         .then(data => setUserInfo(data))
         .catch(error => console.log(error));

@@ -24,6 +24,7 @@ const unlinkAsync = promisify(fs.unlink);
 
 
 @Controller('user')
+@UseGuards(AuthGuard('jwt'))
 export class UserController {
     constructor(private prisma: PrismaService) {}
     /* recuperer tous les users */

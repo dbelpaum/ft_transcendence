@@ -130,6 +130,7 @@ body {
 }
 .active .pie {
   transform: translateX(0) translateY(0);
+  z-index: 10000;
 }
 .active .hamburger path:nth-child(1) {
   transform: rotate(45deg);

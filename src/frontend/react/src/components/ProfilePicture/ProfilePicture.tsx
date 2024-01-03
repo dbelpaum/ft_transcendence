@@ -1,6 +1,7 @@
 import React, { useState , useEffect} from 'react';
 import DefaultProfilePic from '../../assets/default-profile.png';
 import ProfilePictureUploader from '../ProfilePictureUploader/ProfilePictureUploader';
+import { useAuth } from '../../context/AuthContexte';
 
 interface ProfilePictureProps {
     id42: number; // Identifiant du utilisateur
@@ -9,10 +10,17 @@ interface ProfilePictureProps {
 const ProfilePicture: React.FC<ProfilePictureProps> = ({ id42 }) => {
     const [isUploaderVisible, setUploaderVisible] = useState(false);
     const [profilePicUrl, setProfilePicUrl] = useState('');
+	const {authToken} = useAuth()
 
     useEffect(() => {
         if (id42) {
-            fetch(`http://localhost:4000/user/${id42}/image`)
+            fetch(`http://localhost:4000/user/${id42}/image`,
+				{
+					headers: {
+						'Authorization': `Bearer ${authToken}`
+					}
+				}
+			)
                 .then(response => {
                     if (!response.ok) {
                         throw new Error(`Erreur réseau: ${response.status}`);
