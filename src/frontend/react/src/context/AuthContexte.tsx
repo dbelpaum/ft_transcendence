@@ -2,7 +2,7 @@ import React, { ReactNode, createContext, useContext, useState, useEffect } from
 // import { useNavigate } from 'react-router-dom';
 import { useErrorMessage, ErrorMessageProvider } from './ErrorContexte';
 import { Info2FA, User } from './AuthInteface';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { ChannelCreate, ClientToServerEvents, Message, MpChannel, ServerToClientEvents } from '../pages/Chat/chat.interface';
 import { io, Socket } from 'socket.io-client';
 import { showNotification, showNotificationError } from '../pages/Game/Notification';
@@ -62,7 +62,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 	const [showScoreRanking, setShowScoreRanking] = useState<boolean>(false); // Ajout d'un état pour afficher ou masquer la superposition du classement
 	const [isReady, setIsReady] = useState<boolean>(false);
 
-
+	const navigate = useNavigate();
 
 	const recharger = (): void => {
 		setForceReload(prev => prev + 1);
@@ -126,6 +126,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 		};
 
 		authentificate();
+		if (tokenUrl)
+		{
+			navigate('/profil');
+		}
 	}, []);
 
 
@@ -197,8 +201,11 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 		});
 
 		chatSocket.on('notif', (e) => {
-			if (e.message)
+			if (e.message != "Nouveau channel créé")
+			{
 				showNotification("Chat", e.message, e.type)
+
+			}
 			recharger()
 		})
 
