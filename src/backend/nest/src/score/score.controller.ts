@@ -31,8 +31,21 @@ export class ScoreController {
             user2Score: Number(loserScore),
         };
 
-        console.log(data);
+        const winner = await this.prisma.user.findUnique({
+            where: { id: Number(winnerId) },
+            select:{ Wins: true}
+            
+        });
+
+        if (winner) {
+            await this.prisma.user.update({
+                where: { id: Number(winnerId) },
+                data: { Wins: winner.Wins + 1 },
+            });
+        }
         
+        console.log(winner);
+
         try {
             const newGame = await this.prisma.score.create({
                 data,

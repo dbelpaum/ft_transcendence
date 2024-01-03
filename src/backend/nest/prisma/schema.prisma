@@ -22,6 +22,7 @@ model User {
 	createdAt               DateTime      @default(now())
 	isTwoFactorAuthEnabled  Boolean       @default(false) // Double auth désactivée par défaut
 	twoFactorSecret         String? 	  @default("")
+  Wins                    Int           @default(0)
 	friendshipsAsRequester  Friendship[]  @relation("RequesterRelation")
 	friendshipsAsAddressee  Friendship[]  @relation("AddresseeRelation")
 	myScores                Score[]       @relation("UserScores1")

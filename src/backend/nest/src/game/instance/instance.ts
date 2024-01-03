@@ -203,6 +203,8 @@ export class Instance {
 		this.lobby.lobbyManager.deleteLobby(this.lobby.id);
 		this.stopGameRuntime();
 
+		this.updateScores(winner.auth.pseudo, leaver.auth.pseudo, this.scores[leaver.auth.pseudo]);
+
 		
 		// Faire la requête, attention il ne faut pas prendre en compte le score pour le gagnant ici
 	
