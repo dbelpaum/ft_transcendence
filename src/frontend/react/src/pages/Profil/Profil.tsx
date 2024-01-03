@@ -62,7 +62,6 @@ function Profil() {
       })
       .then(response => response.json())
       .then(data => {
-        console.log('Field updated:', data);
       })
       .catch(error => {
         console.error('Error updating field:', error);

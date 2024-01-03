@@ -47,13 +47,11 @@ export class ScoreController {
             });
         }
         
-        console.log(winner);
 
         try {
             const newGame = await this.prisma.score.create({
                 data,
             });
-            console.log(newGame);
             return newGame;
         } catch (error) {
             console.error(error);

@@ -232,7 +232,7 @@ export class Instance {
 				headers:
 				{
 					'Content-Type': 'application/json',
-					'x-internal-api-key': process.env.INTERNAL_SECRET_WORD,
+					'x-internal-secret': process.env.INTERNAL_SECRET_WORD,
 				}
 			});
 		} catch (error) {
