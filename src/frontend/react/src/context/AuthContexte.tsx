@@ -201,8 +201,11 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 		});
 
 		chatSocket.on('notif', (e) => {
-			if (e.message)
+			if (e.message != "Nouveau channel créé")
+			{
 				showNotification("Chat", e.message, e.type)
+
+			}
 			recharger()
 		})
 
