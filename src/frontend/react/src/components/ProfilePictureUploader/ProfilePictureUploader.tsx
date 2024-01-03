@@ -41,7 +41,7 @@ const ProfilePictureUploader: React.FC<ProfilePictureUploaderProps> = ({ id42, o
             return;
         }
 
-        const uploadUrl = `https://localhost:4000/user/${id42}/image`; // Utiliser HTTPS
+        const uploadUrl = `http://localhost:4000/user/${id42}/image`; // Utiliser HTTPS
         const formData = new FormData();
         formData.append('image', file);
         formData.append('id42', id42.toString());
