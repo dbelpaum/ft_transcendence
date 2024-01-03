@@ -2,7 +2,7 @@
 	box-sizing: border-box;
 }
 nav .menu{
-	z-index: 2;
+	z-index: 10001;
 }
 @media screen AND (max-width: 1200px) {
 	.buttonContainer{

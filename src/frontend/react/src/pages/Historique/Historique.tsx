@@ -20,6 +20,7 @@ interface Match {
 const Historique: React.FC = () => {
     const [matches, setMatches] = useState<Match[]>([]);
     const auth = useAuth();
+	const {authToken} = useAuth()
 
     useEffect(() => {
         if (auth.user && auth.user.id) {
@@ -47,7 +48,13 @@ const Historique: React.FC = () => {
 
     const fetchUserDetails = async (userId: number) => {
         try {
-            const response = await fetch(`http://localhost:4000/user/by-id/${userId}`);
+            const response = await fetch(`http://localhost:4000/user/by-id/${userId}`,
+				{
+					headers: {
+						'Authorization': `Bearer ${authToken}`
+					}
+				}
+			);
             if (!response.ok) {
                 throw new Error(`Erreur HTTP: ${response.status}`);
             }
@@ -60,7 +67,12 @@ const Historique: React.FC = () => {
 
     const fetchMatches = async (userId: number) => {
         try {
-            const response = await fetch(`http://localhost:4000/score/matches/${userId}`);
+            const response = await fetch(`http://localhost:4000/score/matches/${userId}`,
+			{
+				headers: {
+					'Authorization': `Bearer ${authToken}`
+				}
+			});
             if (!response.ok) {
                 throw new Error(`Erreur HTTP: ${response.status}`);
             }

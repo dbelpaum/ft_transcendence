@@ -1,13 +1,11 @@
 import { Module, NestModule, MiddlewareConsumer } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { SamTestController } from './sam-test/sam-test.controller';
 import { PrismaService } from './prisma.service';
 import { AuthentificationModule } from './authentification/authentification.module';
 import { ChatModule } from './chat/chat.module';
 
 import { ChannelModule } from './channel/channel.module';
-import { LogoutController } from './logout/logout.controller';
 import { ScheduleModule } from '@nestjs/schedule';
 import { UserController } from './user/user.controller';
 import * as session from 'express-session';
@@ -17,7 +15,7 @@ import { ScoreController } from './score/score.controller';
 
 @Module({
 	imports: [AuthentificationModule, ChatModule, ChannelModule, ScheduleModule.forRoot(), GameModule],
-	controllers: [AppController, SamTestController, LogoutController, UserController, FriendshipController, ScoreController],
+	controllers: [AppController, UserController, FriendshipController, ScoreController],
 	providers: [AppService, PrismaService],
 })
 

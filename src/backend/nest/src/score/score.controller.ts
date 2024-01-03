@@ -7,7 +7,9 @@ import { InternalRequestGuard } from './internal-api';
 @Controller('score')
 export class ScoreController {
 	constructor(private prisma: PrismaService) { }
+
     @Get('matches/:userId')
+	@UseGuards(AuthGuard('jwt'))
     async getUserMatches(@Param('userId') userId: string) {
         const userMatches = await this.prisma.score.findMany({
             where: {

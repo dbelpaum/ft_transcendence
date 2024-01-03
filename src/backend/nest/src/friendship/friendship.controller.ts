@@ -5,6 +5,7 @@ import { UserTokenInfo } from 'src/chat/chat.interface';
 
 
 @Controller('friendship')
+@UseGuards(AuthGuard('jwt'))
 export class FriendshipController {
 	constructor(private prisma: PrismaService) { }
 
@@ -16,7 +17,6 @@ export class FriendshipController {
 
 	// Get the list of my block people
 	@Get("/blockList")
-	@UseGuards(AuthGuard('jwt'))
 	async getBlockList(@Req() req: Request & { user: UserTokenInfo }): Promise<number[]> {
 		const blockedFriendships = await this.prisma.friendship.findMany({
 			where: {
@@ -34,7 +34,6 @@ export class FriendshipController {
 
 
 @Get(':userId/friends-and-blocked')
-@UseGuards(AuthGuard('jwt'))
 async getFriendsAndBlocked(@Param('userId') userId: string) {
     const friends = await this.prisma.friendship.findMany({
         where: {
@@ -91,7 +90,6 @@ async getFriendsAndBlocked(@Param('userId') userId: string) {
 
 
 	@Post(':requesterId/add-friend/:addresseeId')
-	@UseGuards(AuthGuard('jwt'))
 	async addFriend(
 		@Param('requesterId') requesterId: string,
 		@Param('addresseeId') addresseeId: string
@@ -148,7 +146,6 @@ async getFriendsAndBlocked(@Param('userId') userId: string) {
 	// FriendshipController
 
 	@Post(':requesterId/remove-friend/:addresseeId')
-	@UseGuards(AuthGuard('jwt'))
 	async removeFriend(
 		@Param('requesterId') requesterId: string,
 		@Param('addresseeId') addresseeId: string
@@ -190,7 +187,6 @@ async getFriendsAndBlocked(@Param('userId') userId: string) {
 
 
 	@Post(':requesterId/block/:addresseeId')
-	@UseGuards(AuthGuard('jwt'))
 	async blockUser(
 		@Param('requesterId') requesterId: string,
 		@Param('addresseeId') addresseeId: string
@@ -239,7 +235,6 @@ async getFriendsAndBlocked(@Param('userId') userId: string) {
 
 
 	@Post(':requesterId/unblock/:addresseeId')
-	@UseGuards(AuthGuard('jwt'))
 	async unblockUser(
 		@Param('requesterId') requesterId: string,
 		@Param('addresseeId') addresseeId: string
@@ -275,13 +270,5 @@ async getFriendsAndBlocked(@Param('userId') userId: string) {
 
 		return unblockedFriendship;
 	}
-
-
-
-
-
-
-
-
 
 }

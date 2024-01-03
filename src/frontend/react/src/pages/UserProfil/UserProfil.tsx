@@ -50,7 +50,12 @@ const UserProfile: React.FC = () => {
 
 
 
-		fetch(`http://localhost:4000/user/by-pseudo/${pseudo}`)
+		fetch(`http://localhost:4000/user/by-pseudo/${pseudo}`,
+		{
+			headers: {
+				'Authorization': `Bearer ${authToken}`
+			}
+		})
 			.then(response => response.json())
 			.then((data: UserInfo) => {
 				setUserInfo(data);
@@ -148,7 +153,13 @@ const UserProfile: React.FC = () => {
 		if (!user?.id42 || !userInfo?.id42) {
 			return;
 		}
-		fetch(`http://localhost:4000/friendship/${user?.id}/relation/${userInfo?.id}`)
+		fetch(`http://localhost:4000/friendship/${user?.id}/relation/${userInfo?.id}`,
+		{
+			headers: {
+				'Authorization': `Bearer ${authToken}`
+			}
+		}
+		)
 			.then(response => response.json())
 			.then((response) => {
 				setFriendshipStatus(response.status);

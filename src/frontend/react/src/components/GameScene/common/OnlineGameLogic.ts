@@ -277,14 +277,16 @@ export class OnlineGameLogic {
 		// Back to menu button
 		const backToMenuButton = document.createElement('button');
 		backToMenuButton.innerText = 'Back to menu';
-		backToMenuButton.addEventListener('click', () => {
+		window.addEventListener('click', () => {
 			window.location.href = '/game';
 		});
+	
 		overlay.appendChild(backToMenuButton);
 
 		// Append overlay to the body
 		document.body.appendChild(overlay);
 		this.dispose();
+
 	}
 
 	private receiveGameState(data: any) {
