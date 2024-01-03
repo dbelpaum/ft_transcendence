@@ -1,4 +1,4 @@
 .env
 **/node_modules/
 src/backend/nest/dist/main.js
-src/backend/nest/prisma/migrations/*
+# src/backend/nest/prisma/migrations/*
