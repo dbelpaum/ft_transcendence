@@ -24,7 +24,7 @@ app.use('/uploads', express.static(join(__dirname, '..', 'uploads')));
     origin: "http://localhost:3000",
 	credentials:true, // Autorise les requêtes de l'application React
 	methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
-    allowedHeaders: 'Content-Type, Accept, Authorization',
+    allowedHeaders: 'Content-Type, Accept, Authorization, x-internal-api-key',
   });
   	await app.listen(4000);
 }

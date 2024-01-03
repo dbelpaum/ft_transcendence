@@ -229,6 +229,11 @@ export class Instance {
 			// Mettre à jour les scores
 			await fetch(`http://localhost:4000/score/create_match/${winnerId.id}/${loserId.id}/${loserScore}`, {
 				method: 'POST',
+				headers:
+				{
+					'Content-Type': 'application/json',
+					'x-internal-api-key': process.env.INTERNAL_SECRET_WORD,
+				}
 			});
 		} catch (error) {
 			console.error('Error updating scores:', error);

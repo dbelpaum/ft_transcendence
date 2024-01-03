@@ -2,11 +2,11 @@ import { Controller, Get, Param, Post, UseGuards } from '@nestjs/common';
 import { PrismaService } from 'src/prisma.service';
 import { AuthGuard } from '@nestjs/passport';
 import { UserTokenInfo } from 'src/chat/chat.interface';
+import { InternalRequestGuard } from './internal-api';
 
 @Controller('score')
 export class ScoreController {
 	constructor(private prisma: PrismaService) { }
-
     @Get('matches/:userId')
     async getUserMatches(@Param('userId') userId: string) {
         const userMatches = await this.prisma.score.findMany({
@@ -23,6 +23,7 @@ export class ScoreController {
 
 
     @Post('create_match/:winnerId/:loserId/:loserScore')
+	@UseGuards(InternalRequestGuard)
     async createScore(@Param('winnerId') winnerId: string, @Param('loserId') loserId: string, @Param('loserScore') loserScore: string) {
         const data = {
             user1Id: Number(winnerId),
