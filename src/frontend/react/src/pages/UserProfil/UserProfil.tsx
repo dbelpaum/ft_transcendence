@@ -55,7 +55,7 @@ const UserProfile: React.FC = () => {
 			.then((data: UserInfo) => {
 				setUserInfo(data);
 			})
-			.catch(error => console.log(error));
+			.catch(() => navigate('/UserList'));
 
 	}, [pseudo]);
 

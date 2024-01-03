@@ -32,6 +32,7 @@ function App() {
 					<div>
 						<NavBar />
 						<Routes>
+							<Route path="*" element={<Navigate to="/" />} />
 							<Route path="/" element={<Home />} />
 							<Route path="/game" element={<ProtectedElement><Game /></ProtectedElement>} />
 							<Route path="/chat" element={<ProtectedElement><Chat /></ProtectedElement>} />
