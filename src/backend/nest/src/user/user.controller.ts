@@ -65,6 +65,22 @@ export class UserController {
       });
     }
 
+    @Get('victories/:userId')
+    @UseGuards(AuthGuard('jwt'))
+    async getUserVictories(@Param('userId') userId: string) {
+        const victories = await this.prisma.user.findFirst({
+            where: {
+                id42 : Number(userId),
+            },
+            select: {
+              Wins:true,
+            },
+        });
+        console.log('Nombre de victoires: ' + victories.Wins);
+        if (!victories) return { victories: 0 };
+        return { victories: victories.Wins };
+    }
+
 
     @Get(':id')
     @UseGuards(AuthGuard('jwt'))

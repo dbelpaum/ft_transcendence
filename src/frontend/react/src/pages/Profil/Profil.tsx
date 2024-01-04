@@ -27,6 +27,7 @@ function Profil() {
   const userId = user?.id42;
   const [userInfo, setUserInfo] = useState<User | null>(null);
   const [showFriendshipList, setShowFriendshipList] = useState(false);
+  const [userVictories, setUserVictories] = useState(0);
 
 
   useEffect(() => {
@@ -42,6 +43,20 @@ function Profil() {
         .catch(error => console.log(error));
     }
   }, [userId]);
+
+  useEffect(() => {
+    if (userId) {
+      fetch(`http://localhost:4000/user/victories/${userId}`, {
+        headers: {
+          'Authorization': `Bearer ${authToken}`
+        }
+      })
+      .then(response => response.json())
+      .then(data => setUserVictories(data.victories))
+      .catch(error => console.log(error));
+    }
+  }, [userId, authToken]);
+  
 
   const saveField = (field: keyof User, value: string) => {
     
@@ -116,6 +131,10 @@ function Profil() {
 
         )}
 
+<div className="profil-victories">
+  <h3>Nombre de Victoires : {userVictories}</h3>
+</div>
+
 	<Button2FA />
 	<div className="button-action">
 		{user?.id && <FriendshipList userId={user?.id} />}
@@ -124,7 +143,7 @@ function Profil() {
 
   <Link to="/historique">Historique des parties</Link>
   
-
+    
       </div>
     </main>
   );
