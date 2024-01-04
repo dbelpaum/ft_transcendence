@@ -55,9 +55,6 @@ const Button2FA = () => {
 		setQrCodeImage(data.qrCode)
 		setShowModal2FA(true)
 		setIsActive(true);
-		console.log("normalement, l'url")
-		console.log(data.qrCode)
-		console.log("2FA activée :", data);
     })
     .catch(error => console.error('Erreur lors de l\'activation de la 2FA:', error));
   };

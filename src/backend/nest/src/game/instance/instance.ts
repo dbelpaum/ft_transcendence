@@ -215,8 +215,23 @@ export class Instance {
 		try {
 			// Récupérer les ID des utilisateurs simultanément
 			const [winnerResponse, loserResponse] = await Promise.all([
-				fetch(`http://localhost:4000/user/by-pseudo-id/${winnerPseudo}`),
-				fetch(`http://localhost:4000/user/by-pseudo-id/${loserPseudo}`)
+				fetch(`http://localhost:4000/user/by-pseudo-id/${winnerPseudo}`,
+				{
+					headers:
+					{
+						'Content-Type': 'application/json',
+						'x-internal-secret': process.env.INTERNAL_SECRET_WORD,
+					}
+				}
+				),
+				fetch(`http://localhost:4000/user/by-pseudo-id/${loserPseudo}`,
+				{
+					headers:
+					{
+						'Content-Type': 'application/json',
+						'x-internal-secret': process.env.INTERNAL_SECRET_WORD,
+					}
+				})
 			]);
 	
 			// Convertir les réponses en JSON
@@ -232,7 +247,7 @@ export class Instance {
 				headers:
 				{
 					'Content-Type': 'application/json',
-					'x-internal-api-key': process.env.INTERNAL_SECRET_WORD,
+					'x-internal-secret': process.env.INTERNAL_SECRET_WORD,
 				}
 			});
 		} catch (error) {

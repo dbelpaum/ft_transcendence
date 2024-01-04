@@ -45,7 +45,6 @@ export class LobbyManager {
 				avatar: imageURL	// A changer avec une requête bdd ou autre
 			}
 		} catch (e) {
-			console.log(e)
 			client.disconnect(); // Déconnectez le client en cas d'échec de la vérification
 			return;
 		}

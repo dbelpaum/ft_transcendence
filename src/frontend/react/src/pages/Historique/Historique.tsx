@@ -95,7 +95,6 @@ const Historique: React.FC = () => {
             }));
             matchesWithUserDetails.sort((a, b) => new Date(b.playedAt).getTime() - new Date(a.playedAt).getTime());
 
-            console.log('Matches:', matchesWithUserDetails);
 
             setMatches(matchesWithUserDetails);
         } catch (error) {

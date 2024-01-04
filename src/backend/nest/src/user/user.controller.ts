@@ -19,16 +19,17 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { promisify } from 'util';
 import * as fs from 'fs';
+import { InternalRequestGuard } from 'src/score/internal-api';
 
 const unlinkAsync = promisify(fs.unlink);
 
 
 @Controller('user')
-@UseGuards(AuthGuard('jwt'))
 export class UserController {
     constructor(private prisma: PrismaService) {}
     /* recuperer tous les users */
     @Get('GetAllUsers')
+    @UseGuards(AuthGuard('jwt'))
     async getAllUsers() {
     return await this.prisma.user.findMany();
     }
@@ -37,6 +38,8 @@ export class UserController {
 
     /* GET depuis un pseudo */
     @Get('by-pseudo/:pseudo')
+    @UseGuards(AuthGuard('jwt'))
+
     async getUserByPseudo(@Param('pseudo') pseudo: string) {
         return await this.prisma.user.findUnique({
             where: { pseudo },
@@ -44,6 +47,7 @@ export class UserController {
     }
 
     @Get('by-pseudo-id/:pseudo')
+	@UseGuards(InternalRequestGuard)
     async getUserIdByPseudo(@Param('pseudo') pseudo: string) {
         return await this.prisma.user.findUnique({
             where: { pseudo },
@@ -53,7 +57,8 @@ export class UserController {
     }
 
   // ici
-    @Get('wins') 
+    @Get('wins')
+    @UseGuards(AuthGuard('jwt'))
     async getUsersWins() {
       return await this.prisma.user.findMany({
         select: { pseudo: true, Wins: true },
@@ -62,28 +67,26 @@ export class UserController {
 
 
     @Get(':id')
+    @UseGuards(AuthGuard('jwt'))
     async getUserById42(@Param('id') id: string) {
-      console.log(id);
         const user = await this.prisma.user.findUnique({
             where: { id42: Number(id) },
         });
 
-        console.log(user);
         return user ? user : null;
     }
 
     @Get('by-id/:id')
+    @UseGuards(AuthGuard('jwt'))
     async getUserById(@Param('id') id: string) {
-      console.log(id);
         const user = await this.prisma.user.findUnique({
             where: { id: Number(id) },
         });
-
-        console.log(user);
         return user ? user : null;
     }
     
     @Get(':id/pseudo')
+    @UseGuards(AuthGuard('jwt'))
     async getPseudo(@Param('id') id: string) {
         const user = await this.prisma.user.findUnique({
             where: { id42: Number(id) },
@@ -93,6 +96,7 @@ export class UserController {
     }
     
     @Get(':id/email')
+    @UseGuards(AuthGuard('jwt'))
     async getEmail(@Param('id') id: string) {
         const user = await this.prisma.user.findUnique({
             where: { id42: Number(id) },
@@ -102,6 +106,7 @@ export class UserController {
     }
 
     @Get(':id/firstname')
+    @UseGuards(AuthGuard('jwt'))
     async getFirstName(@Param('id') id: string) {
         const user = await this.prisma.user.findUnique({
             where: { id42: Number(id) },
@@ -111,6 +116,7 @@ export class UserController {
     }
 
     @Get(':id/lastname')
+    @UseGuards(AuthGuard('jwt'))
     async getLastName(@Param('id') id: string) {
         const user = await this.prisma.user.findUnique({
             where: { id42: Number(id) },
@@ -120,6 +126,7 @@ export class UserController {
     }
     
     @Get(':id/image')
+    @UseGuards(AuthGuard('jwt'))
     async getImage(@Param('id') id: string) {
         const user = await this.prisma.user.findUnique({
             where: { id42: Number(id) },

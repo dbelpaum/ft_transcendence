@@ -43,7 +43,6 @@ const UserProfile: React.FC = () => {
 
 	useEffect(() => {
 		if (!pseudo) {
-			console.log("Aucun pseudo utilisateur fourni");
 			return;
 		}
 
@@ -68,7 +67,6 @@ const UserProfile: React.FC = () => {
 
 	useEffect(() => {
 		if (!userInfo) {
-			console.log("Aucun pseudo utilisateur fourni");
 			return;
 		}
 
@@ -118,7 +116,6 @@ const UserProfile: React.FC = () => {
 
 	useEffect(() => {
 		if (!userInfo) {
-			console.log("Aucun pseudo utilisateur fourni");
 			return;
 		}
 
@@ -167,11 +164,9 @@ const UserProfile: React.FC = () => {
 					setButtonStatus('removeFriend');
 				} else if (friendshipStatus === 'blocked') {
 					setButtonStatus('unblock');
-					console.log('On rentre dans le else if')
 				} else {
 
 					setButtonStatus('addFriend');
-					console.log('On rentre dans le else')
 				}
 			})
 			.catch(error => console.log(error));
@@ -182,7 +177,6 @@ const UserProfile: React.FC = () => {
 		return <div>Chargement...</div>;
 	}
 
-	console.log('Friendship status initial ' + friendshipStatus);
 
 	const handleAddFriendClick = () => {
 		// Envoyer la requête d'ami

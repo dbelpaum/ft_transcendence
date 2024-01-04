@@ -87,7 +87,6 @@ const ProfilePictureUploader: React.FC<ProfilePictureUploaderProps> = ({ id42, o
             }
 
             const responseData = await response.json();
-            console.log(responseData);
 
             onUploadSuccess(responseData.imageUrl);
         } catch (error) {

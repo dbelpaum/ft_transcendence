@@ -44,8 +44,6 @@ const InfoMp: React.FC<userInfoMpProps> = ({ channelUtility, mpChannel}) => {
 		if (socket && channelUtility && channelUtility.socket && channelUtility.me)
 		{
 			socket.once("server.lobby.state", (data: any) => {
-				console.log("Un lobby est créé, voila les infos:");
-				console.log(data)
 				const theUrlGame = `http://localhost:3000/game?room=${data.lobbyId}`
 				setInLobby(true);
 				setLobbyData(data);
