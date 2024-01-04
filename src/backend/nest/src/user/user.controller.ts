@@ -76,7 +76,6 @@ export class UserController {
               Wins:true,
             },
         });
-        console.log('Nombre de victoires: ' + victories.Wins);
         if (!victories) return { victories: 0 };
         return { victories: victories.Wins };
     }
@@ -156,10 +155,13 @@ export class UserController {
     @Patch(':id/pseudo')
     @UseGuards(AuthGuard('jwt'))
     async updatePseudo(@Param('id') id: string, @Body('pseudo') pseudo: string) {
-        return await this.prisma.user.update({
-            where: { id42: Number(id) },
-            data: { pseudo },
-        });
+      try{
+        await this.prisma.user.update({
+           where: { id42: Number(id) },
+           data: { pseudo },
+       });
+      }
+      catch(e){}
     }
 
 
