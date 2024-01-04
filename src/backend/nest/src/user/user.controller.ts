@@ -156,10 +156,13 @@ export class UserController {
     @Patch(':id/pseudo')
     @UseGuards(AuthGuard('jwt'))
     async updatePseudo(@Param('id') id: string, @Body('pseudo') pseudo: string) {
-        return await this.prisma.user.update({
-            where: { id42: Number(id) },
-            data: { pseudo },
-        });
+      try{
+        await this.prisma.user.update({
+           where: { id42: Number(id) },
+           data: { pseudo },
+       });
+      }
+      catch(e){}
     }
 
 

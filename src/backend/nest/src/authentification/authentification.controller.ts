@@ -49,12 +49,10 @@ export class AuthentificationController {
   @Get('42/error')
   error() {
     // Gérer la page d'erreur
-    return 'Erreur d\'authentification';
   }
 
   @Get('42/callback')
   @UseInterceptors(new MutexInterceptor())
-  @UseGuards(AuthGuard('42'))
   async callback42(@Req() req, @Res() res: Response) {
 	try{
 		// Gérer le callback après l'authentification
