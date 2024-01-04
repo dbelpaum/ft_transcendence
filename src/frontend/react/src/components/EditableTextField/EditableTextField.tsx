@@ -1,29 +1,32 @@
 import React, { useState } from 'react';
 import './EditableTextField.css';
+import exp from 'constants';
 
 interface EditableTextFieldProps {
   label: string;
   value: string;
   onSave: (value: string) => void;
   editable?: boolean;
-  maxLength?: number; // Ajout d'une nouvelle propriété pour la limite de caractères
+  maxLength?: number;
+  minLength?: number;
 }
 
-function EditableTextField({ label, value, onSave, editable = true, maxLength = 25 }: EditableTextFieldProps) {
+function EditableTextField({ label, value, onSave, editable = true, maxLength = 25, minLength = 3 }: EditableTextFieldProps) {
   const [inputValue, setInputValue] = useState(value || '');
   const [isEdited, setIsEdited] = useState(false);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const newValue = e.target.value;
-    if (!maxLength || newValue.length <= maxLength) { // Vérifie la limite de caractères
-      setInputValue(newValue);
-      setIsEdited(true);
-    }
+    setInputValue(e.target.value);
+    setIsEdited(true);
   };
 
   const handleSave = () => {
-    onSave(inputValue);
-    setIsEdited(false);
+    if (inputValue.length >= minLength && inputValue.length <= maxLength) {
+      onSave(inputValue);
+      setIsEdited(false);
+    }/*  else {
+      alert(`La longueur du texte doit être entre ${minLength} et ${maxLength} caractères.`);
+    } */
   };
 
   return (
@@ -31,9 +34,15 @@ function EditableTextField({ label, value, onSave, editable = true, maxLength = 
       <label>{label}: </label>
       {editable ? (
         <>
-          <input type="text" value={inputValue} onChange={handleChange} maxLength={maxLength} />
+          <input type="text" value={inputValue} onChange={handleChange} />
           {isEdited && (
-            <button className='save-button' onClick={handleSave}>Sauvegarder</button>
+            <button 
+              className='save-button' 
+              onClick={handleSave}
+              disabled={inputValue.length < minLength || inputValue.length > maxLength}
+            >
+              Sauvegarder
+            </button>
           )}
         </>
       ) : (
