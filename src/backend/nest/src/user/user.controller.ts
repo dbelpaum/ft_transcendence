@@ -76,7 +76,6 @@ export class UserController {
               Wins:true,
             },
         });
-        console.log('Nombre de victoires: ' + victories.Wins);
         if (!victories) return { victories: 0 };
         return { victories: victories.Wins };
     }
