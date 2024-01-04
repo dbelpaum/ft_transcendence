@@ -418,7 +418,6 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		  
 		  // Si la vérification échoue, une exception sera lancée
 		} catch (e) {
-			console.log("client disconnected" + e)
 		client.disconnect(); // Déconnectez le client en cas d'échec de la vérification
 	  }
     this.logger.log(`Socket connected: ${client.id}`)

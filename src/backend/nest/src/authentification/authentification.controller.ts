@@ -104,11 +104,12 @@ export class AuthentificationController {
 		}
 		else
 		{
+			const isConnected = !findUser.isTwoFactorAuthEnabled
 			dataToken = {
 				id: findUser.id,
 				id42: findUser.id42,
 				pseudo: findUser.pseudo,
-				isConnected: !findUser.isTwoFactorAuthEnabled
+				isConnected: isConnected
 
 			}
 		}
@@ -157,6 +158,7 @@ export class AuthentificationController {
 		const data = await this.prisma.user.findUnique({
 		    where: { id: req.user.id},
 		});
+		if (!data) return
 		return {isActive: data.isTwoFactorAuthEnabled}
 	}
 
