@@ -1,45 +1,37 @@
-## Usage
+# FT_TRANSCENDENCE
 
-Quand on arrive sur le projet, d’abord il faut creer son propre fichier d’environnement !
-Pour ça il faut copier le example.env et le transformer en env.
-Il faut faire ça que la premiere fois, apres votre .env sera gardé, et comme il est dans le gitignore, il ne sera jamais push en ligne
+A website where you can play pong and chat with your friends
 
-
-cp example.env .env
-
-Puis modifier le .env
+![](https://github.com/dbelpaum/ft_transcendence/blob/master/demo%20transcendence.gif)
 
 
-docker compose up --build
+Running under NestJS (backend) and React (frontend), written in TypeScript.
 
-Et ça lance tout les dockers.
+#Build
+Requires Docker. [Get Docker](Https://Docs.Docker.Com/Get-Docker/)
+Copy the following to a `.env` file at the root of the repo.
+```
+#Postgres database information
+POSTGRES_USER=samir
+POSTGRES_PASSWORD=samir
+POSTGRES_DB=transcendance
 
-### Stopper tous les conteners
+#URL for prisma to connect with postgres
+DATABASE_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432
 
-Si on veut être sur que tout est stopé, on peut executer ce groupe de commande :
+#42 API authentification
+## Create your own 42 app : https://profile.intra.42.fr/oauth/applications/
+FORTYTWO_APP_ID="YOUR_APP_ID"
+FORTYTWO_APP_SECRET="YOUR_APP_SECRET"
+FORTYTWO_CALLBACK=http://localhost:4000/authentification/42/callback
 
+# Secret key for JWT
+SECRET_JWT=azpxmvfsdozpw46fd54wxj78a9ze16mlk56
 
-docker stop $(docker ps -aq); docker rm $(docker ps -aq); docker volume rm $(docker volume ls); docker system prune;docker volume prune;
+# Secret key for internal requests
+INTERNAL_SECRET_WORD=wnaq7y3F2j6Q3C3w7a9z3m6dn5
 
+AUTH_NAME="Transcendance"
+```
 
-### La visite guidée
-
-- **Le front** : Commençons par aller voir le front en react.
-Il faut aller sur http://localhost:3000
-
-Attention, pas https !
-- **Le back** : Pour voir si tout fonctionne, allons voir ces 2 urls
-    - http://localhost:4000 → Censé ecrire un texte de joie ou de bienvenue
-    - http://localhost:4000/sam-test → Fait une requete en bdd, la réponse est sous forme de json
-    
-
-    💡 Hésitez pas a prendre en main postman, il permet de tester les requestes de manière simple.
-    Pratiquement indispensable si on travaille sur nest
-
-    
-- **Prisma** : Pour voir et surtout ajouter des éléments dans la bdd !
-Pour cela, allez sur http://localhost:5555
-
-
-💡 Attention, parfois au moment d’enregistrer ou de modifier un volume, il y aura des problemes de permissions.
-Un bon ptit sudo nous regle le soucis en général ^^
+Then you can run `docker compose up --build`
