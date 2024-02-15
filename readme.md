@@ -1,6 +1,7 @@
-# FT_TRANSCENDENCE
+# ft_transcendence
 
-A website where you can play pong and chat with your friends
+A website where you can play pong and chat with your friends.
+
 
 ![](https://github.com/dbelpaum/ft_transcendence/blob/master/demo%20transcendence.gif)
 
@@ -10,6 +11,7 @@ Running under NestJS (backend) and React (frontend), written in TypeScript.
 # Build
 
 Requires Docker. [Get Docker](Https://Docs.Docker.Com/Get-Docker/)
+
 Copy the following to a `.env` file at the root of the repo.
 ```
 #Postgres database information
@@ -36,3 +38,5 @@ AUTH_NAME="Transcendance"
 ```
 
 Then you can run `docker compose up --build`
+
+Head to `http://localhost:3000` and log in with your 42 intranet account.
