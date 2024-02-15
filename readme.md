@@ -7,7 +7,8 @@ A website where you can play pong and chat with your friends
 
 Running under NestJS (backend) and React (frontend), written in TypeScript.
 
-#Build
+# Build
+
 Requires Docker. [Get Docker](Https://Docs.Docker.Com/Get-Docker/)
 Copy the following to a `.env` file at the root of the repo.
 ```
